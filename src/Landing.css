@@ -1,0 +1,514 @@
+/* =================================
+   RESET
+================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =================================
+   LANDING PAGE
+================================= */
+
+.landing {
+  position: relative;
+
+  width: 100vw;
+  height: 100vh;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #294d3d 0%,
+      #142c22 45%,
+      #07120e 100%
+    );
+
+  color: white;
+
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+
+/* =================================
+   FADE OUT
+================================= */
+
+.landing-finished {
+  opacity: 0;
+  transform: scale(1.03);
+}
+
+
+/* =================================
+   BACKGROUND GLOW
+================================= */
+
+.background-glow {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  width: 750px;
+  height: 750px;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(69, 214, 111, 0.20),
+      transparent 68%
+    );
+
+  filter: blur(30px);
+
+  z-index: 1;
+}
+
+
+/* =================================
+   GROUND
+================================= */
+
+.road {
+  position: absolute;
+
+  left: -10%;
+  bottom: -35%;
+
+  width: 120%;
+  height: 65%;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(0, 0, 0, 0.55)
+    );
+
+  transform:
+    perspective(700px)
+    rotateX(55deg);
+
+  transform-origin: bottom;
+
+  z-index: 2;
+}
+
+
+/* =================================
+   TOP BAR
+================================= */
+
+.top-bar {
+  position: absolute;
+
+  top: 30px;
+  left: 40px;
+
+  z-index: 20;
+}
+
+.brand {
+  font-size: 20px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+.brand span {
+  color: #45d66f;
+}
+
+
+/* =================================
+   LOGO CONTAINER
+================================= */
+
+.logo-container {
+  position: absolute;
+
+  top: 42%;
+  left: 50%;
+
+  width: 520px;
+  height: 520px;
+
+  transform: translate(-50%, -50%);
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 10;
+}
+
+
+/* =================================
+   LOGO GLOW
+================================= */
+
+.logo-glow {
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(69, 214, 111, 0.25),
+      rgba(69, 214, 111, 0.08) 40%,
+      transparent 70%
+    );
+
+  filter: blur(35px);
+
+  animation:
+    logoGlow 3s ease-in-out infinite;
+}
+
+
+/* =================================
+   MAIN LOGO
+================================= */
+
+.main-logo {
+  position: relative;
+
+  width: 470px;
+  height: 470px;
+
+  object-fit: contain;
+
+  z-index: 2;
+
+  animation:
+    logoAppear 1.5s ease forwards;
+
+  filter:
+    drop-shadow(
+      0 20px 40px
+      rgba(0, 0, 0, 0.45)
+    );
+}
+
+
+/* =================================
+   LOGO APPEAR
+================================= */
+
+@keyframes logoAppear {
+
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* =================================
+   LOGO GLOW
+================================= */
+
+@keyframes logoGlow {
+
+  0% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+
+  100% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+}
+
+
+/* =================================
+   WELCOME TEXT
+================================= */
+
+.welcome {
+  position: absolute;
+
+  left: 50%;
+  bottom: 16%;
+
+  width: 100%;
+
+  transform:
+    translateX(-50%)
+    translateY(25px);
+
+  text-align: center;
+
+  z-index: 15;
+
+  opacity: 0;
+}
+
+
+/* =================================
+   WELCOME APPEAR
+================================= */
+
+.animation-started .welcome {
+  animation:
+    welcomeAppear 1s ease 0.8s forwards;
+}
+
+
+@keyframes welcomeAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(-50%)
+      translateY(0);
+  }
+}
+
+
+/* =================================
+   WELCOME HEADINGS
+================================= */
+
+.welcome h1 {
+  margin: 0;
+
+  font-size: 30px;
+
+  line-height: 1.25;
+
+  font-weight: 500;
+}
+
+.green-text {
+  color: #45d66f;
+
+  font-weight: 700 !important;
+}
+
+
+/* =================================
+   SUBTEXT
+================================= */
+
+.welcome p {
+  margin-top: 10px;
+
+  font-size: 16px;
+
+  letter-spacing: 1px;
+
+  color:
+    rgba(255, 255, 255, 0.7);
+}
+
+
+/* =================================
+   GET STARTED BUTTON
+================================= */
+
+.start-button {
+  position: absolute;
+
+  left: 50%;
+  bottom: 8%;
+
+  transform: translateX(-50%);
+
+  z-index: 20;
+
+  padding: 14px 32px;
+
+  border: 2px solid #45d66f;
+
+  border-radius: 30px;
+
+  background: transparent;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+
+.start-button span {
+  margin-left: 10px;
+
+  font-size: 20px;
+}
+
+
+.start-button:hover {
+  background: #45d66f;
+
+  color: #07120e;
+
+  transform:
+    translateX(-50%)
+    translateY(-3px);
+
+  box-shadow:
+    0 10px 30px
+    rgba(69, 214, 111, 0.25);
+}
+
+
+/* =================================
+   FOOTER
+================================= */
+
+.bottom-section {
+  position: absolute;
+
+  left: 50%;
+  bottom: 20px;
+
+  transform: translateX(-50%);
+
+  width: 100%;
+
+  text-align: center;
+
+  z-index: 20;
+}
+
+
+.bottom-section p {
+  margin: 0;
+
+  font-size: 13px;
+
+  letter-spacing: 1px;
+
+  color:
+    rgba(255, 255, 255, 0.6);
+}
+
+
+/* =================================
+   TABLET
+================================= */
+
+@media (max-width: 900px) {
+
+  .logo-container {
+    width: 450px;
+    height: 450px;
+
+    top: 40%;
+  }
+
+  .main-logo {
+    width: 410px;
+    height: 410px;
+  }
+
+  .welcome {
+    bottom: 16%;
+  }
+}
+
+
+/* =================================
+   MOBILE
+================================= */
+
+@media (max-width: 600px) {
+
+  .top-bar {
+    top: 20px;
+    left: 20px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .logo-container {
+    width: 330px;
+    height: 330px;
+
+    top: 36%;
+  }
+
+  .main-logo {
+    width: 310px;
+    height: 310px;
+  }
+
+  .welcome {
+    bottom: 17%;
+  }
+
+  .welcome h1 {
+    font-size: 23px;
+  }
+
+  .welcome p {
+    font-size: 14px;
+  }
+
+  .start-button {
+    bottom: 7%;
+
+    padding: 12px 25px;
+  }
+}

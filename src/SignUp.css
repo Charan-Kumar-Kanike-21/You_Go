@@ -1,0 +1,391 @@
+/* =========================================
+   SIGN UP PAGE
+   NITK CYCLE SHARING THEME
+   ========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================================
+   MAIN PAGE
+   ========================================= */
+
+.signup-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(45, 170, 83, 0.30) 0%,
+      rgba(10, 35, 25, 0.15) 35%,
+      transparent 65%
+    ),
+    linear-gradient(
+      135deg,
+      #061a13 0%,
+      #09251a 45%,
+      #061810 100%
+    );
+
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* =========================================
+   BACKGROUND GLOW
+   ========================================= */
+
+.signup-page::before {
+  content: "";
+
+  position: absolute;
+
+  width: 500px;
+  height: 500px;
+
+  border-radius: 50%;
+
+  background: rgba(49, 210, 104, 0.10);
+
+  filter: blur(100px);
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   SIGNUP CARD
+   ========================================= */
+
+.signup-card {
+  width: 100%;
+  max-width: 470px;
+
+  padding: 38px 42px;
+
+  position: relative;
+  z-index: 1;
+
+  background: rgba(8, 31, 22, 0.88);
+
+  border: 1px solid rgba(60, 224, 112, 0.35);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 0 40px rgba(32, 190, 86, 0.12),
+    0 20px 60px rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(12px);
+
+  text-align: center;
+}
+
+
+/* =========================================
+   LOGO
+   ========================================= */
+
+.signup-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+.signup-logo img {
+  width: 200px;
+  height: 200px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 0 12px rgba(72, 225, 113, 0.35));
+
+  transition: transform 0.3s ease;
+}
+
+.signup-logo img:hover {
+  transform: scale(1.04);
+}
+
+
+/* =========================================
+   HEADING
+   ========================================= */
+
+.signup-card h1 {
+  margin: 0 0 8px;
+
+  color: #f4fff7;
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+}
+
+
+/* =========================================
+   SUBTITLE
+   ========================================= */
+
+.signup-subtitle {
+  margin: 0 0 28px;
+
+  color: #a8bdb1;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   INPUT GROUP
+   ========================================= */
+
+.input-group {
+  text-align: left;
+
+  margin-bottom: 17px;
+}
+
+
+/* LABEL */
+
+.input-group label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #d8e9df;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+/* INPUT */
+
+.input-group input {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  border: 1px solid rgba(160, 190, 173, 0.25);
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* INPUT PLACEHOLDER */
+
+.input-group input::placeholder {
+  color: #789087;
+}
+
+
+/* INPUT FOCUS */
+
+.input-group input:focus {
+  border-color: #35e276;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 0 0 2px rgba(53, 226, 118, 0.10),
+    0 0 15px rgba(53, 226, 118, 0.08);
+}
+
+
+/* =========================================
+   TERMS
+   ========================================= */
+
+.terms {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin: 8px 0 22px;
+
+  text-align: left;
+
+  color: #9db3a7;
+
+  font-size: 12px;
+}
+
+.terms input {
+  width: 14px;
+  height: 14px;
+
+  accent-color: #35e276;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   CREATE ACCOUNT BUTTON
+   ========================================= */
+
+.signup-button {
+  width: 100%;
+
+  padding: 13px 20px;
+
+  border: 2px solid #35e276;
+
+  border-radius: 30px;
+
+  background: transparent;
+
+  color: #f4fff7;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+/* BUTTON HOVER */
+
+.signup-button:hover {
+  background: #35e276;
+
+  color: #061a13;
+
+  box-shadow:
+    0 0 20px rgba(53, 226, 118, 0.35);
+
+  transform: translateY(-2px);
+}
+
+
+/* BUTTON ACTIVE */
+
+.signup-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================
+   LOGIN TEXT
+   ========================================= */
+
+.login-text {
+  margin: 22px 0 0;
+
+  color: #82998d;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   LOGIN BUTTON
+   ========================================= */
+
+.login-link {
+  border: none;
+
+  background: none;
+
+  padding: 0;
+
+  margin-left: 5px;
+
+  color: #35e276;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.login-link:hover {
+  color: #6ff49a;
+
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .signup-page {
+    padding: 25px 15px;
+  }
+
+  .signup-card {
+    padding: 32px 24px;
+
+    border-radius: 18px;
+  }
+
+  .signup-logo img {
+    width: 90px;
+    height: 90px;
+  }
+
+  .signup-card h1 {
+    font-size: 27px;
+  }
+
+  .signup-subtitle {
+    font-size: 13px;
+  }
+}
