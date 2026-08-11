@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { supabase } from "./supabase";
+
 import Landing from "./Landing";
 import Login from "./Login";
 import SignUp from "./SignUp";
@@ -16,24 +18,33 @@ import NotificationPage from "./NotificationPage";
 import OTP from "./OTP";
 import ReturnPage from "./ReturnPage";
 import AdminDashboard from "./AdminDashboard";
+import OwnerDetails from "./OwnerDetails";
+import CycleVerification from "./CycleVerification";
+import NotificationBell from "./NotificationBell";
 
 function App() {
   // =========================================
   // CURRENT PAGE
   // =========================================
 
-  const [page, setPage] = useState("OTP");
+  const [page, setPage] = useState("Landing");
 
   const [selectedCycle, setSelectedCycle] = useState(null);
 
+  const [profileReturnPage, setProfileReturnPage] = useState("ChoicePage");
+
+  const [notificationReturnPage, setNotificationReturnPage] = useState("ChoicePage");
+
+  const [ownerDetails, setOwnerDetails] = useState(null);
+
   const handleReportIssue = (rental) => {
-  setSelectedCycle(rental);
-  setPage("ReportPage");
-};
+    setSelectedCycle(rental);
+    setPage("ReportPage");
+  };
 
   const handleViewDetails = (cycle) => {
-  setSelectedCycle(cycle);
-  setPage("BookingPage");
+    setSelectedCycle(cycle);
+    setPage("BookingPage");
   };
 
   const handleBookingBack = () => {
@@ -41,9 +52,53 @@ function App() {
   setPage("HomePageRental");
   };
 
+  const handleOpenOwnerDetails = async () => {
+  if (!selectedCycle?.owner_id) {
+    console.error("Owner ID not found for this cycle");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select(`
+      full_name,
+      phone,
+      avatar_url
+    `)
+    .eq("id", selectedCycle.owner_id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching owner:", error);
+    setOwnerDetails(null);
+  } else {
+    setOwnerDetails(data);
+  }
+
+  setPage("OwnerDetails");
+  };
+
   const handleCycleOwner = () => {
     setPage("CycleOwner")
   }
+
+  
+  // =========================================
+  // OPEN NOTIFICATION PAGE
+  // =========================================
+
+  const handleOpenNotifications = (returnPage) => {
+    setNotificationReturnPage(returnPage);
+    setPage("NotificationPage");
+  };
+
+  // =========================================
+  // NOTIFICATION BACK
+  // =========================================
+
+  const handleNotificationBack = () => {
+    setPage(notificationReturnPage);
+  };
 
   // =========================================
   // LANDING → LOGIN
@@ -51,6 +106,10 @@ function App() {
 
   const handleLandingFinish = () => {
     setPage("Login");
+  };
+
+  const handleBackToChoice = () => {
+    setPage("ChoicePage");  
   };
 
   // =========================================
@@ -73,8 +132,12 @@ function App() {
   // LOGIN → CHOICE PAGE
   // =========================================
 
-  const handleLoginSuccess = () => {
-    setPage("ChoicePage");
+  const handleLoginSuccess = (role) => {
+    if (role === "admin") {
+      setPage("AdminDashboard");
+    } else if (role === "student") {
+      setPage("ChoicePage");
+    }
   };
 
   // const handleChoicetoRentPage = () => {
@@ -105,20 +168,21 @@ function App() {
     setPage("OnGoingRents");
   };
 
-  // =========================================
-  // PROFILE → RENTAL HOME PAGE
+    // =========================================
+  // OPEN PROFILE PAGE
   // =========================================
 
-  const handleProfileBack = () => {
-    setPage("HomePageRental");
+  const handleOpenProfile = (returnPage) => {
+    setProfileReturnPage(returnPage);
+    setPage("Profile");
   };
 
   // =========================================
-  // RENTAL HOME PAGE → PROFILE
+  // PROFILE BACK
   // =========================================
 
-  const handleHomePagetoProfile = () => {
-    setPage("Profile");
+  const handleProfileBack = () => {
+    setPage(profileReturnPage);
   };
 
   return (
@@ -149,6 +213,7 @@ function App() {
         <BookingPage
         cycle = {selectedCycle}
         onBack = {handleBookingBack}
+        onOwnerDetails={handleOpenOwnerDetails}
         />
       )}
 
@@ -169,8 +234,7 @@ function App() {
       {page === "ChoicePage" && (
         <ChoicePage
           onRentalChoice={handleRentalChoice}
-          // onListingChoice={handleListingChoice}
-          onProfileChoice={handleHomePagetoProfile}
+          onProfileChoice={() => handleOpenProfile("ChoicePage")}
           onCycleOwner = {handleCycleOwner}
           onActiveRentals = {handleOnGoingRents}
         />
@@ -182,9 +246,12 @@ function App() {
 
       {page === "HomePageRental" && (
         <HomePageRental
-          onProfile={handleHomePagetoProfile}
-          BackToChoice={handleLoginSuccess}
+          onProfile={() => handleOpenProfile("HomePageRental")}
+          BackToChoice={handleBackToChoice}
           onViewDetails={handleViewDetails}
+          onNotifications={() =>
+            handleOpenNotifications("HomePageRental")
+          }
         />
       )}
 
@@ -217,18 +284,26 @@ function App() {
       {page === "CycleOwner" && (
         <CycleOwner
             onListCycle={handleListingChoice}
-            onBack={handleLoginSuccess}
+            onBack={handleBackToChoice}
+            onNotifications={() =>
+              handleOpenNotifications("CycleOwner")
+            }
         />
       )}
 
       {page === "OnGoingRents" && (
        <OnGoingRents
        onReportIssue={handleReportIssue}
+       onNotifications={() =>
+          handleOpenNotifications("onGoingRents")
+        }
        />
       )}
 
       {page ==="NotificationPage" && (
-        <NotificationPage/>
+        <NotificationPage
+          onBack={handleNotificationBack}
+        />
       )}
 
       {page === "ReportPage" && (
@@ -247,7 +322,22 @@ function App() {
       )}
 
       {page === "AdminDashboard"&& (
-        <AdminDashboard/>
+        <AdminDashboard
+          onNotifications={() =>
+            handleOpenNotifications("AdminDashboard")
+          }
+        />
+      )}
+
+      {page === "OwnerDetails" && (
+        <OwnerDetails
+            owner={ownerDetails}
+            onBack={() => setPage("BookingPage")}
+        />
+      )}
+
+      {page === "CycleVerification" && (
+        <CycleVerification/>
       )}
     </>
   );

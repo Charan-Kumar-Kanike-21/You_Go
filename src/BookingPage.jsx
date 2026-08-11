@@ -1,11 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./BookingPage.css";
 import { supabase } from "./supabase";
+import OwnerDetails from "./OwnerDetails";
 
-function BookingPage({ cycle, onBack }) {
+function BookingPage({ cycle, onBack, onOwnerDetails}) {
   const [hours, setHours] = useState("");
   const [days, setDays] = useState("");
+  const [owner, setOwner] = useState(null);
+  const [ownerLoading, setOwnerLoading] = useState(true);
   const [booking, setBooking] = useState(false);
+  useEffect(() => {
+  const fetchOwnerDetails = async () => {
+    if (!cycle?.owner_id) {
+      setOwnerLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(`
+          full_name,
+          phone,
+          avatar_url,
+          hostel
+        `)
+        .eq("id", cycle.owner_id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching owner:", error);
+        setOwner(null);
+      } else {
+        setOwner(data);
+      }
+    } catch (error) {
+      console.error("Owner fetch error:", error);
+      setOwner(null);
+    } finally {
+      setOwnerLoading(false);
+    }
+  };
+
+  fetchOwnerDetails();
+  }, [cycle]);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
@@ -236,7 +274,6 @@ function BookingPage({ cycle, onBack }) {
           <div className="booking-details">
 
             <div className="booking-title-row">
-
               <div>
                 <p className="booking-small-label">
                   CYCLE
@@ -247,13 +284,24 @@ function BookingPage({ cycle, onBack }) {
                 </h2>
               </div>
 
-              {cycle.rating && (
-                <div className="booking-rating">
-                  ★ {cycle.rating}
-                </div>
-              )}
+              <div className="booking-top-actions">
 
-            </div>
+                {cycle.rating && (
+                  <div className="booking-rating">
+                    ★ {cycle.rating}
+                  </div>
+                )}
+
+                <button
+                  className="owner-details-btn"
+                  onClick={onOwnerDetails}
+                >
+                  👤 Owner Details
+                </button>
+
+              </div>
+
+          </div>
 
 
             {/* LOCATION */}

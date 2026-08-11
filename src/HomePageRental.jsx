@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 import "./HomePageRental.css";
 import { supabase } from "./supabase";
 
-function Home({ onProfile, BackToChoice, onViewDetails }) {
+import NotificationBell from "./NotificationBell";
+
+function Home({ onProfile, BackToChoice, onViewDetails, onNotifications }) {
   // =========================================
   // CYCLE DATA
   // =========================================
@@ -30,6 +32,7 @@ function Home({ onProfile, BackToChoice, onViewDetails }) {
             display_order
           )
         `)
+        .eq("status", "available")
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -287,6 +290,8 @@ function Home({ onProfile, BackToChoice, onViewDetails }) {
         {/* NAVIGATION */}
 
         <div className="navbar-actions">
+
+          <NotificationBell onClick={onNotifications} />
 
           <button
             className="nav-home-btn"

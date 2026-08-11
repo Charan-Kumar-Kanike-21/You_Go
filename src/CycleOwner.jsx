@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./CycleOwner.css";
 import { supabase } from "./supabase";
 
-function CycleOwner({ onBack, onListCycle }) {
+import NotificationBell from "./NotificationBell";
+
+function CycleOwner({ onBack, onListCycle, onNotifications }) {
   const [cycles, setCycles] = useState([]);
   const [profile, setProfile] = useState(null);
 
@@ -273,6 +275,10 @@ function CycleOwner({ onBack, onListCycle }) {
             <span>SHARING</span>
           </div>
         </div>
+
+        <NotificationBell
+          onClick={onNotifications}
+        />
 
         <button
           className="owner-back-btn"

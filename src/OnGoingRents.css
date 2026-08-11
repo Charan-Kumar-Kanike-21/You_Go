@@ -604,6 +604,29 @@ body,
   -webkit-backdrop-filter: blur(8px);
 }
 
+.ongoing-back-button {
+  display: block;
+  margin: 0 auto 20px;
+  padding: 9px 16px;
+
+  border: 1px solid rgba(66, 231, 122, 0.35);
+  border-radius: 10px;
+
+  background: rgba(66, 231, 122, 0.06);
+  color: #42e77a;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.back-button:hover {
+  background: rgba(66, 231, 122, 0.14);
+  border-color: #42e77a;
+}
+
 .return-modal {
   position: relative;
 

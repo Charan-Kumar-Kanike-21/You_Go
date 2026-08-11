@@ -347,8 +347,35 @@ function Login({ onCreateAccount, onLoginSuccess, onForgotPassword })  {
       // -----------------------------
 
 
+      // -----------------------------
+      // CHECK USER ROLE
+      // -----------------------------
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Profile fetch error:", profileError);
+        alert("Unable to determine user role.");
+        return;
+      }
+
+      console.log("User profile:", profile);
+
+      // -----------------------------
+      // REDIRECT BASED ON ROLE
+      // -----------------------------
+
       alert("Login successful!");
-      onLoginSuccess();
+
+      if (profile.role === "admin") {
+        onLoginSuccess("admin");
+      } else {
+        onLoginSuccess("student");
+      }
 
       /*
         You can navigate to your homepage here.

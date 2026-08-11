@@ -404,9 +404,14 @@ function OnGoingRents( {onReportIssue}) {
           </p>
         </div>
 
-        <div className="active-badge">
-          <span></span>
-          Active Rental
+        <div>
+          <button className="ongoing-back-button">
+            ← Back
+          </button>
+          <div className="active-badge">
+            <span></span>
+            Active Rental
+          </div>
         </div>
       </div>
 
