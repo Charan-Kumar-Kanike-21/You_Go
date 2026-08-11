@@ -1,324 +1,339 @@
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f5f7f8;
-  color: #1f2933;
-}
-
-
-/* =========================
-   MAIN PAGE
-========================= */
+/* =========================================
+   CHOICE PAGE
+========================================= */
 
 .choice-page {
   min-height: 100vh;
-  background: #f5f7f8;
-}
+  width: 100%;
+  box-sizing: border-box;
 
+  background: linear-gradient(
+    135deg,
+    #001f16,
+    #003528,
+    #001f16
+  );
 
-/* =========================
-   HEADER
-========================= */
-
-.choice-header {
-  height: 70px;
-
-  background: #ffffff;
-
-  border-bottom: 1px solid #e5e7eb;
+  color: #ffffff;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
 
-  padding: 0 6%;
+  padding: 35px 25px 50px;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  overflow-x: hidden;
 }
 
 
-/* =========================
-   LOGO
-========================= */
+/* =========================================
+   PROFILE
+========================================= */
 
-.choice-logo {
+.choice-profile {
+  width: 100%;
   display: flex;
-  align-items: center;
+  justify-content: flex-end;
 
-  gap: 10px;
-
-  color: #215b63;
-
-  font-size: 24px;
-
-  font-weight: 700;
+  padding-right: 35px;
+  box-sizing: border-box;
 }
 
-.choice-logo-circle {
-  width: 38px;
-  height: 38px;
-
-  border-radius: 50%;
-
-  background: #215b63;
-
-  color: white;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: bold;
-}
-
-
-/* =========================
-   CONTAINER
-========================= */
-
-.choice-container {
-  width: 90%;
-  max-width: 900px;
-
-  margin: 0 auto;
-
-  padding: 55px 0 60px;
-}
-
-
-/* =========================
-   PROFILE SECTION
-========================= */
-
-.profile-section {
-  text-align: center;
-
-  margin-bottom: 45px;
-}
-
-.profile-picture {
-  width: 105px;
-  height: 105px;
-
-  margin: 0 auto 20px;
-
-  border-radius: 50%;
-
-  background: #e6eeee;
-
-  border: 4px solid #ffffff;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.profile-picture span {
-  font-size: 48px;
-}
-
-.profile-section h1 {
-  margin: 0;
-
-  color: #173f45;
-
-  font-size: 28px;
-}
-
-.profile-section p {
-  margin-top: 8px;
-
-  color: #667085;
-
-  font-size: 15px;
-}
-
-
-/* =========================
-   CHOICE GRID
-========================= */
-
-.choice-grid {
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 18px;
-}
-
-
-/* =========================
-   CHOICE CARD
-========================= */
-
-.choice-card {
-  position: relative;
-
-  min-height: 150px;
-
-  border: 1px solid #e2e7e9;
-
-  border-radius: 12px;
-
-  background: #ffffff;
-
-  padding: 25px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 20px;
-
-  text-align: left;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
-}
-
-.choice-card:hover {
-  transform: translateY(-3px);
-
-  border-color: #b8ccce;
-
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
-}
-
-
-/* =========================
-   ICON
-========================= */
-
-.choice-icon {
+.profile-image-container {
   width: 58px;
   height: 58px;
 
-  flex-shrink: 0;
+  border-radius: 50%;
 
-  border-radius: 12px;
-
-  background: #eef3f3;
+  border: 2px solid #19f28b;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 28px;
+  padding: 3px;
+
+  background: #062d23;
+
+  box-shadow: 0 0 15px rgba(25, 242, 139, 0.25);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+
+  border-radius: 50%;
+
+  object-fit: cover;
 }
 
 
-/* =========================
-   TEXT
-========================= */
+/* =========================================
+   HEADER
+========================================= */
 
-.choice-text {
-  padding-right: 20px;
+.choice-header {
+  text-align: center;
+
+  margin-top: 25px;
+  margin-bottom: 40px;
 }
 
-.choice-text h2 {
-  margin: 0 0 7px;
-
-  color: #173f45;
-
-  font-size: 18px;
-
-  font-weight: 600;
-}
-
-.choice-text p {
+.choice-header h1 {
   margin: 0;
 
-  color: #667085;
+  font-size: 32px;
+  font-weight: 700;
 
-  font-size: 13px;
+  color: #ffffff;
+}
 
-  line-height: 1.5;
+.choice-header p {
+  margin-top: 12px;
+
+  font-size: 16px;
+
+  color: #9bb5ad;
 }
 
 
-/* =========================
-   ARROW
-========================= */
+/* =========================================
+   CHOICE CONTAINER
+========================================= */
 
-.arrow {
-  position: absolute;
+.choice-container {
+  width: 100%;
+  max-width: 1050px;
 
-  right: 20px;
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 25px;
+
+  align-items: stretch;
+}
+
+
+/* =========================================
+   CHOICE CARD
+========================================= */
+
+.choice-card {
+  background: rgba(7, 42, 33, 0.9);
+
+  border: 1px solid rgba(25, 242, 139, 0.25);
+
+  border-radius: 18px;
+
+  padding: 35px 25px;
+
+  text-align: center;
+
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================
+   CARD HOVER
+========================================= */
+
+.choice-card:hover {
+  transform: translateY(-7px);
+
+  border-color: #19f28b;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(25, 242, 139, 0.12);
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.choice-icon {
+  width: 70px;
+  height: 70px;
+
+  border-radius: 50%;
+
+  background: #0a3b2d;
+
+  border: 1px solid rgba(25, 242, 139, 0.3);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 32px;
+
+  margin-bottom: 20px;
+}
+
+
+/* =========================================
+   CARD HEADING
+========================================= */
+
+.choice-card h2 {
+  margin: 0 0 12px;
 
   font-size: 22px;
 
-  color: #215b63;
-
-  transition: transform 0.2s ease;
-}
-
-.choice-card:hover .arrow {
-  transform: translateX(4px);
+  color: #ffffff;
 }
 
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =========================================
+   CARD DESCRIPTION
+========================================= */
 
-@media (max-width: 700px) {
+.choice-card p {
+  margin: 0;
+
+  max-width: 250px;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  color: #9bb5ad;
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.choice-button {
+  width: 100%;
+
+  max-width: 220px;
+
+  margin-top: 25px;
+
+  padding: 12px 20px;
+
+  border-radius: 25px;
+
+  border: 1.5px solid #19f28b;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.choice-button:hover {
+  background: #19f28b;
+
+  color: #00271c;
+
+  transform: scale(1.03);
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 850px) {
+
+  .choice-container {
+    grid-template-columns: 1fr 1fr;
+
+    max-width: 700px;
+  }
+
+  .choice-card:last-child {
+    grid-column: 1 / -1;
+
+    max-width: 330px;
+
+    width: 100%;
+
+    justify-self: center;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .choice-page {
+    padding: 25px 18px 40px;
+  }
+
+  .choice-profile {
+    padding-right: 5px;
+  }
+
+  .profile-image-container {
+    width: 50px;
+    height: 50px;
+  }
 
   .choice-header {
-    padding: 0 5%;
+    margin-top: 25px;
+    margin-bottom: 30px;
+  }
+
+  .choice-header h1 {
+    font-size: 25px;
+  }
+
+  .choice-header p {
+    font-size: 14px;
   }
 
   .choice-container {
-    width: 90%;
-
-    padding-top: 40px;
-  }
-
-  .profile-section {
-    margin-bottom: 32px;
-  }
-
-  .profile-section h1 {
-    font-size: 24px;
-  }
-
-  .choice-grid {
     grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+  .choice-card:last-child {
+    grid-column: auto;
+
+    max-width: none;
   }
 
   .choice-card {
-    min-height: 125px;
+    min-height: 280px;
 
-    padding: 20px;
+    padding: 30px 20px;
   }
 
 }
-
-@media (max-width: 400px) {
-
-  .choice-card {
-    gap: 14px;
-  }
-
-  .choice-icon {
-    width: 50px;
-    height: 50px;
-
-    font-size: 24px;
-  }
-
-  .choice-text h2 {
-    font-size: 16px;
-  }
-
-  .choice-text p {
-    font-size: 12px;
-  }
-
-}
-

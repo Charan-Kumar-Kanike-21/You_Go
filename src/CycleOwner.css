@@ -1,0 +1,1243 @@
+
+/* =========================================
+   RESET
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+
+/* =========================================
+   PAGE
+========================================= */
+
+.owner-page {
+  min-height: 100vh;
+  width: 100%;
+
+  padding-bottom: 50px;
+
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(45, 130, 72, 0.75) 0%,
+      rgba(28, 92, 53, 0.58) 20%,
+      rgba(13, 47, 33, 0.88) 45%,
+      rgba(6, 27, 20, 1) 75%
+    );
+
+  color: white;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.owner-navbar {
+  width: 100%;
+  min-height: 75px;
+
+  padding: 0 6%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgba(5, 25, 18, 0.84);
+
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  border-bottom:
+    1px solid rgba(70, 225, 120, 0.20);
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+
+/* =========================================
+   BRAND
+========================================= */
+
+.owner-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.owner-brand-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    rgba(66, 231, 122, 0.10);
+
+  border:
+    1px solid rgba(66, 231, 122, 0.20);
+
+  font-size: 25px;
+}
+
+.owner-brand h2 {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #f4f8f5;
+}
+
+.owner-brand span {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 3px;
+
+  color: #42e77a;
+}
+
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.owner-back-btn {
+  padding: 10px 20px;
+
+  border:
+    1px solid rgba(105, 180, 125, 0.25);
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  color: #dce8e0;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.owner-back-btn:hover {
+  background:
+    rgba(66, 231, 122, 0.12);
+
+  border-color:
+    rgba(66, 231, 122, 0.45);
+
+  color: #42e77a;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.owner-hero {
+  width: min(1200px, 88%);
+
+  margin: 40px auto 25px;
+
+  padding: 42px 50px;
+
+  border:
+    1px solid rgba(70, 225, 120, 0.30);
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(5, 35, 23, 0.90),
+      rgba(22, 86, 49, 0.78)
+    );
+
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  box-shadow:
+    0 0 45px rgba(42, 170, 80, 0.12),
+    0 20px 50px rgba(0, 0, 0, 0.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  overflow: hidden;
+}
+
+.owner-hero-content {
+  flex: 1;
+}
+
+.owner-small-title {
+  margin: 0 0 10px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  color: #42e77a;
+}
+
+.owner-hero h1 {
+  margin: 0;
+
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 700;
+
+  color: #f4f8f5;
+}
+
+.owner-hero p {
+  margin: 12px 0 0;
+
+  max-width: 650px;
+
+  line-height: 1.6;
+
+  color: #a9c2b3;
+
+  font-size: 15px;
+}
+
+
+/* =========================================
+   HERO ICON
+========================================= */
+
+.owner-hero-icon {
+  width: 110px;
+  height: 110px;
+
+  flex-shrink: 0;
+
+  margin-left: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    rgba(66, 231, 122, 0.08);
+
+  border:
+    1px solid rgba(66, 231, 122, 0.25);
+
+  box-shadow:
+    0 0 30px rgba(66, 231, 122, 0.08);
+
+  font-size: 58px;
+}
+
+
+/* =========================================
+   ACTION CARDS
+========================================= */
+
+.owner-actions {
+  width: min(1200px, 88%);
+
+  margin: 0 auto 40px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+
+/* =========================================
+   ACTION CARD
+========================================= */
+
+.owner-action-card {
+  min-height: 140px;
+
+  padding: 25px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+
+  text-align: left;
+
+  border:
+    1px solid rgba(105, 180, 125, 0.22);
+
+  border-radius: 18px;
+
+  background:
+    rgba(5, 25, 18, 0.78);
+
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  color: white;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25);
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+
+/* Only the clickable action card */
+
+button.owner-action-card {
+  width: 100%;
+
+  cursor: pointer;
+
+  font-family: inherit;
+}
+
+button.owner-action-card:hover {
+  transform: translateY(-4px);
+
+  background:
+    rgba(10, 45, 28, 0.88);
+
+  border-color:
+    rgba(66, 231, 122, 0.45);
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.35),
+    0 0 25px rgba(66, 231, 122, 0.06);
+}
+
+
+/* =========================================
+   ACTION ICON
+========================================= */
+
+.action-icon {
+  width: 58px;
+  height: 58px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background:
+    rgba(66, 231, 122, 0.10);
+
+  border:
+    1px solid rgba(66, 231, 122, 0.18);
+
+  font-size: 28px;
+}
+
+
+/* =========================================
+   ACTION CONTENT
+========================================= */
+
+.action-content {
+  flex: 1;
+}
+
+.action-content h2 {
+  margin: 0 0 7px;
+
+  font-size: 20px;
+
+  color: #f4f8f5;
+}
+
+.action-content p {
+  margin: 0;
+
+  color: #9db3a6;
+
+  line-height: 1.5;
+
+  font-size: 14px;
+}
+
+.action-content strong {
+  color: #42e77a;
+}
+
+
+/* =========================================
+   ACTION ARROW
+========================================= */
+
+.action-arrow {
+  font-size: 25px;
+
+  color: #42e77a;
+
+  transition:
+    transform 0.2s ease;
+}
+
+button.owner-action-card:hover .action-arrow {
+  transform: translateX(5px);
+}
+
+
+/* =========================================
+   LIST ACTION
+========================================= */
+
+.list-action {
+  border-color:
+    rgba(66, 231, 122, 0.30);
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+.owner-main {
+  width: min(1200px, 88%);
+
+  margin: 0 auto;
+
+  padding-bottom: 60px;
+}
+
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.owner-section-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 25px;
+}
+
+.owner-section-header p {
+  margin: 0 0 5px;
+
+  color: #42e77a;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+}
+
+.owner-section-header h2 {
+  margin: 0;
+
+  font-size: 28px;
+
+  color: #f4f8f5;
+}
+
+
+/* =========================================
+   REFRESH BUTTON
+========================================= */
+
+.refresh-btn {
+  padding: 10px 16px;
+
+  border:
+    1px solid rgba(105, 180, 125, 0.25);
+
+  border-radius: 9px;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  color: #dce8e0;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.refresh-btn:hover {
+  background:
+    rgba(66, 231, 122, 0.10);
+
+  border-color:
+    rgba(66, 231, 122, 0.40);
+
+  color: #42e77a;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   CYCLE GRID
+========================================= */
+
+.owner-cycle-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(290px, 1fr)
+    );
+
+  gap: 25px;
+}
+
+
+/* =========================================
+   CYCLE CARD
+========================================= */
+
+.owner-cycle-card {
+  overflow: hidden;
+
+  background:
+    rgba(5, 25, 18, 0.82);
+
+  border:
+    1px solid rgba(105, 180, 125, 0.22);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.28);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.owner-cycle-card:hover {
+  transform: translateY(-4px);
+
+  border-color:
+    rgba(66, 231, 122, 0.35);
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.38),
+    0 0 25px rgba(66, 231, 122, 0.05);
+}
+
+
+/* =========================================
+   CYCLE IMAGE
+========================================= */
+
+.owner-cycle-image {
+  height: 210px;
+
+  background:
+    rgba(2, 17, 12, 0.75);
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.owner-cycle-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+.no-cycle-image {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 65px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(66, 231, 122, 0.12),
+      rgba(2, 17, 12, 0.75)
+    );
+}
+
+
+/* =========================================
+   STATUS BADGE
+========================================= */
+
+.status-badge {
+  position: absolute;
+
+  top: 14px;
+  left: 14px;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  background:
+    rgba(5, 25, 18, 0.88);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.12);
+
+  color: #b7c8bf;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.25);
+
+  text-transform: capitalize;
+}
+
+.status-badge.available {
+  color: #42e77a;
+
+  background:
+    rgba(25, 110, 58, 0.25);
+
+  border-color:
+    rgba(66, 231, 122, 0.35);
+}
+
+
+/* =========================================
+   CYCLE DETAILS
+========================================= */
+
+.owner-cycle-details {
+  padding: 20px;
+}
+
+
+/* =========================================
+   CYCLE TITLE
+========================================= */
+
+.owner-cycle-title {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  margin-bottom: 18px;
+}
+
+.owner-cycle-title h3 {
+  margin: 0;
+
+  font-size: 21px;
+
+  color: #f4f8f5;
+}
+
+.owner-cycle-title p {
+  margin: 4px 0 0;
+
+  color: #8ea59a;
+
+  font-size: 13px;
+}
+
+.owner-cycle-title > span {
+  font-size: 22px;
+}
+
+
+/* =========================================
+   CYCLE INFO
+========================================= */
+
+.owner-cycle-info {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.owner-cycle-info div {
+  padding: 11px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border:
+    1px solid rgba(105, 180, 125, 0.12);
+
+  border-radius: 10px;
+}
+
+.owner-cycle-info span,
+.owner-cycle-pricing span {
+  display: block;
+
+  color: #70877a;
+
+  font-size: 11px;
+
+  margin-bottom: 4px;
+}
+
+.owner-cycle-info strong {
+  display: block;
+
+  font-size: 13px;
+
+  color: #dce8e0;
+
+  text-transform: capitalize;
+}
+
+
+/* =========================================
+   LOCATION
+========================================= */
+
+.owner-cycle-location {
+  padding: 12px 0;
+
+  border-top:
+    1px solid rgba(105, 180, 125, 0.12);
+
+  border-bottom:
+    1px solid rgba(105, 180, 125, 0.12);
+
+  color: #9db3a6;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   PRICING
+========================================= */
+
+.owner-cycle-pricing {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+
+  padding: 15px 0;
+}
+
+.owner-cycle-pricing div {
+  text-align: center;
+}
+
+.owner-cycle-pricing strong {
+  font-size: 20px;
+
+  color: #42e77a;
+}
+
+
+/* =========================================
+   DELETE BUTTON
+========================================= */
+
+.delete-cycle-btn {
+  width: 100%;
+
+  padding: 12px;
+
+  border:
+    1px solid rgba(230, 90, 90, 0.30);
+
+  border-radius: 10px;
+
+  background:
+    rgba(180, 40, 40, 0.08);
+
+  color: #ff8c8c;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.delete-cycle-btn:hover {
+  background:
+    rgba(200, 55, 55, 0.16);
+
+  border-color:
+    rgba(240, 100, 100, 0.50);
+
+  color: #ffaaaa;
+}
+
+.delete-cycle-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   STATES
+========================================= */
+
+.owner-state {
+  min-height: 300px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 40px;
+
+  border:
+    1px dashed rgba(105, 180, 125, 0.30);
+
+  border-radius: 18px;
+
+  background:
+    rgba(5, 25, 18, 0.60);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.state-icon {
+  font-size: 50px;
+
+  margin-bottom: 10px;
+}
+
+.owner-state h2 {
+  margin: 5px 0;
+
+  font-size: 22px;
+
+  color: #f4f8f5;
+}
+
+.owner-state p {
+  margin: 5px 0 20px;
+
+  color: #8fa69b;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   STATE BUTTONS
+========================================= */
+
+.retry-btn,
+.empty-list-btn {
+  border:
+    1px solid #42e77a;
+
+  padding: 11px 20px;
+
+  border-radius: 9px;
+
+  background:
+    rgba(42, 150, 75, 0.10);
+
+  color: #42e77a;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.retry-btn:hover,
+.empty-list-btn:hover {
+  background: #42e77a;
+
+  color: #062016;
+
+  transform: translateY(-2px);
+}
+
+.error-state {
+  border-color:
+    rgba(230, 90, 90, 0.35);
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.owner-footer {
+  width: 100%;
+
+  padding: 25px 6%;
+
+  background:
+    rgba(5, 25, 18, 0.90);
+
+  border-top:
+    1px solid rgba(70, 225, 120, 0.18);
+
+  color: white;
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 13px;
+}
+
+.owner-footer p {
+  margin: 0;
+
+  font-weight: 700;
+
+  color: #f4f8f5;
+}
+
+.owner-footer span {
+  color: #718a7d;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 800px) {
+
+  .owner-navbar {
+    padding: 0 5%;
+  }
+
+  .owner-hero {
+    width: 92%;
+
+    padding: 32px;
+
+    margin-top: 25px;
+  }
+
+  .owner-hero-icon {
+    display: none;
+  }
+
+  .owner-actions {
+    width: 92%;
+
+    grid-template-columns: 1fr;
+  }
+
+  .owner-main {
+    width: 92%;
+  }
+
+  .owner-section-header {
+    align-items: flex-start;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .owner-navbar {
+    min-height: 70px;
+
+    padding: 0 20px;
+  }
+
+  .owner-brand h2 {
+    font-size: 18px;
+  }
+
+  .owner-brand span {
+    font-size: 8px;
+
+    letter-spacing: 2px;
+  }
+
+  .owner-brand-icon {
+    width: 40px;
+    height: 40px;
+
+    font-size: 21px;
+  }
+
+  .owner-back-btn {
+    padding: 9px 14px;
+
+    font-size: 13px;
+  }
+
+  .owner-hero {
+    width: 94%;
+
+    margin-top: 25px;
+
+    padding: 28px 22px;
+
+    border-radius: 18px;
+  }
+
+  .owner-hero h1 {
+    font-size: 30px;
+  }
+
+  .owner-hero p {
+    font-size: 14px;
+  }
+
+  .owner-actions {
+    width: 94%;
+
+    gap: 15px;
+
+    margin-bottom: 30px;
+  }
+
+  .owner-action-card {
+    min-height: 120px;
+
+    padding: 18px;
+
+    gap: 15px;
+  }
+
+  .action-icon {
+    width: 50px;
+    height: 50px;
+
+    font-size: 23px;
+  }
+
+  .action-content h2 {
+    font-size: 18px;
+  }
+
+  .action-content p {
+    font-size: 13px;
+  }
+
+  .owner-main {
+    width: 94%;
+  }
+
+  .owner-section-header {
+    gap: 15px;
+
+    align-items: center;
+  }
+
+  .owner-section-header h2 {
+    font-size: 23px;
+  }
+
+  .refresh-btn {
+    padding: 9px 12px;
+
+    font-size: 12px;
+  }
+
+  .owner-cycle-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+  .owner-cycle-image {
+    height: 200px;
+  }
+
+  .owner-footer {
+    padding: 22px 20px;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    text-align: center;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 400px) {
+
+  .owner-navbar {
+    padding: 0 15px;
+  }
+
+  .owner-brand {
+    gap: 8px;
+  }
+
+  .owner-brand h2 {
+    font-size: 16px;
+  }
+
+  .owner-brand span {
+    font-size: 7px;
+  }
+
+  .owner-brand-icon {
+    width: 37px;
+    height: 37px;
+
+    font-size: 19px;
+  }
+
+  .owner-back-btn {
+    padding: 8px 11px;
+
+    font-size: 12px;
+  }
+
+  .owner-hero {
+    width: 96%;
+
+    padding: 24px 18px;
+  }
+
+  .owner-hero h1 {
+    font-size: 27px;
+  }
+
+  .owner-actions {
+    width: 96%;
+  }
+
+  .owner-main {
+    width: 96%;
+  }
+
+  .owner-action-card {
+    padding: 15px;
+  }
+
+  .action-icon {
+    width: 45px;
+    height: 45px;
+
+    font-size: 21px;
+  }
+
+  .action-content h2 {
+    font-size: 17px;
+  }
+
+  .action-arrow {
+    font-size: 20px;
+  }
+
+  .owner-cycle-details {
+    padding: 17px;
+  }
+
+  .owner-cycle-info {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-cycle-pricing {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .owner-state {
+    padding: 25px 15px;
+  }
+}

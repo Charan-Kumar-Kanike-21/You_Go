@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Landing.css";
 
-import logoImage from "./assets/app_logo.png";
+import logoImage from "./assets/UGO_logo.jpeg";
 
 function Landing({ onFinish }) {
   const [started, setStarted] = useState(false);

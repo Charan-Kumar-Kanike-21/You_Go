@@ -1,0 +1,576 @@
+
+/* =========================================================
+   RETURN PAGE
+   NITK CYCLE SHARING
+   ========================================================= */
+
+.return-page {
+  --bg-dark: #08051a;
+  --green-dark: #051912;
+  --green-bg: #0d2f21;
+  --green: #42e77a;
+  --green-light: #66e77a;
+
+  --text-primary: #f4f8f5;
+  --text-secondary: #81968a;
+  --text-muted: #61796b;
+
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 90px 20px 50px;
+
+  box-sizing: border-box;
+
+  color: var(--text-primary);
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      rgba(45, 130, 72, 0.55) 0%,
+      rgba(28, 92, 53, 0.38) 22%,
+      rgba(13, 47, 33, 0.75) 45%,
+      rgba(6, 27, 20, 1) 75%
+    );
+
+  background-color: var(--bg-dark);
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.return-container {
+  width: 100%;
+  max-width: 520px;
+
+  padding: 38px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.20);
+
+  border-radius: 25px;
+
+  background:
+    rgba(5, 25, 18, 0.82);
+
+  box-shadow:
+    0 25px 70px
+    rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.return-icon {
+  width: 70px;
+  height: 70px;
+
+  margin: 0 auto 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;
+
+  background:
+    rgba(66, 231, 122, 0.08);
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.20);
+
+  font-size: 31px;
+}
+
+.return-eyebrow {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: var(--green);
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+.return-container h1 {
+  margin: 0;
+
+  font-size: 34px;
+
+  font-weight: 700;
+
+  letter-spacing: -1px;
+}
+
+.return-description {
+  max-width: 390px;
+
+  margin: 12px auto 27px;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   RENTAL INFORMATION
+   ========================================================= */
+
+.rental-info {
+  padding: 16px 18px;
+
+  margin-bottom: 18px;
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.14);
+
+  border-radius: 16px;
+
+  background:
+    rgba(66, 231, 122, 0.035);
+
+  text-align: left;
+}
+
+.rental-info-row {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 10px 0;
+}
+
+.rental-info-row + .rental-info-row {
+  border-top:
+    1px solid
+    rgba(66, 231, 122, 0.08);
+}
+
+.rental-info-row span {
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.rental-info-row strong {
+  color: var(--text-primary);
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   INSTRUCTIONS
+   ========================================================= */
+
+.return-instructions {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin-bottom: 20px;
+
+  padding: 15px;
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.12);
+
+  border-radius: 14px;
+
+  background:
+    rgba(66, 231, 122, 0.035);
+
+  text-align: left;
+}
+
+.instruction-icon {
+  width: 28px;
+  height: 28px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    rgba(66, 231, 122, 0.10);
+
+  color: var(--green);
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.return-instructions h3 {
+  margin: 1px 0 5px;
+
+  color: var(--text-primary);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.return-instructions p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   RETURN BUTTON
+   ========================================================= */
+
+.return-button {
+  width: 100%;
+
+  padding: 14px 20px;
+
+  border: none;
+
+  border-radius: 13px;
+
+  background:
+    var(--green);
+
+  color:
+    #062016;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.return-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 30px
+    rgba(66, 231, 122, 0.22);
+}
+
+.return-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   REPORT SECTION
+   ========================================================= */
+
+.report-section {
+  margin-top: 28px;
+}
+
+.report-divider {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 10px;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+.report-divider::before,
+.report-divider::after {
+  content: "";
+
+  flex: 1;
+
+  height: 1px;
+
+  background:
+    rgba(66, 231, 122, 0.10);
+}
+
+.report-section > p {
+  margin: 0 auto 13px;
+
+  max-width: 350px;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   REPORT BUTTON
+   ========================================================= */
+
+.report-button {
+  width: 100%;
+
+  padding: 12px 18px;
+
+  border:
+    1px solid
+    rgba(255, 115, 115, 0.35);
+
+  border-radius: 12px;
+
+  background:
+    rgba(255, 90, 90, 0.06);
+
+  color:
+    #ff9696;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.report-button:hover {
+  background:
+    rgba(255, 90, 90, 0.11);
+
+  border-color:
+    rgba(255, 115, 115, 0.60);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SECURITY NOTE
+   ========================================================= */
+
+.return-security-note {
+  margin: 22px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   SUCCESS SCREEN
+   ========================================================= */
+
+.return-success-card {
+  width: 100%;
+  max-width: 480px;
+
+  padding: 48px 40px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.28);
+
+  border-radius: 26px;
+
+  background:
+    rgba(5, 25, 18, 0.85);
+
+  box-shadow:
+    0 25px 70px
+    rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.return-success-icon {
+  width: 78px;
+  height: 78px;
+
+  margin: 0 auto 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  border:
+    2px solid
+    var(--green);
+
+  background:
+    rgba(66, 231, 122, 0.10);
+
+  color:
+    var(--green);
+
+  font-size: 40px;
+
+  font-weight: 700;
+
+  box-shadow:
+    0 0 30px
+    rgba(66, 231, 122, 0.15);
+}
+
+.return-success-card h1 {
+  margin: 0;
+
+  font-size: 31px;
+
+  letter-spacing: -1px;
+}
+
+.return-success-card p {
+  max-width: 350px;
+
+  margin: 13px auto 22px;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   SUCCESS STATUS
+   ========================================================= */
+
+.return-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(66, 231, 122, 0.07);
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.20);
+
+  color:
+    var(--green-light);
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+.return-status-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background:
+    var(--green);
+
+  box-shadow:
+    0 0 9px
+    rgba(66, 231, 122, 0.60);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .return-page {
+    padding:
+      40px
+      14px;
+  }
+
+  .return-container,
+  .return-success-card {
+    padding: 30px 20px;
+
+    border-radius: 21px;
+  }
+
+  .return-container h1,
+  .return-success-card h1 {
+    font-size: 28px;
+  }
+
+  .rental-info-row {
+    gap: 10px;
+  }
+}

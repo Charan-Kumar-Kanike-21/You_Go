@@ -1,122 +1,94 @@
-
 import React from "react";
 import "./ChoicePage.css";
 
-function ChoicePage() {
+function ChoicePage({ onRentalChoice, onProfileChoice, onCycleOwner, onActiveRentals }) {
   return (
     <div className="choice-page">
 
-      {/* Header */}
-      <header className="choice-header">
-        <div className="choice-logo">
-          <div className="choice-logo-circle">C</div>
-          <span>Cycle</span>
+      {/* ---------------- PROFILE ---------------- */}
+      <div className="choice-profile">
+        <div className="profile-image-container">
+          {/* <button ></button> */}
+          <img
+            src="/profile.png"
+            alt="Profile"
+            className="profile-image"
+            onClick={onProfileChoice}
+          />
         </div>
-      </header>
+      </div>
 
+      {/* ---------------- HEADING ---------------- */}
+      <div className="choice-header">
+        <h1>Welcome to NITK Cycle Sharing</h1>
+        <p>What would you like to do?</p>
+      </div>
 
-      {/* Main Content */}
-      <main className="choice-container">
+      {/* ---------------- OPTIONS ---------------- */}
+      <div className="choice-container">
 
-        {/* Profile Section */}
-        <section className="profile-section">
-
-          <div className="profile-picture">
-            <span>👤</span>
+        {/* RENT A CYCLE */}
+        <div className="choice-card">
+          <div className="choice-icon">
+            🚲
           </div>
 
-          <h1>Welcome Back!</h1>
+          <h2>Rent a Cycle</h2>
 
-          <p>What would you like to do?</p>
+          <p>
+            Find an available cycle and rent it for your journey.
+          </p>
 
-        </section>
-
-
-        {/* Choices */}
-        <section className="choice-grid">
-
-          {/* Rent a Cycle */}
-          <button className="choice-card">
-
-            <div className="choice-icon">
-              🚲
-            </div>
-
-            <div className="choice-text">
-              <h2>Rent a Cycle</h2>
-              <p>
-                Find and rent a cycle from the campus community.
-              </p>
-            </div>
-
-            <span className="arrow">→</span>
-
+          <button className="choice-button"
+            onClick={onRentalChoice}>
+            Rent a Cycle
           </button>
+        </div>
 
 
-          {/* My Cycles */}
-          <button className="choice-card">
+        {/* MY CYCLES */}
+        <div className="choice-card">
+          <div className="choice-icon">
+            🚴
+          </div>
 
-            <div className="choice-icon">
-              🔑
-            </div>
+          <h2>My Cycles</h2>
 
-            <div className="choice-text">
-              <h2>My Cycles</h2>
-              <p>
-                Manage the cycles you have listed for rent.
-              </p>
-            </div>
+          <p>
+            View and manage the cycles you have listed.
+          </p>
 
-            <span className="arrow">→</span>
-
+          <button className="choice-button"
+            onClick={(onCycleOwner)}
+          >
+            My Cycles
           </button>
+        </div>
 
 
-          {/* Active Rentals */}
-          <button className="choice-card">
+        {/* ONGOING RENTS */}
+        <div className="choice-card">
+          <div className="choice-icon">
+            📋
+          </div>
 
-            <div className="choice-icon">
-              🛞
-            </div>
+          <h2>Ongoing Rents</h2>
 
-            <div className="choice-text">
-              <h2>Active Rentals</h2>
-              <p>
-                View the cycles you are currently renting.
-              </p>
-            </div>
+          <p>
+            Check your currently rented cycles and rental status.
+          </p>
 
-            <span className="arrow">→</span>
-
+          <button className="choice-button"
+            onClick={(onActiveRentals)}
+          >
+            Ongoing Rents
           </button>
+        </div>
 
-
-          {/* Profile */}
-          <button className="choice-card">
-
-            <div className="choice-icon">
-              👤
-            </div>
-
-            <div className="choice-text">
-              <h2>Profile</h2>
-              <p>
-                View and manage your account settings.
-              </p>
-            </div>
-
-            <span className="arrow">→</span>
-
-          </button>
-
-        </section>
-
-      </main>
+      </div>
 
     </div>
   );
 }
 
 export default ChoicePage;
-

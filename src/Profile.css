@@ -1,0 +1,669 @@
+/* =========================================
+   RESET
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+
+/* =========================================
+   PROFILE PAGE
+========================================= */
+
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+
+  position: relative;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  color: white;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(31, 112, 60, 0.55) 0%,
+      rgba(15, 66, 43, 0.55) 30%,
+      rgba(3, 30, 21, 0.95) 65%,
+      #031d15 100%
+    );
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.profile-top-header {
+  width: 100%;
+
+  height: 80px;
+
+  padding: 0 38px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  border-bottom:
+    1px solid
+    rgba(75, 150, 105, 0.12);
+}
+
+
+/* =========================================
+   UGO
+========================================= */
+
+.profile-brand {
+  font-size: 24px;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+}
+
+.brand-u {
+  color: #ffffff;
+}
+
+.brand-go {
+  color: #42e77a;
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+.profile-back-btn {
+  border: none;
+
+  background: transparent;
+
+  color: #42e77a;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.profile-back-btn:hover {
+  color: #7af69d;
+
+  transform: translateX(-3px);
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+.profile-container {
+  width: 100%;
+
+  min-height:
+    calc(100vh - 125px);
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding:
+    25px 20px 30px;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.profile-card {
+  width: 615px;
+
+  max-width: 100%;
+
+  padding:
+    30px 36px 30px;
+
+  border-radius: 21px;
+
+  background:
+    rgba(3, 29, 21, 0.83);
+
+  border:
+    1px solid
+    rgba(61, 205, 109, 0.38);
+
+  box-shadow:
+    0 0 55px
+    rgba(40, 190, 85, 0.13),
+
+    0 25px 60px
+    rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(14px);
+
+  -webkit-backdrop-filter: blur(14px);
+}
+
+
+/* =========================================
+   APP LOGO
+========================================= */
+
+.profile-logo-container {
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  margin-bottom: 4px;
+}
+
+.profile-app-logo {
+  width: 145px;
+
+  height: 145px;
+
+  object-fit: contain;
+
+  display: block;
+
+  filter:
+    drop-shadow(
+      0 0 15px
+      rgba(66, 231, 122, 0.22)
+    );
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.profile-header {
+  text-align: center;
+
+  margin-bottom: 22px;
+}
+
+.profile-header h1 {
+  margin: 0;
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  color: #f5f8f6;
+}
+
+.profile-header p {
+  margin:
+    7px 0 0;
+
+  color: #91a99b;
+
+  font-size: 14px;
+}
+
+
+/* =========================================
+   PROFILE PHOTO
+========================================= */
+
+.profile-photo-section {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  margin-bottom: 25px;
+}
+
+.profile-photo {
+  width: 102px;
+
+  height: 102px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  overflow: hidden;
+
+  background:
+    rgba(8, 43, 29, 0.8);
+
+  border:
+    2px solid #42e77a;
+
+  box-shadow:
+    0 0 22px
+    rgba(66, 231, 122, 0.20);
+}
+
+.profile-photo img {
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.profile-photo span {
+  font-size: 42px;
+
+  font-weight: 700;
+
+  color: #42e77a;
+}
+
+
+/* =========================================
+   CHANGE PHOTO
+========================================= */
+
+.change-photo-btn {
+  margin-top: 10px;
+
+  padding:
+    10px 18px;
+
+  border-radius: 10px;
+
+  border:
+    1px solid
+    rgba(66, 231, 122, 0.40);
+
+  background:
+    rgba(20, 95, 49, 0.12);
+
+  color: #42e77a;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.change-photo-btn:hover {
+  background: #42e77a;
+
+  color: #052217;
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+.error-message {
+  margin-bottom: 18px;
+
+  padding:
+    12px 15px;
+
+  border-radius: 9px;
+
+  border:
+    1px solid
+    rgba(230, 80, 80, 0.45);
+
+  background:
+    rgba(80, 25, 25, 0.18);
+
+  color: #ff9d9d;
+
+  font-size: 13px;
+
+  text-align: center;
+}
+
+
+/* =========================================
+   DETAILS
+========================================= */
+
+.profile-details {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+
+/* =========================================
+   FIELD
+========================================= */
+
+.profile-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.profile-field label {
+  color: #dbe7df;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================
+   VALUE
+========================================= */
+
+.profile-value {
+  width: 100%;
+
+  min-height: 46px;
+
+  padding:
+    12px 15px;
+
+  border-radius: 9px;
+
+  border:
+    1px solid
+    rgba(66, 135, 92, 0.30);
+
+  background:
+    rgba(1, 23, 16, 0.76);
+
+  color: #f2f6f3;
+
+  font-size: 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+
+/* =========================================
+   LOCKED EMAIL
+========================================= */
+
+.non-editable {
+  color: #758c80;
+}
+
+.lock-icon {
+  font-size: 13px;
+
+  opacity: 0.7;
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.profile-field input {
+  width: 100%;
+
+  height: 46px;
+
+  padding:
+    0 15px;
+
+  border-radius: 9px;
+
+  border:
+    1px solid
+    rgba(66, 135, 92, 0.30);
+
+  outline: none;
+
+  background:
+    rgba(1, 23, 16, 0.76);
+
+  color: white;
+
+  font-size: 14px;
+}
+
+.profile-field input:focus {
+  border-color: #42e77a;
+
+  box-shadow:
+    0 0 0 2px
+    rgba(66, 231, 122, 0.08);
+}
+
+.profile-field input::placeholder {
+  color: #5f766a;
+}
+
+
+/* =========================================
+   PASSWORD
+========================================= */
+
+.password-value {
+  letter-spacing: 3px;
+}
+
+.password-note {
+  color: #71877b;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.profile-actions {
+  margin-top: 22px;
+
+  width: 100%;
+}
+
+
+/* EDIT */
+
+.edit-profile-btn,
+.save-profile-btn {
+  width: 100%;
+
+  height: 49px;
+
+  border-radius: 9px;
+
+  border:
+    1.5px solid #42e77a;
+
+  background:
+    rgba(20, 95, 49, 0.08);
+
+  color: #42e77a;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.edit-profile-btn:hover,
+.save-profile-btn:hover {
+  background: #42e77a;
+
+  color: #052217;
+
+  box-shadow:
+    0 0 25px
+    rgba(66, 231, 122, 0.25);
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.profile-footer {
+  width: 100%;
+
+  text-align: center;
+
+  padding:
+    0 20px 18px;
+
+  color: #71877b;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 700px) {
+
+  .profile-card {
+    width: 100%;
+
+    max-width: 580px;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 500px) {
+
+  .profile-top-header {
+    height: 70px;
+
+    padding:
+      0 20px;
+  }
+
+  .profile-brand {
+    font-size: 21px;
+  }
+
+  .profile-container {
+    align-items: flex-start;
+
+    padding:
+      20px 14px 30px;
+  }
+
+  .profile-card {
+    padding:
+      25px 20px 25px;
+
+    border-radius: 17px;
+  }
+
+  .profile-app-logo {
+    width: 115px;
+
+    height: 115px;
+  }
+
+  .profile-header h1 {
+    font-size: 26px;
+  }
+
+  .profile-header p {
+    font-size: 13px;
+  }
+
+  .profile-photo {
+    width: 95px;
+
+    height: 95px;
+  }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 380px) {
+
+  .profile-top-header {
+    padding:
+      0 15px;
+  }
+
+  .profile-card {
+    padding:
+      22px 17px;
+  }
+
+  .profile-app-logo {
+    width: 200px;
+
+    height: 200px;
+  }
+
+  .profile-header h1 {
+    font-size: 23px;
+  }
+
+  .profile-photo {
+    width: 88px;
+
+    height: 88px;
+  }
+
+}
