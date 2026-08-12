@@ -5,7 +5,7 @@ import "./OnGoingRents.css";
 // Change this import path according to your project
 import { supabase } from "./supabase";
 
-function OnGoingRents( { onBack, onReportIssue}) {
+function OnGoingRents( { onBack, onReportIssue, onReturn}) {
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -281,33 +281,19 @@ function OnGoingRents( { onBack, onReportIssue}) {
       return;
     }
 
-    /*
-      OTP IMPLEMENTATION:
-
-      For now we only select the return destination.
-
-      Later this function can:
-      1. Generate OTP
-      2. Send OTP to owner/admin
-      3. Verify OTP
-      4. Mark rental as completed
-      5. Calculate final security deposit
-      6. Update cycle status to available
-    */
-
-    if (returnMethod === "owner") {
-      alert(
-        "Return to owner selected. OTP verification will be used here."
-      );
+    if (!rental?.id) {
+      alert("Booking ID is missing.");
+      return;
     }
 
-    if (returnMethod === "admin") {
-      alert(
-        "Return to admin selected. OTP verification will be used here."
-      );
-    }
+    console.log("Returning booking:", rental.id);
+    console.log("Return method:", returnMethod);
 
     closeReturnModal();
+
+    if (onReturn) {
+      onReturn(rental.id);
+    }
   };
 
   // ============================================================

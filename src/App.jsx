@@ -535,6 +535,8 @@ function App() {
   const [profileReturnPage, setProfileReturnPage] =
     useState("ChoicePage");
 
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+
   // =========================================================
   // NOTIFICATIONS
   // =========================================================
@@ -1238,6 +1240,11 @@ function App() {
             )
           }
 
+          onReturn={(bookingId) => {
+            setSelectedBookingId(bookingId);
+            setPage("ReturnPage");
+          }}
+
           onNotifications={() =>
             handleOpenNotifications(
               "onGoingRents"
@@ -1293,7 +1300,9 @@ function App() {
       ===================================================== */}
 
       {page === "ReturnPage" && (
-        <ReturnPage />
+        <ReturnPage 
+           bookingId = {selectedBookingId}
+        />
       )}
 
       {/* =====================================================
