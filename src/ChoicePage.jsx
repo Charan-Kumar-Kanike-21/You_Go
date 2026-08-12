@@ -1,9 +1,18 @@
 import React from "react";
 import "./ChoicePage.css";
 
-function ChoicePage({ onRentalChoice, onProfileChoice, onCycleOwner, onActiveRentals }) {
+function ChoicePage({ onRentalChoice, onProfileChoice, onCycleOwner, onActiveRentals, isAdmin, onBackToAdmin }) {
   return (
     <div className="choice-page">
+
+      {isAdmin && (
+        <button
+          className="back-admin-button"
+          onClick={onBackToAdmin}
+        >
+          ← Back to Admin
+        </button>
+      )}
 
       {/* ---------------- PROFILE ---------------- */}
       <div className="choice-profile">

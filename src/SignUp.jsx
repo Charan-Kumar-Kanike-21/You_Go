@@ -3,7 +3,7 @@ import "./SignUp.css";
 import logo from "./assets/app_logo.png";
 import { supabase } from "./supabase";
 
-function SignUp({ onBackToLogin }) {
+function SignUp({ onBackToLogin, onTermsClick }) {
   const [formData, setFormData] = useState({
     email: "",
     mobile: "",
@@ -215,7 +215,6 @@ function SignUp({ onBackToLogin }) {
           />
         </div>
 
-        {/* Terms */}
         <div className="terms">
           <input
             type="checkbox"
@@ -223,7 +222,14 @@ function SignUp({ onBackToLogin }) {
           />
 
           <span>
-            I agree to the terms and conditions
+            I agree to the{" "}
+            <button
+              type="button"
+              className="terms-link"
+              onClick={onTermsClick}
+            >
+              Terms & Conditions
+            </button>
           </span>
         </div>
 

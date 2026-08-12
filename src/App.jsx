@@ -21,6 +21,7 @@ import AdminDashboard from "./AdminDashboard";
 import OwnerDetails from "./OwnerDetails";
 import CycleVerification from "./CycleVerification";
 import NotificationBell from "./NotificationBell";
+import TermsAndConditions from "./TermsAndConditions";
 
 function App() {
   // =========================================
@@ -34,6 +35,8 @@ function App() {
   const [profileReturnPage, setProfileReturnPage] = useState("ChoicePage");
 
   const [notificationReturnPage, setNotificationReturnPage] = useState("ChoicePage");
+
+  const [isAdminChoicePage, setIsAdminChoicePage] = useState(false);
 
   const [ownerDetails, setOwnerDetails] = useState(null);
 
@@ -109,7 +112,8 @@ function App() {
   };
 
   const handleBackToChoice = () => {
-    setPage("ChoicePage");  
+    setPage("ChoicePage");
+    setIsAdminChoicePage(true);
   };
 
   // =========================================
@@ -134,8 +138,10 @@ function App() {
 
   const handleLoginSuccess = (role) => {
     if (role === "admin") {
+      setIsAdminChoicePage(false);
       setPage("AdminDashboard");
     } else if (role === "student") {
+      setIsAdminChoicePage(false);
       setPage("ChoicePage");
     }
   };
@@ -164,8 +170,16 @@ function App() {
     setPage("Listing");
   };
 
-  const handleOnGoingRents = () => {
+  const [ongoingRentsReturnPage, setOngoingRentsReturnPage] =
+    useState("ChoicePage");
+
+  const handleOnGoingRents = (returnPage = "ChoicePage") => {
+    setOngoingRentsReturnPage(returnPage);
     setPage("OnGoingRents");
+  };
+
+  const handleOnGoingRentsBack = () => {
+    setPage(ongoingRentsReturnPage);
   };
 
     // =========================================
@@ -183,6 +197,75 @@ function App() {
 
   const handleProfileBack = () => {
     setPage(profileReturnPage);
+  };
+
+  const handleNotificationAction = (notification, actionType) => {
+  switch (actionType) {
+    case "RETURN_CYCLE":
+      setPage("ReturnPage");
+      break;
+
+    case "VIEW_RENTAL":
+      setPage("OnGoingRents");
+      break;
+
+    case "VIEW_REPORT":
+      setPage("ReportPage");
+      break;
+
+      case "VIEW_CYCLE":
+        if (notification.type === "CYCLE_VERIFICATION_ASSIGNED") {
+
+          if (!notification.cycle_id) {
+            console.error(
+              "Cycle ID is missing from notification:",
+              notification
+            );
+
+            alert("Cycle ID not found in this notification.");
+            return;
+          }
+
+          setSelectedCycle({
+            id: notification.cycle_id,
+          });
+
+          setPage("CycleVerification");
+
+        } else {
+
+          // Normal cycle notification
+          setPage("BookingPage");
+
+        }
+
+        break;
+
+    case "VIEW_EXTENSION":
+      // Add your extension page here later
+      console.log("Open extension request");
+      break;
+
+    case "VIEW_ACCOUNT":
+      // Add admin account page here later
+      console.log("Open account");
+      break;
+
+    case "RETRY_PAYMENT":
+      console.log("Retry payment");
+      break;
+
+    case "VIEW_DISPUTE":
+      console.log("Open payment dispute");
+      break;
+
+    case "VIEW_SECURITY":
+      console.log("Open security settings");
+      break;
+
+    default:
+      console.log("Unknown notification action:", actionType);
+  }
   };
 
   return (
@@ -224,6 +307,7 @@ function App() {
       {page === "SignUp" && (
         <SignUp
           onBackToLogin={handleBackToLogin}
+          onTermsClick={() => setPage("TermsAndConditions")}
         />
       )}
 
@@ -236,7 +320,9 @@ function App() {
           onRentalChoice={handleRentalChoice}
           onProfileChoice={() => handleOpenProfile("ChoicePage")}
           onCycleOwner = {handleCycleOwner}
-          onActiveRentals = {handleOnGoingRents}
+          onActiveRentals={() => handleOnGoingRents("ChoicePage")}
+          isAdmin={isAdminChoicePage}
+          onBackToAdmin={() => setPage("AdminDashboard")}
         />
       )}
 
@@ -293,6 +379,7 @@ function App() {
 
       {page === "OnGoingRents" && (
        <OnGoingRents
+       onBack={handleOnGoingRentsBack}
        onReportIssue={handleReportIssue}
        onNotifications={() =>
           handleOpenNotifications("onGoingRents")
@@ -303,6 +390,7 @@ function App() {
       {page ==="NotificationPage" && (
         <NotificationPage
           onBack={handleNotificationBack}
+          onNotificationAction={handleNotificationAction}
         />
       )}
 
@@ -326,6 +414,7 @@ function App() {
           onNotifications={() =>
             handleOpenNotifications("AdminDashboard")
           }
+          onAdminToStudent = {handleBackToChoice}
         />
       )}
 
@@ -337,7 +426,15 @@ function App() {
       )}
 
       {page === "CycleVerification" && (
-        <CycleVerification/>
+        <CycleVerification
+          cycleId={selectedCycle?.id}
+        />
+      )}
+
+      {page === "TermsAndConditions" &&(
+        <TermsAndConditions
+          onBack={() => setPage("SignUp")}
+        />
       )}
     </>
   );

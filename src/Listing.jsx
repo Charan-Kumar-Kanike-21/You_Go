@@ -1,376 +1,4 @@
 
-// // import React, { useState } from "react";
-// // import "./Listing.css";
-
-// // function MyCycles({ onBack }) {
-// //   const [images, setImages] = useState([null, null, null]);
-
-// //   const handleImageUpload = (index, event) => {
-// //     const file = event.target.files[0];
-
-// //     if (file) {
-// //       const updatedImages = [...images];
-// //       updatedImages[index] = URL.createObjectURL(file);
-// //       setImages(updatedImages);
-// //     }
-// //   };
-
-// //   const handleSubmit = (event) => {
-// //     event.preventDefault();
-
-// //     alert("Cycle listed successfully!");
-// //   };
-
-// //   return (
-// //     <div className="my-cycles-page">
-
-// //       {/* NAVBAR */}
-// //       <nav className="my-cycles-navbar">
-// //         <div className="my-cycles-logo">
-// //           🚲 CycleShare
-// //         </div>
-
-// //         <button className="back-btn" onClick={onBack}>
-// //           ← Back
-// //         </button>
-// //       </nav>
-
-// //       {/* FORM CONTAINER */}
-// //       <div className="cycle-form-wrapper">
-
-// //         <div className="cycle-form-header">
-// //           <h1>List Your Cycle</h1>
-// //           <p>
-// //             Add your cycle details and make it available for other students.
-// //           </p>
-// //         </div>
-
-// //         <form onSubmit={handleSubmit}>
-
-// //           {/* OWNER DETAILS */}
-// //           <div className="form-section">
-// //             <h2>Owner Details</h2>
-
-// //             <div className="form-grid">
-
-// //               <div className="input-group">
-// //                 <label>Owner Name</label>
-// //                 <input
-// //                   type="text"
-// //                   placeholder="Enter your name"
-// //                   required
-// //                 />
-// //               </div>
-
-// //               <div className="input-group">
-// //                 <label>Phone Number</label>
-// //                 <input
-// //                   type="tel"
-// //                   placeholder="Enter phone number"
-// //                   required
-// //                 />
-// //               </div>
-
-// //               <div className="input-group full-width">
-// //                 <label>Email</label>
-// //                 <input
-// //                   type="email"
-// //                   placeholder="Enter email address"
-// //                   required
-// //                 />
-// //               </div>
-
-// //             </div>
-// //           </div>
-
-
-// //           {/* CYCLE DETAILS */}
-// //           <div className="form-section">
-// //             <h2>Cycle Details</h2>
-
-// //             <div className="form-grid">
-
-// //               <div className="input-group">
-// //                 <label>Cycle Brand Name</label>
-// //                 <input
-// //                   type="text"
-// //                   placeholder="Example: Hero, Firefox, Hercules"
-// //                   required
-// //                 />
-// //               </div>
-
-// //               <div className="input-group">
-// //                 <label>Cycle Model</label>
-// //                 <input
-// //                   type="text"
-// //                   placeholder="Enter cycle model"
-// //                 />
-// //               </div>
-
-// //               <div className="input-group">
-// //                 <label>Cycle Type</label>
-
-// //                 <select required>
-// //                   <option value="">Select cycle type</option>
-// //                   <option value="mountain">Mountain Bike</option>
-// //                   <option value="road">Road Bike</option>
-// //                   <option value="hybrid">Hybrid</option>
-// //                   <option value="gear">Gear Cycle</option>
-// //                   <option value="normal">Normal Cycle</option>
-// //                 </select>
-// //               </div>
-
-// //               <div className="input-group">
-// //                 <label>Cycle Condition</label>
-
-// //                 <select required>
-// //                   <option value="">Select condition</option>
-// //                   <option value="excellent">Excellent</option>
-// //                   <option value="good">Good</option>
-// //                   <option value="average">Average</option>
-// //                 </select>
-// //               </div>
-
-// //             </div>
-// //           </div>
-
-
-// //           {/* PRICING */}
-// //           <div className="form-section">
-// //             <h2>Rental Pricing</h2>
-
-// //             <div className="form-grid">
-
-// //               <div className="input-group">
-// //                 <label>Price Per Hour (₹)</label>
-
-// //                 <input
-// //                   type="number"
-// //                   min="1"
-// //                   max="100"
-// //                   placeholder="Maximum ₹100"
-// //                   required
-// //                 />
-
-// //                 <span className="input-hint">
-// //                   Maximum allowed: ₹100/hour
-// //                 </span>
-// //               </div>
-
-// //               <div className="input-group">
-// //                 <label>Price Per Day (₹)</label>
-
-// //                 <input
-// //                   type="number"
-// //                   min="1"
-// //                   max="500"
-// //                   placeholder="Maximum ₹500"
-// //                   required
-// //                 />
-
-// //                 <span className="input-hint">
-// //                   Maximum allowed: ₹500/day
-// //                 </span>
-// //               </div>
-
-// //             </div>
-// //           </div>
-
-
-// //           {/* LOCATION */}
-// //           <div className="form-section">
-// //             <h2>Cycle Location</h2>
-
-// //             <div className="input-group">
-// //               <label>Pickup / Cycle Location</label>
-
-// //               <input
-// //                 type="text"
-// //                 placeholder="Example: NITK Main Gate, Hostel Block, Surathkal"
-// //                 required
-// //               />
-// //             </div>
-// //           </div>
-
-
-// //           {/* AVAILABILITY */}
-// //           <div className="form-section">
-// //             <h2>Cycle Availability</h2>
-
-// //             <p className="section-description">
-// //               Set the time during which other students can rent or pick up your cycle.
-// //               Use the 24-hour clock.
-// //             </p>
-
-// //             <div className="form-grid">
-
-// //               {/* AVAILABLE FROM */}
-// //               <div className="input-group">
-// //                 <label>Available From</label>
-
-// //                 <input
-// //                   type="time"
-// //                   min="00:00"
-// //                   max="23:59"
-// //                   required
-// //                 />
-
-// //                 <span className="input-hint">
-// //                   Example: 09:00 = 9:00 AM
-// //                 </span>
-// //               </div>
-
-
-// //               {/* AVAILABLE UNTIL */}
-// //               <div className="input-group">
-// //                 <label>Available Until</label>
-
-// //                 <input
-// //                   type="time"
-// //                   min="00:00"
-// //                   max="23:59"
-// //                   required
-// //                 />
-
-// //                 <span className="input-hint">
-// //                   Example: 18:30 = 6:30 PM
-// //                 </span>
-// //               </div>
-
-// //             </div>
-
-// //             {/* AVAILABILITY DAYS */}
-// //             <div className="input-group availability-days-group">
-// //               <label>Available Days</label>
-
-// //               <div className="days-grid">
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="monday" />
-// //                   <span>Monday</span>
-// //                 </label>
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="tuesday" />
-// //                   <span>Tuesday</span>
-// //                 </label>
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="wednesday" />
-// //                   <span>Wednesday</span>
-// //                 </label>
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="thursday" />
-// //                   <span>Thursday</span>
-// //                 </label>
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="friday" />
-// //                   <span>Friday</span>
-// //                 </label>
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="saturday" />
-// //                   <span>Saturday</span>
-// //                 </label>
-
-// //                 <label className="day-option">
-// //                   <input type="checkbox" value="sunday" />
-// //                   <span>Sunday</span>
-// //                 </label>
-
-// //               </div>
-// //             </div>
-
-// //           </div>
-
-
-// //           {/* IMAGES */}
-// //           <div className="form-section">
-// //             <h2>Cycle Images</h2>
-
-// //             <p className="section-description">
-// //               Upload exactly 3 clear images of your cycle.
-// //             </p>
-
-// //             <div className="image-upload-grid">
-
-// //               {[0, 1, 2].map((index) => (
-// //                 <label
-// //                   className="image-upload-box"
-// //                   key={index}
-// //                 >
-
-// //                   {images[index] ? (
-// //                     <img
-// //                       src={images[index]}
-// //                       alt={`Cycle ${index + 1}`}
-// //                     />
-// //                   ) : (
-// //                     <>
-// //                       <div className="upload-icon">＋</div>
-
-// //                       <span>
-// //                         Upload Image {index + 1}
-// //                       </span>
-// //                     </>
-// //                   )}
-
-// //                   <input
-// //                     type="file"
-// //                     accept="image/*"
-// //                     onChange={(event) =>
-// //                       handleImageUpload(index, event)
-// //                     }
-// //                     required
-// //                   />
-
-// //                 </label>
-// //               ))}
-
-// //             </div>
-// //           </div>
-
-
-// //           {/* ADDITIONAL DETAILS */}
-// //           <div className="form-section">
-// //             <h2>Additional Details</h2>
-
-// //             <div className="input-group">
-// //               <label>Description</label>
-
-// //               <textarea
-// //                 rows="5"
-// //                 placeholder="Mention any additional information about your cycle..."
-// //               ></textarea>
-// //             </div>
-// //           </div>
-
-
-// //           {/* SUBMIT */}
-// //           <div className="submit-area">
-
-// //             <button
-// //               type="submit"
-// //               className="list-cycle-btn"
-// //             >
-// //               List My Cycle 🚲
-// //             </button>
-
-// //           </div>
-
-// //         </form>
-
-// //       </div>
-
-// //     </div>
-// //   );
-// // }
-
-// // export default MyCycles;
-
-
 import React, { useState, useEffect } from "react";
 import "./Listing.css";
 import { supabase } from "./supabase";
@@ -386,6 +14,8 @@ function MyCycles({ onBack }) {
   const [draftId, setDraftId] = useState(null);
 
   const [saving, setSaving] = useState(false);
+
+  const [submitting, setSubmitting] = useState(false);
 
   const [loadingDraft, setLoadingDraft] = useState(true);
 
@@ -1061,6 +691,10 @@ function MyCycles({ onBack }) {
 
     event.preventDefault();
 
+    if(submitting) return;
+
+    setSubmitting(true);
+
 
     try {
 
@@ -1476,8 +1110,8 @@ function MyCycles({ onBack }) {
       // SUCCESS
       // =================================================
       // =================================================
-// TRIGGER BACKEND VERIFICATION
-// =================================================
+      // TRIGGER BACKEND VERIFICATION
+      // =================================================
 
       const webhookResponse = await fetch(
         "https://stem61.app.n8n.cloud/webhook/cycle-listing-verification",
@@ -1529,6 +1163,10 @@ function MyCycles({ onBack }) {
         "Failed to list cycle: " +
         error.message
       );
+    }
+
+    finally {
+      setSubmitting(false);
     }
   };
 
@@ -2214,15 +1852,13 @@ function MyCycles({ onBack }) {
 
             {/* FINAL SUBMISSION */}
 
-            <button
-              type="submit"
-              className="list-cycle-btn"
-              disabled={saving}
-            >
-
-              List My Cycle 🚲
-
-            </button>
+              <button
+                type="submit"
+                className="list-cycle-btn"
+                disabled={saving || submitting}
+              >
+                {submitting ? "Listing Cycle..." : "List My Cycle 🚲"}
+              </button>
 
 
           </div>

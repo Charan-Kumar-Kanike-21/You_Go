@@ -5,7 +5,7 @@ import "./OnGoingRents.css";
 // Change this import path according to your project
 import { supabase } from "./supabase";
 
-function OnGoingRents( {onReportIssue}) {
+function OnGoingRents( { onBack, onReportIssue}) {
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -317,9 +317,21 @@ function OnGoingRents( {onReportIssue}) {
   if (loading) {
     return (
       <div className="my-rental-page">
+
+        <div className="empty-page-header">
+          <button
+            type="button"
+            className="ongoing-back-button"
+            onClick={onBack}
+          >
+            ← Back
+          </button>
+        </div>
+
         <div className="rental-loading">
           Loading your active rental...
         </div>
+
       </div>
     );
   }
@@ -331,8 +343,21 @@ function OnGoingRents( {onReportIssue}) {
   if (error) {
     return (
       <div className="my-rental-page">
+
+        <div className="empty-page-header">
+          <button
+            type="button"
+            className="ongoing-back-button"
+            onClick={onBack}
+          >
+            ← Back
+          </button>
+        </div>
+
         <div className="rental-message">
+
           <h2>Unable to load rental</h2>
+
           <p>{error}</p>
 
           <button
@@ -341,11 +366,12 @@ function OnGoingRents( {onReportIssue}) {
           >
             Try Again
           </button>
+
         </div>
+
       </div>
     );
   }
-
   // ============================================================
   // NO ACTIVE RENTAL
   // ============================================================
@@ -353,6 +379,17 @@ function OnGoingRents( {onReportIssue}) {
   if (!rental) {
     return (
       <div className="my-rental-page">
+
+        <div className="empty-page-header">
+          <button
+            type="button"
+            className="ongoing-back-button"
+            onClick={onBack}
+          >
+            ← Back
+          </button>
+        </div>
+
         <div className="rental-message">
           <div className="empty-icon">🚲</div>
 
@@ -362,6 +399,7 @@ function OnGoingRents( {onReportIssue}) {
             You currently don't have any rented cycle.
           </p>
         </div>
+
       </div>
     );
   }
@@ -405,7 +443,9 @@ function OnGoingRents( {onReportIssue}) {
         </div>
 
         <div>
-          <button className="ongoing-back-button">
+          <button className="ongoing-back-button"
+            onClick={onBack}
+          >
             ← Back
           </button>
           <div className="active-badge">
