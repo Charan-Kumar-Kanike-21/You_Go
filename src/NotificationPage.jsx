@@ -1,86 +1,98 @@
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabase";
 import "./NotificationPage.css";
 
+
 /*
 |--------------------------------------------------------------------------
-| Notification configuration
+| Notification visual configuration
 |--------------------------------------------------------------------------
 |
 | IMPORTANT:
-| notification.type from Supabase should exactly match these keys.
+|
+| type is used ONLY for:
+|   - icon
+|   - category
+|   - visual style
+|
+| The actual button/action comes from:
+|
+|   notification.action_type
+|   notification.action_data
+|
+| Therefore action_data is the source of truth for action information.
 |
 */
+
 
 const NOTIFICATION_CONFIG = {
 
   /* =========================================================
-     RENTAL REQUESTS
+     RENTAL
      ========================================================= */
 
   RENTAL_REQUEST_RECEIVED: {
     icon: "🚲",
     category: "Rental",
     style: "action",
-    defaultAction: "View Request",
-    actionType: "VIEW_RENTAL",
   },
 
   RENTAL_REQUEST_ACCEPTED: {
     icon: "✓",
     category: "Rental",
     style: "success",
-    defaultAction: "View Rental",
-    actionType: "VIEW_RENTAL",
   },
 
   RENTAL_REQUEST_REJECTED: {
     icon: "✕",
     category: "Rental",
     style: "danger",
-    actionType: "NONE",
   },
 
   RENTAL_REQUEST_CANCELLED: {
     icon: "↩",
     category: "Rental",
     style: "warning",
-    actionType: "NONE",
   },
 
   RENTAL_REQUEST_EXPIRED: {
     icon: "⌛",
     category: "Rental",
     style: "warning",
-    actionType: "NONE",
   },
 
 
   /* =========================================================
-     RENTAL START
+     OTP / RENTAL START
      ========================================================= */
 
   RENTAL_OTP_GENERATED: {
     icon: "🔐",
     category: "Rental",
     style: "otp",
-    actionType: "NONE",
+  },
+
+  RENTAL_OTP_EXPIRED_OWNER_ABSENT: {
+    icon: "⏰",
+    category: "Rental",
+    style: "danger",
   },
 
   RENTAL_STARTED: {
     icon: "🚲",
     category: "Rental",
     style: "success",
-    defaultAction: "View Rental",
-    actionType: "VIEW_RENTAL",
   },
 
   RENTAL_START_FAILED: {
     icon: "⚠",
     category: "Rental",
     style: "danger",
-    actionType: "NONE",
   },
 
 
@@ -92,41 +104,35 @@ const NOTIFICATION_CONFIG = {
     icon: "⏰",
     category: "Rental",
     style: "warning",
-    actionType: "NONE",
   },
 
   RENTAL_EXPIRED: {
     icon: "⌛",
     category: "Rental",
     style: "danger",
-    actionType: "NONE",
   },
 
 
   /* =========================================================
-     EXTENSIONS
+     EXTENSION
      ========================================================= */
 
   RENTAL_EXTENSION_REQUESTED: {
     icon: "↗",
     category: "Rental",
     style: "action",
-    defaultAction: "Review Request",
-    actionType: "VIEW_EXTENSION",
   },
 
   RENTAL_EXTENSION_ACCEPTED: {
     icon: "✓",
     category: "Rental",
     style: "success",
-    actionType: "NONE",
   },
 
   RENTAL_EXTENSION_REJECTED: {
     icon: "✕",
     category: "Rental",
     style: "danger",
-    actionType: "NONE",
   },
 
 
@@ -138,38 +144,30 @@ const NOTIFICATION_CONFIG = {
     icon: "↩",
     category: "Return",
     style: "warning",
-    defaultAction: "Return Cycle",
-    actionType: "RETURN_CYCLE",
   },
 
   RETURN_COMPLETED: {
     icon: "✓",
     category: "Return",
     style: "success",
-    actionType: "NONE",
   },
 
   RETURN_PROBLEM_REPORTED: {
     icon: "🚨",
     category: "Return",
     style: "action",
-    defaultAction: "View Report",
-    actionType: "VIEW_REPORT",
   },
 
   RETURN_ASSISTANCE_REQUIRED: {
     icon: "🔑",
     category: "Admin",
     style: "urgent",
-    defaultAction: "Handle",
-    actionType: "VIEW_REPORT",
   },
 
   RETURN_ISSUE_RESOLVED: {
     icon: "✓",
     category: "Return",
     style: "success",
-    actionType: "NONE",
   },
 
 
@@ -181,52 +179,42 @@ const NOTIFICATION_CONFIG = {
     icon: "🔎",
     category: "Verification",
     style: "action",
-    defaultAction: "View Details",
-    actionType: "VIEW_CYCLE",
   },
 
   CYCLE_APPROVED: {
     icon: "✓",
     category: "Verification",
     style: "success",
-    actionType: "NONE",
   },
 
   CYCLE_REJECTED: {
     icon: "✕",
     category: "Verification",
     style: "danger",
-    actionType: "NONE",
   },
 
   CYCLE_LISTING_ACTIVATED: {
     icon: "🚲",
     category: "Cycle",
     style: "success",
-    defaultAction: "View Cycle",
-    actionType: "VIEW_CYCLE",
   },
 
   CYCLE_LISTING_SUSPENDED: {
     icon: "⚠",
     category: "Cycle",
     style: "warning",
-    actionType: "NONE",
   },
 
   CYCLE_LISTING_REMOVED: {
     icon: "✕",
     category: "Cycle",
     style: "danger",
-    actionType: "NONE",
   },
 
   CYCLE_REVERIFICATION_REQUIRED: {
     icon: "🔎",
     category: "Verification",
     style: "action",
-    defaultAction: "Review Cycle",
-    actionType: "VIEW_CYCLE",
   },
 
 
@@ -238,46 +226,36 @@ const NOTIFICATION_CONFIG = {
     icon: "🚨",
     category: "Report",
     style: "action",
-    defaultAction: "View Report",
-    actionType: "VIEW_REPORT",
   },
 
   OWNER_REPORTED: {
     icon: "🚨",
     category: "Report",
     style: "action",
-    defaultAction: "View Report",
-    actionType: "VIEW_REPORT",
   },
 
   RENTER_REPORTED: {
     icon: "🚨",
     category: "Report",
     style: "action",
-    defaultAction: "View Report",
-    actionType: "VIEW_REPORT",
   },
 
   CYCLE_REPORTED: {
     icon: "🚨",
     category: "Report",
     style: "action",
-    defaultAction: "View Report",
-    actionType: "VIEW_REPORT",
   },
 
   REPORT_RESOLVED: {
     icon: "✓",
     category: "Report",
     style: "success",
-    actionType: "NONE",
   },
 
   REPORT_DISMISSED: {
     icon: "—",
     category: "Report",
     style: "neutral",
-    actionType: "NONE",
   },
 
 
@@ -289,29 +267,24 @@ const NOTIFICATION_CONFIG = {
     icon: "⛔",
     category: "Account",
     style: "urgent",
-    actionType: "NONE",
   },
 
   ACCOUNT_UNBLOCKED: {
     icon: "✓",
     category: "Account",
     style: "success",
-    actionType: "NONE",
   },
 
   ACCOUNT_WARNING: {
     icon: "⚠",
     category: "Account",
     style: "warning",
-    actionType: "NONE",
   },
 
   ACCOUNT_REVIEW_REQUIRED: {
     icon: "🔎",
     category: "Account",
     style: "action",
-    defaultAction: "Review Account",
-    actionType: "VIEW_ACCOUNT",
   },
 
 
@@ -323,51 +296,42 @@ const NOTIFICATION_CONFIG = {
     icon: "₹",
     category: "Payment",
     style: "success",
-    actionType: "NONE",
   },
 
   PAYMENT_FAILED: {
     icon: "₹",
     category: "Payment",
     style: "danger",
-    defaultAction: "Retry Payment",
-    actionType: "RETRY_PAYMENT",
   },
 
   REFUND_INITIATED: {
     icon: "↩",
     category: "Payment",
     style: "neutral",
-    actionType: "NONE",
   },
 
   REFUND_COMPLETED: {
     icon: "₹",
     category: "Payment",
     style: "success",
-    actionType: "NONE",
   },
 
   REFUND_FAILED: {
     icon: "⚠",
     category: "Payment",
     style: "danger",
-    actionType: "NONE",
   },
 
   PAYMENT_DISPUTE_OPENED: {
     icon: "⚖",
     category: "Payment",
     style: "action",
-    defaultAction: "View Dispute",
-    actionType: "VIEW_DISPUTE",
   },
 
   PAYMENT_DISPUTE_RESOLVED: {
     icon: "✓",
     category: "Payment",
     style: "success",
-    actionType: "NONE",
   },
 
 
@@ -379,22 +343,18 @@ const NOTIFICATION_CONFIG = {
     icon: "🔐",
     category: "Security",
     style: "warning",
-    actionType: "NONE",
   },
 
   SECURITY_ALERT: {
     icon: "🚨",
     category: "Security",
     style: "urgent",
-    defaultAction: "Review",
-    actionType: "VIEW_SECURITY",
   },
 
   PASSWORD_CHANGED: {
     icon: "🔐",
     category: "Security",
     style: "success",
-    actionType: "NONE",
   },
 
 
@@ -406,35 +366,31 @@ const NOTIFICATION_CONFIG = {
     icon: "📢",
     category: "System",
     style: "neutral",
-    actionType: "NONE",
   },
 
   SYSTEM_MAINTENANCE: {
     icon: "🔧",
     category: "System",
     style: "warning",
-    actionType: "NONE",
   },
 
   TERMS_UPDATED: {
     icon: "📄",
     category: "System",
     style: "neutral",
-    actionType: "NONE",
   },
 
   PRIVACY_POLICY_UPDATED: {
     icon: "📄",
     category: "System",
     style: "neutral",
-    actionType: "NONE",
   },
 };
 
 
 /*
 |--------------------------------------------------------------------------
-| Fallback configuration
+| Default configuration
 |--------------------------------------------------------------------------
 */
 
@@ -442,7 +398,65 @@ const DEFAULT_NOTIFICATION_CONFIG = {
   icon: "🔔",
   category: "General",
   style: "neutral",
-  actionType: "NONE",
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Action button labels
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+|
+| The label is determined by action_type.
+|
+| The backend does NOT need to store action_label unless you
+| specifically want custom labels in the future.
+|
+*/
+
+
+const ACTION_LABELS = {
+
+  ENTER_RENTAL_OTP:
+    "Enter OTP",
+
+  REPORT_OWNER:
+    "Report Owner",
+
+  // VIEW_RENTAL:
+  //   "View Rental",
+
+  VIEW_EXTENSION:
+    "Review Request",
+
+  RETURN_CYCLE:
+    "Return Cycle",
+
+  VIEW_REPORT:
+    "View Report",
+
+  // HANDLE_RETURN_ASSISTANCE:
+  //   "Handle",
+
+  VIEW_CYCLE:
+  "View Cycle",
+
+  // VERIFY_CYCLE:
+  //   "Verify Cycle",
+  
+  // VIEW_ACCOUNT:
+  //   "View Account",
+
+  RETRY_PAYMENT:
+    "Retry Payment",
+
+  // VIEW_DISPUTE:
+  //   "View Dispute",
+
+  VIEW_SECURITY:
+    "Review",
+
 };
 
 
@@ -452,7 +466,10 @@ const DEFAULT_NOTIFICATION_CONFIG = {
 |--------------------------------------------------------------------------
 */
 
-function NotificationPage({ onBack, onNotificationAction }) {
+function NotificationPage({
+  onBack,
+  onNotificationAction,
+}) {
 
   const [notifications, setNotifications] =
     useState([]);
@@ -469,7 +486,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
   /*
   |--------------------------------------------------------------------------
-  | Fetch current user's notifications
+  | Fetch notifications
   |--------------------------------------------------------------------------
   */
 
@@ -480,8 +497,9 @@ function NotificationPage({ onBack, onNotificationAction }) {
       setLoading(true);
       setError("");
 
+
       /*
-       * Get authenticated user.
+       * Get currently authenticated user.
        */
 
       const {
@@ -489,10 +507,13 @@ function NotificationPage({ onBack, onNotificationAction }) {
         error: userError,
       } =
         await supabase.auth.getUser();
+        console.log(user);
+        console.log(userError);
 
       if (userError) {
         throw userError;
       }
+
 
       if (!user) {
 
@@ -505,28 +526,36 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
 
       /*
-       * IMPORTANT:
+       * Fetch ONLY this user's notifications.
        *
-       * Only notifications belonging to this
-       * authenticated user are fetched.
+       * action_data is fetched directly from
+       * the notifications table.
        */
 
-      const {
-        data,
-        error: notificationError,
-      } =
-        await supabase
-          .from("notifications")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", {
-            ascending: false,
-          });
+      const { data, error: notificationError } = await supabase
+  .from("notifications")
+  .select(
+    "id",
+    "user_id",
+    "title",
+    "message",
+    "type",
+    "action_type",
+    "action_data",
+    "is_read",
+          // priority,
+          "created_at"
+        )
+        .eq("user_id", user.id)
+        .order("created_at", {
+        ascending: false,
+      });
 
 
       if (notificationError) {
         throw notificationError;
       }
+
 
       setNotifications(data || []);
 
@@ -546,18 +575,20 @@ function NotificationPage({ onBack, onNotificationAction }) {
       setLoading(false);
 
     }
+
   };
 
 
   /*
   |--------------------------------------------------------------------------
-  | Initial fetch + realtime notifications
+  | Initial load + realtime
   |--------------------------------------------------------------------------
   */
 
   useEffect(() => {
 
     let channel = null;
+
 
     const initialize = async () => {
 
@@ -576,8 +607,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
 
       /*
-       * Listen only for notifications belonging
-       * to this user.
+       * Realtime INSERT listener.
        */
 
       channel =
@@ -616,9 +646,11 @@ function NotificationPage({ onBack, onNotificationAction }) {
     return () => {
 
       if (channel) {
+
         supabase.removeChannel(
           channel
         );
+
       }
 
     };
@@ -642,19 +674,19 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
 
     /*
-     * Optimistic update
+     * Optimistic UI update.
      */
 
     setNotifications(
       (current) =>
-        current.map((item) =>
-          item.id ===
-          notification.id
-            ? {
-                ...item,
-                is_read: true,
-              }
-            : item
+        current.map(
+          (item) =>
+            item.id === notification.id
+              ? {
+                  ...item,
+                  is_read: true,
+                }
+              : item
         )
     );
 
@@ -668,35 +700,31 @@ function NotificationPage({ onBack, onNotificationAction }) {
         .eq(
           "id",
           notification.id
-        )
-        .eq(
-          "user_id",
-          notification.user_id
         );
 
 
     if (error) {
 
       console.error(
-        "Mark notification read error:",
+        "Mark as read error:",
         error
       );
 
 
       /*
-       * Revert optimistic update
+       * Revert UI if database update fails.
        */
 
       setNotifications(
         (current) =>
-          current.map((item) =>
-            item.id ===
-            notification.id
-              ? {
-                  ...item,
-                  is_read: false,
-                }
-              : item
+          current.map(
+            (item) =>
+              item.id === notification.id
+                ? {
+                    ...item,
+                    is_read: false,
+                  }
+                : item
           )
       );
 
@@ -713,10 +741,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
   const markAllAsRead = async () => {
 
-    if (
-      markingAll ||
-      unreadCount === 0
-    ) {
+    if (markingAll) {
       return;
     }
 
@@ -768,6 +793,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
           )
       );
 
+
     } catch (err) {
 
       console.error(
@@ -803,6 +829,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
     const created =
       new Date(date);
+
 
     const seconds =
       Math.floor(
@@ -873,7 +900,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
   /*
   |--------------------------------------------------------------------------
-  | Get notification configuration
+  | Get visual configuration
   |--------------------------------------------------------------------------
   */
 
@@ -893,70 +920,90 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
   /*
   |--------------------------------------------------------------------------
-  | Notification action
+  | Safely get action_data
   |--------------------------------------------------------------------------
   |
-  | We are intentionally NOT navigating here yet.
+  | PostgreSQL JSONB normally comes into JavaScript as an object.
   |
-  | Your teammates can connect these action types
-  | to the appropriate pages later.
-  |--------------------------------------------------------------------------
+  | This helper also protects the page if action_data happens
+  | to be null or arrives as a JSON string.
+  |
   */
 
-  const handleAction = (notification) => {
-    markAsRead(notification);
+  const getActionData = (
+    notification
+  ) => {
 
-    const config = getConfig(notification);
+    const data =
+      notification.action_data;
 
-    const actionType =
-      notification.action_type &&
-      notification.action_type !== "NONE"
-        ? notification.action_type
-        : config.actionType;
 
-    console.log("Notification action:", {
-      type: notification.type,
-      action: actionType,
-      actionData: notification.action_data,
-      relatedId: notification.related_id,
-    });
-
-    if (onNotificationAction) {
-      onNotificationAction(notification, actionType);
+    if (!data) {
+      return {};
     }
+
+
+    if (
+      typeof data === "object"
+    ) {
+      return data;
+    }
+
+
+    if (
+      typeof data === "string"
+    ) {
+
+      try {
+
+        return JSON.parse(data);
+
+      } catch {
+
+        console.error(
+          "Invalid action_data JSON:",
+          data
+        );
+
+        return {};
+
+      }
+
+    }
+
+
+    return {};
+
   };
+
 
   /*
   |--------------------------------------------------------------------------
-  | Extract OTP
+  | Get OTP
   |--------------------------------------------------------------------------
+  |
+  | OTP is now ONLY read from action_data.
+  |
   */
 
   const getOtp = (
     notification
   ) => {
 
-    if (
-      notification.action_data
-        ?.otp
-    ) {
+    const actionData =
+      getActionData(
+        notification
+      );
 
-      return notification
-        .action_data
-        .otp;
-
-    }
-
-
-    /*
-     * Optional fallback if OTP is
-     * stored directly in a column.
-     */
 
     if (
-      notification.otp
+      notification.type ===
+      "RENTAL_OTP_GENERATED"
     ) {
-      return notification.otp;
+
+      return actionData.otp ||
+        null;
+
     }
 
 
@@ -967,7 +1014,278 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
   /*
   |--------------------------------------------------------------------------
-  | Derived state
+  | Action handler
+  |--------------------------------------------------------------------------
+  |
+  | action_type tells us what to do.
+  |
+  | action_data tells us what information to pass.
+  |
+  */
+
+  const handleAction = async (
+    notification
+  ) => {
+
+    await markAsRead(
+      notification
+    );
+
+
+    const actionType =
+      notification.action_type;
+
+
+    const actionData =
+      getActionData(
+        notification
+      );
+
+
+    /*
+     * No action.
+     */
+
+    if (
+      !actionType ||
+      actionType === "NONE"
+    ) {
+
+      return;
+
+    }
+
+
+    console.log(
+      "Notification action:",
+      {
+        notificationId:
+          notification.id,
+
+        notificationType:
+          notification.type,
+
+        actionType,
+
+        actionData,
+      }
+    );
+
+
+    /*
+     * ---------------------------------------------------------
+     * ENTER RENTAL OTP
+     * ---------------------------------------------------------
+     *
+     * Example action_data:
+     *
+     * {
+     *   booking_id,
+     *   cycle_id,
+     *   owner_id,
+     *   renter_id
+     * }
+     *
+     */
+
+    if (
+      actionType ===
+      "ENTER_RENTAL_OTP"
+    ) {
+
+      if (
+        !actionData.booking_id
+      ) {
+
+        console.error(
+          "ENTER_RENTAL_OTP requires booking_id"
+        );
+
+        return;
+
+      }
+
+
+      if (
+        onNotificationAction
+      ) {
+
+        onNotificationAction(
+          notification,
+          actionType,
+          actionData
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * REPORT OWNER
+     * ---------------------------------------------------------
+     *
+     * Specifically used when:
+     *
+     * OTP expired because owner was absent.
+     *
+     */
+
+    if (
+      actionType ===
+      "REPORT_OWNER"
+    ) {
+
+      if (
+        !actionData.booking_id ||
+        !actionData.owner_id
+      ) {
+
+        console.error(
+          "REPORT_OWNER requires booking_id and owner_id"
+        );
+
+        return;
+
+      }
+
+
+      if (
+        onNotificationAction
+      ) {
+
+        onNotificationAction(
+          notification,
+          actionType,
+          actionData
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * VERIFY / VIEW CYCLE
+     * ---------------------------------------------------------
+     *
+     * cycle_id comes ONLY from action_data.
+     *
+     */
+
+    if (
+      actionType ===
+        "VERIFY_CYCLE" ||
+      actionType ===
+        "VIEW_CYCLE"
+    ) {
+
+      if (
+        !actionData.cycle_id
+      ) {
+
+        console.error(
+          `${actionType} requires cycle_id`
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        const {
+          data: cycle,
+          error: cycleError,
+        } =
+          await supabase
+            .from("cycles")
+            .select("*")
+            .eq(
+              "id",
+              actionData.cycle_id
+            )
+            .single();
+
+
+        if (cycleError) {
+
+          console.error(
+            "Cycle fetch error:",
+            cycleError
+          );
+
+          return;
+
+        }
+
+
+        if (
+          onNotificationAction
+        ) {
+
+          onNotificationAction(
+            notification,
+            actionType,
+            {
+              ...actionData,
+              cycle,
+            }
+          );
+
+        }
+
+      } catch (err) {
+
+        console.error(
+          "Cycle action error:",
+          err
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * ALL OTHER ACTIONS
+     * ---------------------------------------------------------
+     *
+     * Pass action_data exactly as received from database.
+     *
+     */
+
+    if (
+      onNotificationAction
+    ) {
+
+      onNotificationAction(
+        notification,
+        actionType,
+        actionData
+      );
+
+    }
+
+  };
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Unread count
   |--------------------------------------------------------------------------
   */
 
@@ -984,7 +1302,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
   /*
   |--------------------------------------------------------------------------
-  | Loading state
+  | Loading
   |--------------------------------------------------------------------------
   */
 
@@ -995,14 +1313,17 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
         <div className="notification-loading">
 
-          <div className="loading-spinner"></div>
+          <div className="loading-spinner">
+            🔄
+          </div>
 
           <h2>
             Loading notifications...
           </h2>
 
           <p>
-            Please wait while we get your latest updates.
+            Please wait while we get
+            your latest updates.
           </p>
 
         </div>
@@ -1034,12 +1355,16 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
           <div>
 
-          <button
-            className="mark-all-button"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
+            {onBack && (
+
+              <button
+                className="back-button"
+                onClick={onBack}
+              >
+                ← Back
+              </button>
+
+            )}
 
             <span className="notification-eyebrow">
               UGO · CAMPUS CYCLE EXCHANGE
@@ -1063,23 +1388,14 @@ function NotificationPage({ onBack, onNotificationAction }) {
             {unreadCount > 0 && (
 
               <span className="unread-count">
-
-                {unreadCount}
-
-                {" "}
-
-                unread
-
+                {unreadCount} unread
               </span>
 
             )}
 
-
             <button
               className="mark-all-button"
-              onClick={
-                markAllAsRead
-              }
+              onClick={markAllAsRead}
               disabled={
                 markingAll ||
                 unreadCount === 0
@@ -1181,38 +1497,32 @@ function NotificationPage({ onBack, onNotificationAction }) {
                     );
 
 
-                  const otp =
-                    notification.type ===
-                    "RENTAL_OTP_GENERATED"
-                      ? getOtp(
-                          notification
-                        )
-                      : null;
+                  const actionData =
+                    getActionData(
+                      notification
+                    );
 
-
-                  /*
-                   * Use action_type from database
-                   * if provided, otherwise use the
-                   * type configuration.
-                   */
 
                   const actionType =
-                    notification.action_type &&
-                    notification.action_type !==
-                      "NONE"
-                      ? notification.action_type
-                      : config.actionType;
+                    notification.action_type;
 
 
                   const hasAction =
                     actionType &&
-                    actionType !==
-                      "NONE";
+                    actionType !== "NONE";
 
 
                   const actionLabel =
-                    notification.action_label ||
-                    config.defaultAction;
+                    ACTION_LABELS[
+                      actionType
+                    ] ||
+                    "View";
+
+
+                  const otp =
+                    getOtp(
+                      notification
+                    );
 
 
                   return (
@@ -1257,7 +1567,6 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
                       <div className="notification-content">
 
-
                         <div className="notification-title-row">
 
                           <div className="title-with-category">
@@ -1298,7 +1607,7 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
 
                         {/* =================================================
-                            OTP
+                            OTP DISPLAY
                             ================================================= */}
 
                         {otp && (
@@ -1313,10 +1622,32 @@ function NotificationPage({ onBack, onNotificationAction }) {
                               {otp}
                             </strong>
 
-                            <span className="otp-info">
-                              Show this OTP to the
-                              owner to start the rental.
-                            </span>
+                            {actionData.otp_expires_at && (
+
+                              <span className="otp-info">
+
+                                Valid until{" "}
+                                {new Date(
+                                  actionData
+                                    .otp_expires_at
+                                ).toLocaleString()}
+
+                              </span>
+
+                            )}
+
+                            {!actionData
+                              .otp_expires_at && (
+
+                              <span className="otp-info">
+
+                                Show this OTP
+                                to the owner
+                                to start the rental.
+
+                              </span>
+
+                            )}
 
                           </div>
 
@@ -1357,17 +1688,36 @@ function NotificationPage({ onBack, onNotificationAction }) {
 
                         </div>
 
+
+                        {/* =================================================
+                            DEBUG-SAFE ACTION DATA INDICATOR
+                            =================================================
+                            
+                            We intentionally DO NOT display action_data.
+                            
+                            It is internal data used by the button.
+                            
+                        */}
+
                       </div>
 
 
-                      {/* =================================================
+                      {/* =====================================================
                           ACTION BUTTON
-                          ================================================= */}
+                          ===================================================== */}
 
                       {hasAction && (
 
                         <button
-                          className="notification-action"
+                          className={`
+                            notification-action
+                            action-${actionType
+                              .toLowerCase()
+                              .replace(
+                                /_/g,
+                                "-"
+                              )}
+                          `}
                           onClick={(
                             event
                           ) => {

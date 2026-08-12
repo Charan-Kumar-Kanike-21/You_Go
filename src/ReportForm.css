@@ -1,0 +1,451 @@
+/* =========================================
+   RESET
+========================================= */
+
+.report-page,
+.report-page * {
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   PAGE
+========================================= */
+
+.report-page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(33, 91, 99, 0.35),
+      transparent 35%
+    ),
+    #061c17;
+
+  color: #fff6de;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.report-card {
+  width: 100%;
+  max-width: 720px;
+
+  background: rgba(255, 246, 222, 0.06);
+
+  border: 1px solid rgba(255, 246, 222, 0.12);
+
+  border-radius: 24px;
+
+  padding: 32px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(12px);
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.report-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+
+.report-header h1 {
+  margin: 12px 0 8px;
+
+  font-size: 32px;
+  font-weight: 700;
+}
+
+
+.report-header p {
+  margin: 0 auto;
+
+  max-width: 560px;
+
+  color: rgba(255, 246, 222, 0.7);
+
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.report-back-btn {
+  display: block;
+
+  margin-bottom: 24px;
+
+  padding: 10px 16px;
+
+  border: 1px solid rgba(255, 246, 222, 0.18);
+
+  border-radius: 10px;
+
+  background: rgba(255, 246, 222, 0.06);
+
+  color: #fff6de;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+
+.report-back-btn:hover {
+  background: rgba(255, 246, 222, 0.12);
+
+  transform: translateX(-2px);
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.report-icon {
+  width: 64px;
+  height: 64px;
+
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: rgba(201, 124, 124, 0.16);
+
+  font-size: 28px;
+}
+
+
+/* =========================================
+   CYCLE INFORMATION
+========================================= */
+
+.reported-cycle {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 30px;
+}
+
+
+.cycle-info-item {
+  padding: 18px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 246, 222, 0.05);
+
+  border: 1px solid rgba(255, 246, 222, 0.1);
+}
+
+
+.cycle-info-item span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-size: 12px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.08em;
+
+  color: rgba(255, 246, 222, 0.5);
+}
+
+
+.cycle-info-item strong {
+  font-size: 15px;
+
+  color: #fff6de;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.report-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 22px;
+}
+
+
+.report-field {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.report-field label {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #fff6de;
+}
+
+
+/* =========================================
+   SELECT
+========================================= */
+
+.report-field select {
+  width: 100%;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 246, 222, 0.15);
+
+  background: #0b2b24;
+
+  color: #fff6de;
+
+  outline: none;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+
+.report-field select:focus {
+  border-color: #c97c7c;
+
+  box-shadow:
+    0 0 0 3px rgba(201, 124, 124, 0.12);
+}
+
+
+/* =========================================
+   TEXTAREA
+========================================= */
+
+.report-field textarea {
+  width: 100%;
+
+  min-height: 160px;
+
+  padding: 15px 16px;
+
+  resize: vertical;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 246, 222, 0.15);
+
+  background: #0b2b24;
+
+  color: #fff6de;
+
+  outline: none;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+.report-field textarea::placeholder {
+  color: rgba(255, 246, 222, 0.4);
+}
+
+
+.report-field textarea:focus {
+  border-color: #c97c7c;
+
+  box-shadow:
+    0 0 0 3px rgba(201, 124, 124, 0.12);
+}
+
+
+/* =========================================
+   CHARACTER COUNT
+========================================= */
+
+.character-count {
+  align-self: flex-end;
+
+  margin-top: -3px;
+
+  font-size: 12px;
+
+  color: rgba(255, 246, 222, 0.45);
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+.report-error {
+  padding: 13px 15px;
+
+  border-radius: 10px;
+
+  background: rgba(201, 124, 124, 0.12);
+
+  border: 1px solid rgba(201, 124, 124, 0.3);
+
+  color: #ffcaca;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+.submit-report-btn {
+  width: 100%;
+
+  padding: 15px 20px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #c97c7c;
+
+  color: #fff;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+
+.submit-report-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 25px rgba(201, 124, 124, 0.25);
+}
+
+
+.submit-report-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   NOTE
+========================================= */
+
+.report-note {
+  margin: 22px 0 0;
+
+  text-align: center;
+
+  color: rgba(255, 246, 222, 0.5);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.report-empty-icon {
+  text-align: center;
+
+  font-size: 42px;
+
+  margin-bottom: 15px;
+}
+
+
+.report-card > h2 {
+  text-align: center;
+
+  margin-bottom: 10px;
+}
+
+
+.report-card > p {
+  text-align: center;
+
+  color: rgba(255, 246, 222, 0.65);
+
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .report-page {
+    padding: 20px 12px;
+  }
+
+  .report-card {
+    padding: 22px 18px;
+
+    border-radius: 18px;
+  }
+
+  .report-header h1 {
+    font-size: 26px;
+  }
+
+  .reported-cycle {
+    grid-template-columns: 1fr;
+  }
+
+}

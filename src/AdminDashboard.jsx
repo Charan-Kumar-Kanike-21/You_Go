@@ -152,7 +152,7 @@ function AdminDashboard({ onAdminToStudent, onNotifications }) {
       setAlertsError("");
 
       const { data, error } = await supabase
-        .from("notifications")
+        .from("reports")
         .select("*")
         .eq("user_id", adminId)
         .order("created_at", {

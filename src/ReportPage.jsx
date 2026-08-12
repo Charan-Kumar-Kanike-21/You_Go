@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./ReportPage.css";
 import { supabase } from "./supabase";
 
-function ReportPage({ rental, onBack }) {
+function ReportPage({ rental, onBack, reportedUserId, reporterRole }) {
     if (!rental) {
 
     return (
@@ -68,17 +68,24 @@ function ReportPage({ rental, onBack }) {
         throw new Error("Please login again.");
       }
 
+      if (!reportedUserId) {
+        throw new Error("Unable to determine the user being reported.");
+      }
+
       // ============================================
       // CREATE REPORT
       // ============================================
 
-      const { data, error: insertError } = await supabase
-        .from("notification")
+        const { data, error: insertError } = await supabase
+        .from("reports")
         .insert([
           {
-            booking_id: rental.id,
-            cycle_id: rental.cycle_id,
             reported_by: user.id,
+            reported_user_id: reportedUserId,
+            cycle_id: rental.cycle_id,
+            booking_id: rental.id,
+            reporter_role: reporterRole,
+            reason: "Rental Issue",
             description: description.trim(),
             status: "pending",
           },
@@ -106,6 +113,7 @@ function ReportPage({ rental, onBack }) {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="report-page">
