@@ -21,7 +21,7 @@ import "./CycleVerification.css";
 const VERIFICATION_WEBHOOK =
   "https://stem61.app.n8n.cloud/webhook/cycle-listing-verification";
 
-function CycleVerification({ cycleId: propCycleId }) {
+function CycleVerification({ cycleId: propCycleId, onBack }) {
   const [cycleId, setCycleId] = useState(propCycleId || null);
 
   const [adminId, setAdminId] = useState(null);
@@ -39,6 +39,25 @@ function CycleVerification({ cycleId: propCycleId }) {
   const [decision, setDecision] = useState(null);
 
   const [imageIndex, setImageIndex] = useState(0);
+
+const getSessionData = async () => {
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error("Session error:", error);
+    return null;
+  }
+
+  if (!session) {
+    console.log("No active session");
+    return null;
+  }
+  setAdminId(session.user.id)
+  return session;
+};
 
   /*
   |--------------------------------------------------------------------------
@@ -210,50 +229,33 @@ function CycleVerification({ cycleId: propCycleId }) {
       image.url ||
       image.public_url;
 
-    if (directUrl) {
+    // If it is already a complete URL, use it directly
+    if (
+      directUrl &&
+      (directUrl.startsWith("http://") ||
+        directUrl.startsWith("https://"))
+    ) {
       return {
         ...image,
         resolvedUrl: directUrl,
       };
     }
 
-    /*
-     * If your table stores a complete storage URL,
-     * this will also work.
-     */
+    // If image_url is a Storage path, use it
     const storagePath =
+      directUrl ||
       image.storage_path ||
       image.file_path ||
       image.path;
 
-    if (
-      storagePath &&
-      storagePath.startsWith("http")
-    ) {
-      return {
-        ...image,
-        resolvedUrl: storagePath,
-      };
-    }
-
-    /*
-     * IMPORTANT:
-     *
-     * If your cycle images are stored as Supabase
-     * Storage paths, replace "cycle-images" with
-     * your actual bucket name.
-     */
     if (storagePath) {
-      const {
-        data: publicUrlData,
-      } = supabase.storage
+      const { data } = supabase.storage
         .from("cycle-images")
         .getPublicUrl(storagePath);
 
       return {
         ...image,
-        resolvedUrl:
-          publicUrlData?.publicUrl || null,
+        resolvedUrl: data?.publicUrl || null,
       };
     }
 
@@ -575,9 +577,7 @@ function CycleVerification({ cycleId: propCycleId }) {
 
           <button
             className="back-button"
-            onClick={() =>
-              window.history.back()
-            }
+            onClick={onBack}
           >
             ← Go Back
           </button>
@@ -650,9 +650,7 @@ function CycleVerification({ cycleId: propCycleId }) {
 
         <button
           className="back-button page-back-button"
-          onClick={() =>
-            window.history.back()
-          }
+          onClick={onBack}
         >
           ← Back to Notifications
         </button>

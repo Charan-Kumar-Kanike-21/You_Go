@@ -6,9 +6,75 @@ import OwnerDetails from "./OwnerDetails";
 function BookingPage({ cycle, onBack, onOwnerDetails}) {
   const [hours, setHours] = useState("");
   const [days, setDays] = useState("");
+  const numericHours = Number(hours) || 0;
+  const numericDays = Number(days) || 0;
+
+  const pricePerHour = Number(cycle?.price_per_hour) || 0;
+  const pricePerDay = Number(cycle?.price_per_day) || 0;
+
+  const hourlyAmount = numericHours * pricePerHour;
+  const dailyAmount = numericDays * pricePerDay;
+
+  const totalPrice = hourlyAmount + dailyAmount;
   const [owner, setOwner] = useState(null);
   const [ownerLoading, setOwnerLoading] = useState(true);
   const [booking, setBooking] = useState(false);
+
+  const handleHoursChange = (e) => {
+    let value = Number(e.target.value);
+
+    if (Number.isNaN(value)) {
+      setHours("");
+      return;
+    }
+
+    // Prevent negative hours
+    value = Math.max(0, value);
+
+    // Convert hours into days automatically
+    if (value >= 24) {
+      const additionalDays = Math.floor(value / 24);
+      const remainingHours = value % 24;
+
+      const currentDays = Number(days) || 0;
+      const newDays = currentDays + additionalDays;
+
+      // Maximum rental duration = 7 days
+      if (newDays > 7) {
+        setDays("7");
+        setHours("0");
+        return;
+      }
+
+      setDays(String(newDays));
+      setHours(String(remainingHours));
+
+      return;
+    }
+
+    setHours(String(value));
+  };
+
+
+  const handleDaysChange = (e) => {
+    let value = Number(e.target.value);
+
+    if (Number.isNaN(value)) {
+      setDays("");
+      return;
+    }
+
+    // Prevent negative days
+    value = Math.max(0, value);
+
+    // Maximum = 7 days
+    if (value > 7) {
+      value = 7;
+    }
+
+    setDays(String(value));
+  };
+
   useEffect(() => {
   const fetchOwnerDetails = async () => {
     if (!cycle?.owner_id) {
@@ -62,35 +128,97 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
       </div>
     );
   }
-
   const handleBooking = async () => {
     setMessage("");
     setMessageType("");
 
-    const numericHours = Number(hours);
-    const numericDays = Number(days);
-
     if (
       hours === "" ||
-      days === "" ||
-      numericHours < 0 ||
-      numericDays < 0
+      days === ""
     ) {
-      setMessage("Please enter a valid rental duration.");
+      setMessage(
+        "Please enter the rental duration."
+      );
+
       setMessageType("error");
       return;
     }
 
-    if (numericHours === 0 && numericDays === 0) {
-      setMessage("Rental duration cannot be zero.");
+    const bookingHours = Number(hours);
+    const bookingDays = Number(days);
+
+    if (
+      Number.isNaN(bookingHours) ||
+      Number.isNaN(bookingDays) ||
+      bookingHours < 0 ||
+      bookingDays < 0
+    ) {
+      setMessage(
+        "Please enter a valid rental duration."
+      );
+
+      setMessageType("error");
+      return;
+    }
+
+    /*
+    * Hours must always be 0–23.
+    */
+    if (bookingHours > 23) {
+      setMessage(
+        "Hours must be between 0 and 23."
+      );
+
+      setMessageType("error");
+      return;
+    }
+
+    /*
+    * Days must always be 0–7.
+    */
+    if (bookingDays > 7) {
+      setMessage(
+        "Maximum rental duration is 7 days."
+      );
+
+      setMessageType("error");
+      return;
+    }
+
+    /*
+    * Calculate total rental duration.
+    */
+    const totalRentalHours =
+      bookingDays * 24 + bookingHours;
+
+    /*
+    * Cannot exceed 7 days.
+    */
+    if (totalRentalHours > 168) {
+      setMessage(
+        "Maximum rental duration is 7 days."
+      );
+
+      setMessageType("error");
+      return;
+    }
+
+    /*
+    * Cannot be zero.
+    */
+    if (totalRentalHours === 0) {
+      setMessage(
+        "Rental duration cannot be zero."
+      );
+
       setMessageType("error");
       return;
     }
 
     try {
+
       setBooking(true);
 
-      // Get currently logged-in student
       const {
         data: { user },
         error: userError,
@@ -101,27 +229,47 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
       }
 
       if (!user) {
-        setMessage("Please login before booking a cycle.");
+        setMessage(
+          "Please login before booking a cycle."
+        );
+
         setMessageType("error");
         return;
       }
 
-      // Exact payload expected by your n8n booking webhook
       const bookingData = {
+
         cycle_id: cycle.id,
+
         student_id: user.id,
-        hours: String(numericHours),
-        days: String(numericDays),
+
+        hours: String(bookingHours),
+
+        days: String(bookingDays),
+
+        price_per_hour: pricePerHour,
+
+        price_per_day: pricePerDay,
+
+        hourly_amount: hourlyAmount,
+
+        daily_amount: dailyAmount,
+
+        total_price: totalPrice,
       };
 
       const response = await fetch(
         "https://stem61.app.n8n.cloud/webhook/booking",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(bookingData),
+
+          body: JSON.stringify(
+            bookingData
+          ),
         }
       );
 
@@ -134,18 +282,26 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
       setMessage(
         "Booking request sent successfully to the cycle owner."
       );
+
       setMessageType("success");
 
     } catch (error) {
-      console.error("Booking error:", error);
+
+      console.error(
+        "Booking error:",
+        error
+      );
 
       setMessage(
         "Unable to send booking request. Please try again."
       );
+
       setMessageType("error");
 
     } finally {
+
       setBooking(false);
+
     }
   };
 
@@ -424,10 +580,9 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
               <input
                 type="number"
                 min="0"
+                max = "23"
                 value={hours}
-                onChange={(event) =>
-                  setHours(event.target.value)
-                }
+                onChange={handleHoursChange}
                 placeholder="0"
               />
 
@@ -447,10 +602,9 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
               <input
                 type="number"
                 min="0"
+                max = "7"
                 value={days}
-                onChange={(event) =>
-                  setDays(event.target.value)
-                }
+                onChange={handleDaysChange}
                 placeholder="0"
               />
 
@@ -461,6 +615,73 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
             </div>
 
           </div>
+
+          {/* PRICE CALCULATION */}
+
+          <section className="booking-total-card">
+
+            <div className="total-price-header">
+              <div>
+                <p>RENTAL COST</p>
+                <h2>Total Price</h2>
+              </div>
+
+              <div className="total-price-value">
+                ₹{totalPrice.toFixed(2)}
+              </div>
+            </div>
+
+
+            <div className="price-breakdown">
+
+              <div className="price-breakdown-row">
+
+                <span>
+                  {numericDays} day
+                  {numericDays !== 1 ? "s" : ""}
+                  {" × "}
+                  ₹{pricePerDay.toFixed(2)}
+                </span>
+
+                <strong>
+                  ₹{dailyAmount.toFixed(2)}
+                </strong>
+
+              </div>
+
+
+              <div className="price-breakdown-row">
+
+                <span>
+                  {numericHours} hour
+                  {numericHours !== 1 ? "s" : ""}
+                  {" × "}
+                  ₹{pricePerHour.toFixed(2)}
+                </span>
+
+                <strong>
+                  ₹{hourlyAmount.toFixed(2)}
+                </strong>
+
+              </div>
+
+
+              <div className="price-divider"></div>
+
+
+              <div className="price-breakdown-total">
+
+                <span>Total</span>
+
+                <strong>
+                  ₹{totalPrice.toFixed(2)}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </section>
 
         </section>
 
@@ -482,15 +703,18 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
         {/* BOOK BUTTON */}
         <div className="booking-action">
 
-          <button
-            className="book-cycle-btn"
-            onClick={handleBooking}
-            disabled={booking}
-          >
-            {booking
-              ? "Sending Request..."
-              : "Book Cycle 🚲"}
-          </button>
+        <button
+          className="book-cycle-btn"
+          onClick={handleBooking}
+          disabled={
+            booking ||
+            (numericHours === 0 && numericDays === 0)
+          }
+        >
+          {booking
+            ? "Sending Request..."
+            : `Confirm Booking · ₹${totalPrice.toFixed(2)}`}
+        </button>
 
         </div>
 

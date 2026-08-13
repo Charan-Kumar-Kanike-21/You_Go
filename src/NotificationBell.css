@@ -69,3 +69,206 @@
 
   box-sizing: border-box;
 }
+/* =========================================================
+   NOTIFICATION BELL
+   ========================================================= */
+
+.notification-bell {
+  position: relative;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: white;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.notification-bell:hover {
+  background: rgba(66, 231, 122, 0.08);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BELL ICON
+   ========================================================= */
+
+.bell-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 25px;
+
+  line-height: 1;
+
+  transition:
+    transform 0.2s ease;
+}
+
+
+.notification-bell:hover .bell-icon {
+  transform: scale(1.08);
+}
+
+
+/* =========================================================
+   OWNER PAGE BELL
+   ========================================================= */
+
+.Bell-in-Owner {
+  width: 48px;
+  height: 48px;
+}
+
+
+.Bell-in-Owner .bell-icon {
+  font-size: 30px;
+}
+
+
+/* =========================================================
+   NOTIFICATION BADGE
+   ========================================================= */
+
+.notification-badge {
+  position: absolute;
+
+  top: 2px;
+  right: 2px;
+
+  min-width: 17px;
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 4px;
+
+  border-radius: 999px;
+
+  background: #42e77a;
+
+  color: #061a12;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  line-height: 1;
+
+  border: 2px solid #051912;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .notification-bell {
+    width: 40px;
+    height: 40px;
+  }
+
+  .bell-icon {
+    font-size: 23px;
+  }
+
+  .Bell-in-Owner {
+    width: 44px;
+    height: 44px;
+  }
+
+  .Bell-in-Owner .bell-icon {
+    font-size: 27px;
+  }
+
+  .notification-badge {
+    top: 1px;
+    right: 1px;
+
+    min-width: 16px;
+    height: 16px;
+
+    font-size: 7px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .notification-bell {
+    width: 38px;
+    height: 38px;
+  }
+
+  .bell-icon {
+    font-size: 21px;
+  }
+
+  .Bell-in-Owner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .Bell-in-Owner .bell-icon {
+    font-size: 24px;
+  }
+
+  .notification-badge {
+    top: 0;
+    right: 0;
+
+    min-width: 15px;
+    height: 15px;
+
+    font-size: 7px;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .Bell-in-Owner {
+    width: 36px;
+    height: 36px;
+  }
+
+  .Bell-in-Owner .bell-icon {
+    font-size: 22px;
+  }
+
+}

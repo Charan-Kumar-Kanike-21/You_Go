@@ -4,7 +4,7 @@ import { supabase } from "./supabase";
 
 import NotificationBell from "./NotificationBell";
 
-function CycleOwner({ onBack, onListCycle, onNotifications }) {
+function CycleOwner({ onBack, onListCycle, onNotifications, onEditCycle }) {
   const [cycles, setCycles] = useState([]);
   const [profile, setProfile] = useState(null);
 
@@ -276,7 +276,9 @@ function CycleOwner({ onBack, onListCycle, onNotifications }) {
           </div>
         </div>
 
+        <div className="owner-brand">
         <NotificationBell
+          className = "Bell-in-Owner"
           onClick={onNotifications}
         />
 
@@ -286,6 +288,7 @@ function CycleOwner({ onBack, onListCycle, onNotifications }) {
         >
           ← Home
         </button>
+        </div>
 
       </nav>
 
@@ -636,7 +639,15 @@ function CycleOwner({ onBack, onListCycle, onNotifications }) {
                       </div>
 
                     </div>
+                    
 
+                    <div className="Owner-Edit-Delete">
+                    <button
+                      className="edit-cycle-btn"
+                      onClick={() => onEditCycle(cycle.id)}
+                    >
+                      ✏️ Edit Cycle
+                    </button>
 
                     {/* DELETE */}
 
@@ -653,6 +664,7 @@ function CycleOwner({ onBack, onListCycle, onNotifications }) {
                         ? "Deleting..."
                         : "🗑 Delete Cycle"}
                     </button>
+                    </div>
 
                   </div>
 

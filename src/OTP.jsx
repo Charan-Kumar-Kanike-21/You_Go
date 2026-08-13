@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import "./OTP.css";
 
-function OTP() {
+function OTP({ onBookingId }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -62,12 +62,45 @@ function OTP() {
     inputRefs.current[nextIndex]?.focus();
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join("");
 
     if (enteredOtp.length !== 6) {
       setError("Please enter the complete 6-digit OTP.");
       return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://stem61.app.n8n.cloud/webhook/otp-verification",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            booking_id: onBookingId,
+            OTP: enteredOtp,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `OTP verification failed: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+
+      console.log("n8n response:", result);
+
+      // OTP verification successful
+      setError("");
+      
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      setError("Unable to verify OTP. Please try again.");
     }
 
     /*

@@ -5,7 +5,7 @@ import "./AdminDashboard.css";
 
 import NotificationBell from "./NotificationBell";
 
-function AdminDashboard({ onAdminToStudent, onNotifications }) {
+function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
   const [activeSection, setActiveSection] = useState("overview");
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -729,9 +729,11 @@ function AdminDashboard({ onAdminToStudent, onNotifications }) {
 
           <div className="admin-profile">
 
-            <div className="admin-avatar">
+            <button className="admin-avatar" 
+              onClick = {() => {onProfile()}}
+            >
               AD
-            </div>
+            </button>
 
             <div className="admin-profile-text">
 
@@ -814,62 +816,6 @@ function AdminDashboard({ onAdminToStudent, onNotifications }) {
             <span>↔</span>
             Rentals
           </button>
-
-
-          <aside className="admin-sidebar">
-
-  <div className="sidebar-heading">
-    ADMIN PANEL
-  </div>
-
-  <button
-    className={
-      activeSection === "overview"
-        ? "sidebar-item active"
-        : "sidebar-item"
-    }
-    onClick={() => setActiveSection("overview")}
-  >
-    <span>◈</span>
-    Overview
-  </button>
-
-    <button
-      className={
-        activeSection === "users"
-          ? "sidebar-item active"
-          : "sidebar-item"
-      }
-      onClick={() => setActiveSection("users")}
-    >
-      <span>◎</span>
-      Users
-    </button>
-
-    <button
-      className={
-        activeSection === "rentals"
-          ? "sidebar-item active"
-          : "sidebar-item"
-      }
-      onClick={() => setActiveSection("rentals")}
-    >
-      <span>↔</span>
-      Rentals
-    </button>
-
-    <div className="sidebar-divider"></div>
-
-    <button
-      className="sidebar-item"
-      onClick={onAdminToStudent}
-    >
-      <span>↗</span>
-      Student View
-    </button>
-
-  </aside>
-
 
           <div className="sidebar-divider"></div>
 

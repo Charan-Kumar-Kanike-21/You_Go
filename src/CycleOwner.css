@@ -812,7 +812,7 @@ button.owner-action-card:hover .action-arrow {
 ========================================= */
 
 .delete-cycle-btn {
-  width: 100%;
+  width: 48%;
 
   padding: 12px;
 
@@ -1240,4 +1240,121 @@ button.owner-action-card:hover .action-arrow {
   .owner-state {
     padding: 25px 15px;
   }
+}
+
+/* =========================================================
+   NOTIFICATION BELL - OWNER PAGE
+   ========================================================= */
+
+.owner-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Bell itself */
+.Bell-in-Owner {
+  width: 42px !important;
+  height: 42px !important;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+/* If the bell contains an SVG/icon */
+.Bell-in-Owner svg {
+  width: 25px !important;
+  height: 25px !important;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .Bell-in-Owner {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .Bell-in-Owner svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .owner-brand {
+    gap: 10px;
+  }
+
+  .Bell-in-Owner {
+    width: 37px !important;
+    height: 37px !important;
+  }
+
+  .Bell-in-Owner svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+  .owner-brand {
+    gap: 8px;
+  }
+
+  .Bell-in-Owner {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .Bell-in-Owner svg {
+    width: 19px !important;
+    height: 19px !important;
+  }
+
+}
+
+.edit-cycle-btn {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1px solid #32e875;
+  border-radius: 8px;
+  background: transparent;
+  color: #32e875;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.edit-cycle-btn:hover {
+  background: #32e875;
+  color: #031b13;
+}
+
+.Owner-Edit-Delete{
+  display: flex;
+  gap: 20px;
 }

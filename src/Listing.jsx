@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./Listing.css";
 import { supabase } from "./supabase";
 
-function MyCycles({ onBack }) {
+function MyCycles({ onBack ,editCycleId}) {
 
   // =====================================================
   // STATES
@@ -47,7 +47,7 @@ function MyCycles({ onBack }) {
 
     loadDraft();
 
-  }, []);
+  }, [editCycleId]);
 
 
   // =====================================================
@@ -107,24 +107,47 @@ function MyCycles({ onBack }) {
       // FIND USER'S LATEST DRAFT
       // =================================================
 
-      const {
+   let cycleToLoad = null;
+
+if (editCycleId) {
+
+  // EDIT MODE
+  const {
+    data: existingCycle,
+    error: existingCycleError,
+  } = await supabase
+    .from("cycles")
+    .select("*")
+    .eq("id", editCycleId)
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (existingCycleError) {
+    throw existingCycleError;
+  }
+
+  cycleToLoad = existingCycle;
+} else {
+    const {
         data: draft,
         error: draftError,
-      } = await supabase
+    } = await supabase
         .from("cycles")
         .select("*")
         .eq("owner_id", user.id)
         .eq("status", "draft")
         .order("created_at", {
-          ascending: false,
+            ascending: false,
         })
         .limit(1)
         .maybeSingle();
 
+  
 
-      if (draftError) {
-        throw draftError;
-      }
+    cycleToLoad = draft;
+}
+
+     
 
 
       // =================================================
@@ -155,50 +178,42 @@ function MyCycles({ onBack }) {
       // NO DRAFT
       // =================================================
 
-      if (!draft) {
+if (!cycleToLoad) {
+  setLoadingDraft(false);
+  return;
+}
 
-        setLoadingDraft(false);
-
-        return;
-      }
-
-
-      // =================================================
-      // SAVE DRAFT ID
-      // =================================================
-
-      setDraftId(draft.id);
-
+setDraftId(cycleToLoad.id);
 
       // =================================================
       // LOAD CYCLE DATA INTO FORM
       // =================================================
 
       if (form) {
+form.elements.brand.value =
+  cycleToLoad.brand || "";
 
-        form.elements.brand.value =
-          draft.brand || "";
+form.elements.model.value =
+  cycleToLoad.model || "";
 
-        form.elements.model.value =
-          draft.model || "";
+form.elements.cycleType.value =
+  cycleToLoad.cycle_type || "";
 
-        form.elements.cycleType.value =
-          draft.cycle_type || "";
+form.elements.condition.value =
+  cycleToLoad.condition || "";
 
-        form.elements.condition.value =
-          draft.condition || "";
+form.elements.pricePerHour.value =
+  cycleToLoad.price_per_hour ?? "";
 
-        form.elements.pricePerHour.value =
-          draft.price_per_hour ?? "";
+form.elements.pricePerDay.value =
+  cycleToLoad.price_per_day ?? "";
 
-        form.elements.pricePerDay.value =
-          draft.price_per_day ?? "";
+form.elements.location.value =
+  cycleToLoad.location || "";
 
-        form.elements.location.value =
-          draft.location || "";
-
-        form.elements.description.value =
-          draft.description || "";
+form.elements.description.value =
+  cycleToLoad.description || "";
+      
       }
 
 
@@ -212,7 +227,7 @@ function MyCycles({ onBack }) {
       } = await supabase
         .from("cycle_images")
         .select("image_url, display_order")
-        .eq("cycle_id", draft.id)
+        .eq("cycle_id", cycleToLoad.id)
         .order("display_order", {
           ascending: true,
         });
@@ -477,7 +492,7 @@ function MyCycles({ onBack }) {
       } else {
 
         // ---------------------------------------------
-        // CREATE NEW DRAFT
+        // CREATE NEW DATA
         // ---------------------------------------------
 
         const {
@@ -1112,19 +1127,16 @@ function MyCycles({ onBack }) {
       // =================================================
       // TRIGGER BACKEND VERIFICATION
       // =================================================
-
-      const webhookResponse = await fetch(
-        "https://stem61.app.n8n.cloud/webhook/cycle-listing-verification",
+      
+      const  webhookResponse = await fetch(
+        "https://stem61.app.n8n.cloud/webhook/cycle-listing",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            status: "pending",
-            reason: "",
-            admin_id: "",
-            cycle_id: cycle.id,
+          body: JSON.stringify({     
+            cycle_id: cycle.id
           }),
         }
       );
@@ -1210,12 +1222,17 @@ function MyCycles({ onBack }) {
 
         <div className="cycle-form-header">
 
-          <h1>
-            List Your Cycle
-          </h1>
+        <h1>
+          {editCycleId
+            ? "Edit Your Cycle"
+            : "List Your Cycle"}
+        </h1>
 
-          <p>
-            Add your cycle details and make it available for other students.
+         <p>
+            {editCycleId
+              ? "Update your cycle details below."
+              : "Add your cycle details and make it available for other students."
+            }
           </p>
 
         </div>
@@ -1292,6 +1309,7 @@ function MyCycles({ onBack }) {
                   name="email"
                   placeholder="Enter email address"
                   required
+                  readOnly
                 />
 
               </div>
@@ -1856,6 +1874,7 @@ function MyCycles({ onBack }) {
                 type="submit"
                 className="list-cycle-btn"
                 disabled={saving || submitting}
+                
               >
                 {submitting ? "Listing Cycle..." : "List My Cycle 🚲"}
               </button>

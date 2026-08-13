@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import "./NotificationBell.css";
 
-function NotificationBell({ onClick }) {
+function NotificationBell({ onClick, className = "Bell-in-Owner" }) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchUnreadCount = async () => {
@@ -79,7 +79,7 @@ function NotificationBell({ onClick }) {
 
   return (
     <button
-      className="notification-bell"
+      className={`notification-bell ${className}`}
       onClick={onClick}
       title="Notifications"
       aria-label="Notifications"

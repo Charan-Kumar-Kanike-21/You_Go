@@ -4,7 +4,7 @@ import "./Profile.css";
 
 import appLogo from "./assets/app_logo.png";
 
-function ProfilePage({ onBack }) {
+function ProfilePage({ onBack },onLogout) {
   const [user, setUser] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
@@ -189,6 +189,43 @@ function ProfilePage({ onBack }) {
     fullName.trim().length > 0
       ? fullName.trim().charAt(0).toUpperCase()
       : "U";
+
+ // handlelogging out 
+
+  const handleLogout = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to logout?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    // Remove saved page
+    localStorage.removeItem("cycle_last_page");
+
+    // Sign out from Supabase
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Logout error:", error);
+
+      alert("Unable to logout. Please try again.");
+      return;
+    }
+
+    // Tell App.jsx that logout happened
+    if (onLogout) {
+      onLogout();
+    }
+
+  } catch (error) {
+    console.error("Unexpected logout error:", error);
+
+    alert("Something went wrong while logging out.");
+  }
+};
 
 
   return (
@@ -434,8 +471,18 @@ function ProfilePage({ onBack }) {
                 Update Profile
               </button>
 
-            )}
+              
 
+            )
+            
+          }
+              <button
+              className="edit-profile-btn"
+              type="button"
+              onClick={handleLogout}
+              >
+              Logout
+              </button>
           </div>
 
         </div>

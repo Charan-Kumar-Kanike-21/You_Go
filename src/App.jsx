@@ -29,6 +29,10 @@ function App() {
   const [page, setPage] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  const [selectedCycleId, setSelectedCycleId] = useState(null);
+
+  const [bookingId, setBookingId] = useState("");
+
   useEffect(() => {
     let mounted = true;
 
@@ -246,6 +250,8 @@ function App() {
   const [reporterRole, setReporterRole] = useState(null);
 
   const [reportedUserId, setReportedUserId] = useState(null);
+
+  const [editingCycleId, setEditingCycleId] = useState(null);
 
   // =========================================================
   // ONGOING RENT RETURN PAGE
@@ -718,329 +724,849 @@ function App() {
   //   }
   // };
 
-  const handleNotificationAction = (
-    notification,
-    actionType,
-    actionData
-  ) => {
+  // const handleNotificationAction = (
+  //   notification,
+  //   actionType,
+  //   actionData
+  // ) => {
 
-    console.log(
-      "Handling notification action:",
-      {
-        notification,
-        actionType,
-        actionData,
-      }
-    );
+  //   console.log(
+  //     "Handling notification action:",
+  //     {
+  //       notification,
+  //       actionType,
+  //       actionData,
+  //     }
+  //   );
 
 
-    /* =========================================================
-      ENTER RENTAL OTP
-      =========================================================
+  //   /* =========================================================
+  //     ENTER RENTAL OTP
+  //     =========================================================
       
-      Owner clicks:
+  //     Owner clicks:
       
-      [ Enter OTP ]
+  //     [ Enter OTP ]
       
-      Opens OTP page.
+  //     Opens OTP page.
       
-      Required action_data:
-      {
-        booking_id,
-        cycle_id,
-        renter_id,
-        owner_id
-      }
-    */
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       cycle_id,
+  //       renter_id,
+  //       owner_id
+  //     }
+  //   */
 
-    if (
-      actionType === "ENTER_RENTAL_OTP"
-    ) {
+  //   if (
+  //     actionType === "ENTER_RENTAL_OTP"
+  //   ) {
 
-      setCurrentPage("otp");
+  //     setPage("OTP");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     }); 
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      REPORT OWNER
-      =========================================================
+  //   /* =========================================================
+  //     REPORT OWNER
+  //     =========================================================
       
-      Used when:
+  //     Used when:
       
-      OTP expired because owner was absent.
+  //     OTP expired because owner was absent.
       
-      Opens report page.
+  //     Opens report page.
       
-      Required action_data:
-      {
-        booking_id,
-        owner_id,
-        renter_id,
-        cycle_id
-      }
-    */
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       owner_id,
+  //       renter_id,
+  //       cycle_id
+  //     }
+  //   */
 
-    if (
-      actionType === "REPORT_OWNER"
-    ) {
+  //   if (
+  //     actionType === "REPORT_OWNER"
+  //   ) {
 
-      setCurrentPage("report");
+  //     setPage("ReportPage");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      VIEW EXTENSION
-      =========================================================
+  //   /* =========================================================
+  //     VIEW EXTENSION
+  //     =========================================================
       
-      Opens extension request page.
+  //     Opens extension request page.
       
-      Required action_data:
-      {
-        booking_id,
-        extension_request_id,
-        cycle_id,
-        owner_id,
-        renter_id
-      }
-    */
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       extension_request_id,
+  //       cycle_id,
+  //       owner_id,
+  //       renter_id
+  //     }
+  //   */
 
-    if (
-      actionType === "VIEW_EXTENSION"
-    ) {
+  //   if (
+  //     actionType === "VIEW_EXTENSION"
+  //   ) {
 
-      setCurrentPage("extension");
+  //     setCurrentPage("extension");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      RETURN CYCLE
-      =========================================================
+  //   /* =========================================================
+  //     RETURN CYCLE
+  //     =========================================================
       
-      Opens return page.
+  //     Opens return page.
       
-      Required action_data:
-      {
-        booking_id,
-        cycle_id,
-        owner_id,
-        renter_id
-      }
-    */
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       cycle_id,
+  //       owner_id,
+  //       renter_id
+  //     }
+  //   */
 
-    if (
-      actionType === "RETURN_CYCLE"
-    ) {
+  //   if (
+  //     actionType === "RETURN_CYCLE"
+  //   ) {
 
-      setCurrentPage("return");
+  //     setCurrentPage("return");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      VIEW REPORT
-      =========================================================
+  //   /* =========================================================
+  //     VIEW REPORT
+  //     =========================================================
       
-      Used by admins for:
+  //     Used by admins for:
       
-      RETURN_PROBLEM_REPORTED
-      USER_REPORTED
-      OWNER_REPORTED
-      RENTER_REPORTED
-      CYCLE_REPORTED
+  //     RETURN_PROBLEM_REPORTED
+  //     USER_REPORTED
+  //     OWNER_REPORTED
+  //     RENTER_REPORTED
+  //     CYCLE_REPORTED
       
-      Required action_data:
-      {
-        report_id,
-        reporter_id,
-        reported_user_id,
-        booking_id,
-        cycle_id
-      }
-    */
+  //     Required action_data:
+  //     {
+  //       report_id,
+  //       reporter_id,
+  //       reported_user_id,
+  //       booking_id,
+  //       cycle_id
+  //     }
+  //   */
 
-    if (
-      actionType === "VIEW_REPORT"
-    ) {
+  //   if (
+  //     actionType === "VIEW_REPORT"
+  //   ) {
 
-      setCurrentPage("reportDetails");
+  //     setCurrentPage("reportDetails");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      VIEW CYCLE
-      =========================================================
+  //   /* =========================================================
+  //     VIEW CYCLE
+  //     =========================================================
       
-      Used mainly for:
+  //     Used mainly for:
       
-      CYCLE_VERIFICATION_ASSIGNED
+  //     CYCLE_VERIFICATION_ASSIGNED
       
-      Opens cycle verification/details page.
+  //     Opens cycle verification/details page.
       
-      Required action_data:
-      {
-        cycle_id,
-        owner_id,
-        admin_id
-      }
-    */
+  //     Required action_data:
+  //     {
+  //       cycle_id,
+  //       owner_id,
+  //       admin_id
+  //     }
+  //   */
 
-    if (
-      actionType === "VIEW_CYCLE"
-    ) {
+  //   if (
+  //     actionType === "VIEW_CYCLE"
+  //   ) {
 
-      setCurrentPage("cycleDetails");
+  //     setCurrentPage("cycleDetails");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      RETRY PAYMENT
-      =========================================================
+  //   /* =========================================================
+  //     RETRY PAYMENT
+  //     =========================================================
       
-      Payment failed.
+  //     Payment failed.
       
-      Opens payment flow again using the same order details.
+  //     Opens payment flow again using the same order details.
       
-      action_data should contain the information required by
-      your payment flow, for example:
+  //     action_data should contain the information required by
+  //     your payment flow, for example:
       
-      {
-        booking_id,
-        payment_id,
-        order_id,
-        amount,
-        currency
-      }
+  //     {
+  //       booking_id,
+  //       payment_id,
+  //       order_id,
+  //       amount,
+  //       currency
+  //     }
       
-      IMPORTANT:
-      The actual Razorpay initialization should happen in
-      your payment page/component, not directly inside this
-      notification router.
-    */
+  //     IMPORTANT:
+  //     The actual Razorpay initialization should happen in
+  //     your payment page/component, not directly inside this
+  //     notification router.
+  //   */
 
-    if (
-      actionType === "RETRY_PAYMENT"
-    ) {
+  //   if (
+  //     actionType === "RETRY_PAYMENT"
+  //   ) {
 
-      setCurrentPage("payment");
+  //     setCurrentPage("payment");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      VIEW SECURITY
-      =========================================================
+  //   /* =========================================================
+  //     VIEW SECURITY
+  //     =========================================================
       
-      Opens security/review page.
+  //     Opens security/review page.
       
-      Used for:
+  //     Used for:
       
-      NEW_LOGIN_DETECTED
-      SECURITY_ALERT
-      etc.
-    */
+  //     NEW_LOGIN_DETECTED
+  //     SECURITY_ALERT
+  //     etc.
+  //   */
 
-    if (
-      actionType === "VIEW_SECURITY"
-    ) {
+  //   if (
+  //     actionType === "VIEW_SECURITY"
+  //   ) {
 
-      setCurrentPage("security");
+  //     setCurrentPage("security");
 
-      setPageData({
-        notification,
-        actionType,
-        ...actionData,
-      });
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
 
-    /* =========================================================
-      UNKNOWN ACTION
-      =========================================================
-    */
+  //   /* =========================================================
+  //     UNKNOWN ACTION
+  //     =========================================================
+  //   */
 
-    console.warn(
-      "Unknown notification action:",
-      actionType,
-      actionData
-    );
-  };
+  //   console.warn(
+  //     "Unknown notification action:",
+  //     actionType,
+  //     actionData
+  //   );
+  // };
+  // // }
+
+  // if (authLoading || !page) {
+  //   return (
+  //     <div
+  //       style={{
+  //         minHeight: "100vh",
+  //         display: "flex",
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         background:
+  //           "radial-gradient(circle at center, rgba(45, 130, 72, 0.75), rgba(6, 27, 20, 1))",
+  //         color: "white",
+  //         fontSize: "18px",
+  //       }}
+  //     >
+  //       Loading...
+  //     </div>
+  //   );
   // }
 
-  if (authLoading || !page) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background:
-            "radial-gradient(circle at center, rgba(45, 130, 72, 0.75), rgba(6, 27, 20, 1))",
-          color: "white",
-          fontSize: "18px",
-        }}
-      >
-        Loading...
-      </div>
+
+
+const handleNotificationAction = async (
+  action,
+  notification
+) => {
+  console.log("Notification action:", action);
+  console.log("Notification:", notification);
+
+  /*
+  |--------------------------------------------------------------------------
+  | MARK NOTIFICATION AS READ
+  |--------------------------------------------------------------------------
+  |
+  | The notification ID comes from:
+  |
+  | notification.id
+  |
+  | We update only that particular notification.
+  |
+  */
+
+  const markNotificationAsRead = async () => {
+    if (!notification?.id) {
+      console.error(
+        "Cannot mark notification as read: notification ID missing."
+      );
+      return false;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("notifications")
+        .update({
+          is_read: true,
+        })
+        .eq("id", notification.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error(
+          "Error marking notification as read:",
+          error
+        );
+
+        return false;
+      }
+
+      console.log(
+        "Notification marked as read:",
+        data
+      );
+
+      return true;
+
+    } catch (error) {
+      console.error(
+        "Unexpected error while marking notification as read:",
+        error
+      );
+
+      return false;
+    }
+  };
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | MARK AS READ FIRST
+  |--------------------------------------------------------------------------
+  |
+  | Since you specifically want:
+  |
+  | Button clicked
+  |       ↓
+  | is_read = true
+  |       ↓
+  | perform action
+  |
+  | we do it here before the switch.
+  |
+  */
+
+  const markedAsRead =
+    await markNotificationAsRead();
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | If database update failed
+  |--------------------------------------------------------------------------
+  |
+  | We can still stop the action so that the frontend
+  | does not navigate while the notification state
+  | remains inconsistent.
+  |
+  */
+
+  if (!markedAsRead) {
+    console.warn(
+      "Notification could not be marked as read. Action cancelled."
     );
+
+    return;
   }
 
+
+  /*
+  |--------------------------------------------------------------------------
+  | PERFORM THE ACTUAL ACTION
+  |--------------------------------------------------------------------------
+  */
+
+  switch (action) {
+
+    // --------------------------------------------------
+    // ENTER RENTAL OTP
+    // --------------------------------------------------
+
+    case "enter_rental_OTP":
+      setBookingId(notification.action_data.booking_id)
+
+      setPage("OTP");
+
+      break;
+
+
+    // --------------------------------------------------
+    // REPORT OWNER
+    // --------------------------------------------------
+
+    case "report_owner":
+
+      setPage("Report");
+
+      break;
+
+
+    // --------------------------------------------------
+    // VIEW CYCLE
+    // --------------------------------------------------
+
+    case "view_cycle":
+
+      if (
+        notification?.action_data?.cycle_id
+      ) {
+
+        setSelectedCycleId(
+          notification.action_data.cycle_id
+        );
+
+        setPage(
+          "CycleVerification"
+        );
+
+      } else {
+
+        console.error(
+          "cycle_id missing from notification.action_data"
+        );
+
+      }
+
+      break;
+
+
+    // --------------------------------------------------
+    // VIEW RENTAL
+    // --------------------------------------------------
+
+    case "view_rental":
+
+      setPage("myRentals");
+
+      break;
+
+
+    // --------------------------------------------------
+    // VIEW EXTENSION
+    // --------------------------------------------------
+
+    case "view_extension":
+
+      setPage("Extension");
+
+      break;
+
+
+    // --------------------------------------------------
+    // CYCLE RETURNED
+    // --------------------------------------------------
+
+    case "cycle_returned":
+
+        try {
+
+          const response = await fetch(
+            "https://example.com/webhook/cycle-returned"
+          );
+
+          if (!response.ok) {
+
+            throw new Error(
+              "Failed to call cycle returned webhook"
+            );
+
+          }
+
+          const data =
+            await response.json();
+
+          console.log(
+            "Cycle returned backend response:",
+            data
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Cycle returned error:",
+            error
+          );
+
+        }
+
+      break;
+
+
+    // --------------------------------------------------
+    // VIEW REPORT
+    // --------------------------------------------------
+
+    case "view_report":
+
+      setPage("Report");
+
+      break;
+
+
+    // --------------------------------------------------
+    // VIEW ACCOUNT
+    // --------------------------------------------------
+
+    case "view_account":
+
+      setPage("userProfile");
+
+      break;
+
+
+    // --------------------------------------------------
+    // RETRY PAYMENT
+    // --------------------------------------------------
+
+    case "retry_payment":
+
+      try {
+
+        const response = await fetch(
+          "https://example.com/api/create-payment-order",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+
+              booking_id:
+                notification?.action_data
+                  ?.booking_id,
+
+              amount:
+                notification?.action_data
+                  ?.amount || 500,
+
+              currency:
+                "INR",
+
+            }),
+          }
+        );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Failed to create payment order"
+          );
+
+        }
+
+
+        const order =
+          await response.json();
+
+
+        const options = {
+
+          key:
+            "rzp_test_PSEUDO_KEY",
+
+          amount:
+            order.amount,
+
+          currency:
+            order.currency,
+
+          name:
+            "UgO",
+
+          description:
+            "Cycle Rental Payment",
+
+          order_id:
+            order.order_id,
+
+
+          handler:
+            function (
+              paymentResponse
+            ) {
+
+              console.log(
+                "Razorpay payment successful:",
+                paymentResponse
+              );
+
+            },
+
+
+          prefill: {
+
+            name:
+              "Student Name",
+
+            email:
+              "student@example.com",
+
+            contact:
+              "9999999999",
+
+          },
+
+
+          theme: {
+
+            color:
+              "#3399cc",
+
+          },
+
+        };
+
+
+        /*
+         * Razorpay Checkout
+         */
+
+        const razorpay =
+          new window.Razorpay(
+            options
+          );
+
+
+        razorpay.open();
+
+      } catch (error) {
+
+        console.error(
+          "Retry payment error:",
+          error
+        );
+
+      }
+
+      break;
+
+
+    // --------------------------------------------------
+    // VIEW DISPUTE
+    // --------------------------------------------------
+
+    case "view_dispute":
+
+      setPage("Report");
+
+      break;
+
+    case "accepted_rental_request":
+      try {
+
+        const response = await fetch(
+          "https://stem61.app.n8n.cloud/webhook/booking-acceptance",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+
+              booking_id:
+                notification?.action_data
+                  ?.booking_id,
+              status:
+                "accepted"
+            }),
+          }
+        );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Failed to Accept Rental Request"
+          );
+
+        }
+
+        const data =
+          await response.json();
+
+        console.log(
+          "your request has been accepted successfully",
+          data
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Request response error",
+          error
+        );
+
+      }
+      break;
+    
+    case "rejected_rental_request":
+      try {
+
+        const response = await fetch(
+          "https://stem61.app.n8n.cloud/webhook/booking-acceptance",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+
+              booking_id:
+                notification?.action_data
+                  ?.booking_id,
+              status:
+                "rejected"
+            }),
+          }
+        );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Failed to Accept Rental Request"
+          );
+
+        }
+
+        const data =
+          await response.json();
+
+        console.log(
+          "your request has been accepted successfully",
+          data
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Request response error",
+          error
+        );
+
+      }
+      break;
+    
+    // --------------------------------------------------
+    // VIEW SECURITY
+    // --------------------------------------------------
+
+    case "view_security":
+
+      setPage("Security");
+
+      break;
+
+
+    // --------------------------------------------------
+    // UNKNOWN ACTION
+    // --------------------------------------------------
+
+    default:
+
+      console.warn(
+        "Unknown notification action:",
+        action
+      );
+
+      break;
+  }
+};
   // =========================================================
   // RETURN JSX
   // =========================================================
@@ -1171,6 +1697,7 @@ function App() {
       {page === "Listing" && (
         <Listing
           onBack={handleCycleOwner}
+          // editCycleId={}
         />
       )}
 
@@ -1180,11 +1707,12 @@ function App() {
 
       {page === "Profile" && (
         <Profile
-          onBack={
-            handleProfileBack
-          }
-        />
-      )}
+        onBack={handleProfileBack}
+        onLogout={() => {
+        setPage("Login");
+      }}
+  />
+)}
 
       {/* =====================================================
           FORGOT PASSWORD
@@ -1215,6 +1743,10 @@ function App() {
               "CycleOwner"
             )
           }
+          onEditCycle={(cycleId) => {
+            setEditingCycleId(cycleId);
+            setPage("Listing");
+          }}
         />
       )}
 
@@ -1264,12 +1796,8 @@ function App() {
 
       {page === "NotificationPage" && (
         <NotificationPage
-          onBack={
-            handleNotificationBack
-          }
-          onNotificationAction={
-            handleNotificationAction
-          }
+          onAction = {handleNotificationAction}
+          onBack = {handleNotificationBack}
         />
       )}
 
@@ -1297,7 +1825,9 @@ function App() {
       ===================================================== */}
 
       {page === "OTP" && (
-        <OTP />
+        <OTP
+          onBookingId = {bookingId}
+        />
       )}
 
       {/* =====================================================
@@ -1326,6 +1856,7 @@ function App() {
           onAdminToStudent={
             handleBackToChoice
           }
+          onProfile={() => handleOpenProfile("AdminDashboard")}
         />
       )}
 
@@ -1351,8 +1882,9 @@ function App() {
       {page === "CycleVerification" && (
         <CycleVerification
           cycleId={
-            selectedCycle?.id
+            selectedCycleId
           }
+          onBack = {() => {setPage("NotificationPage")}}
         />
       )}
 

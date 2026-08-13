@@ -785,3 +785,18 @@ body,
     font-size: 13px;
   }
 }
+
+/* Fixed owner email */
+
+.input-group input[readonly] {
+  background: #eef2ef;
+  color: #46534b;
+  cursor: not-allowed;
+  border: 1px solid #c8d3cc;
+}
+
+.input-group input[readonly]:focus {
+  outline: none;
+  border-color: #c8d3cc;
+  box-shadow: none;
+}
