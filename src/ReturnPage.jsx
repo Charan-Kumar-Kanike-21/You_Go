@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./ReturnPage.css";
 import { supabase } from "./supabase";
 
-function ReturnPage({ bookingId }) {
+function ReturnPage({ bookingId, onBack, onBackHome }) {
   const [booking, setBooking] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -480,6 +480,14 @@ function ReturnPage({ bookingId }) {
             <span className="return-status-dot"></span>
             Rental Completed
           </div>
+          <div>
+            <button
+              className="return-home-button"
+              onClick={onBackHome}
+            >
+              ← Back to Home
+            </button>
+          </div>
 
         </main>
 
@@ -495,6 +503,14 @@ function ReturnPage({ bookingId }) {
     <div className="return-page">
 
       <main className="return-container">
+
+        <button
+          className="return-back-button"
+          onClick={onBack}
+          disabled={returning}
+        >
+          ← Back
+        </button>
 
         {/* Header Icon */}
 

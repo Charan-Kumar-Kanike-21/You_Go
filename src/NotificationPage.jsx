@@ -89,11 +89,11 @@ const NOTIFICATION_CONFIG = {
     style: "success",
   },
 
-  RENTAL_START_FAILED: {
-    icon: "⚠",
-    category: "Rental",
-    style: "danger",
-  },
+  // RENTAL_START_FAILED: {
+  //   icon: "⚠",
+  //   category: "Rental",
+  //   style: "danger",
+  // },
 
 
   /* =========================================================
@@ -222,11 +222,11 @@ const NOTIFICATION_CONFIG = {
      REPORTS
      ========================================================= */
 
-  USER_REPORTED: {
-    icon: "🚨",
-    category: "Report",
-    style: "action",
-  },
+  // USER_REPORTED: {
+  //   icon: "🚨",
+  //   category: "Report",
+  //   style: "action",
+  // },
 
   OWNER_REPORTED: {
     icon: "🚨",
@@ -322,17 +322,17 @@ const NOTIFICATION_CONFIG = {
     style: "danger",
   },
 
-  PAYMENT_DISPUTE_OPENED: {
-    icon: "⚖",
-    category: "Payment",
-    style: "action",
-  },
+  // PAYMENT_DISPUTE_OPENED: {
+  //   icon: "⚖",
+  //   category: "Payment",
+  //   style: "action",
+  // },
 
-  PAYMENT_DISPUTE_RESOLVED: {
-    icon: "✓",
-    category: "Payment",
-    style: "success",
-  },
+  // PAYMENT_DISPUTE_RESOLVED: {
+  //   icon: "✓",
+  //   category: "Payment",
+  //   style: "success",
+  // },
 
 
   /* =========================================================

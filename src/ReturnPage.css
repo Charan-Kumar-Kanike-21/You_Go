@@ -678,3 +678,46 @@
   color: #ff8a8a !important;
   margin-bottom: 10px;
 }
+
+
+.return-back-button {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s ease;
+}
+
+.return-back-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.return-back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+.return-home-button {
+  margin-top: 28px;
+  padding: 13px 28px;
+  border: 1px solid #32e875;
+  border-radius: 10px;
+  background: transparent;
+  color: #32e875;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.return-home-button:hover {
+  background: #32e875;
+  color: #031b13;
+  transform: translateY(-2px);
+}
