@@ -1,0 +1,23 @@
+{
+  "name": "UgO - Campus Cycle Exchange",
+  "short_name": "UgO",
+  "description": "Campus cycle sharing platform for students",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#031b14",
+  "theme_color": "#39e875",
+  "orientation": "portrait-primary",
+
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

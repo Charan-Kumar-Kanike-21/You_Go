@@ -31,6 +31,451 @@ function App() {
 
   const [selectedCycleId, setSelectedCycleId] = useState(null);
 
+  useEffect(() => {
+    const debugPWA = async () => {
+      console.log("========================================");
+      console.log("        UGO PWA DEBUG START");
+      console.log("========================================");
+
+      // --------------------------------------------------
+      // 1. Browser information
+      // --------------------------------------------------
+
+      console.log("Browser:", navigator.userAgent);
+      console.log("HTTPS:", window.location.protocol === "https:");
+      console.log("Current URL:", window.location.href);
+
+      // --------------------------------------------------
+      // 2. Manifest
+      // --------------------------------------------------
+
+      const manifestLink = document.querySelector(
+        'link[rel="manifest"]'
+      );
+
+      console.log(
+        "Manifest <link> found:",
+        !!manifestLink
+      );
+
+      if (manifestLink) {
+        console.log(
+          "Manifest URL:",
+          manifestLink.href
+        );
+
+        try {
+          const response = await fetch(
+            manifestLink.href,
+            {
+              cache: "no-store",
+            }
+          );
+
+          console.log(
+            "Manifest HTTP status:",
+            response.status
+          );
+
+          console.log(
+            "Manifest content-type:",
+            response.headers.get("content-type")
+          );
+
+          if (!response.ok) {
+            console.error(
+              "❌ Manifest cannot be loaded."
+            );
+          } else {
+            const manifest =
+              await response.json();
+
+            console.log(
+              "✅ Manifest loaded successfully:"
+            );
+
+            console.table(manifest);
+
+            // --------------------------------------------------
+            // Manifest fields
+            // --------------------------------------------------
+
+            console.log(
+              "Manifest name:",
+              manifest.name
+            );
+
+            console.log(
+              "Manifest short_name:",
+              manifest.short_name
+            );
+
+            console.log(
+              "Manifest start_url:",
+              manifest.start_url
+            );
+
+            console.log(
+              "Manifest display:",
+              manifest.display
+            );
+
+            console.log(
+              "Manifest theme_color:",
+              manifest.theme_color
+            );
+
+            console.log(
+              "Manifest background_color:",
+              manifest.background_color
+            );
+
+            console.log(
+              "Manifest icons:",
+              manifest.icons
+            );
+
+            // --------------------------------------------------
+            // 3. Check every icon
+            // --------------------------------------------------
+
+            if (
+              !manifest.icons ||
+              manifest.icons.length === 0
+            ) {
+              console.error(
+                "❌ No icons found in manifest."
+              );
+            } else {
+
+              for (
+                const icon of manifest.icons
+              ) {
+
+                console.log(
+                  "--------------------------------"
+                );
+
+                console.log(
+                  "Checking icon:",
+                  icon.src
+                );
+
+                console.log(
+                  "Expected size:",
+                  icon.sizes
+                );
+
+                console.log(
+                  "Declared type:",
+                  icon.type
+                );
+
+                try {
+
+                  const iconResponse =
+                    await fetch(
+                      icon.src,
+                      {
+                        cache: "no-store",
+                      }
+                    );
+
+                  console.log(
+                    "HTTP status:",
+                    iconResponse.status
+                  );
+
+                  console.log(
+                    "Actual content-type:",
+                    iconResponse.headers.get(
+                      "content-type"
+                    )
+                  );
+
+                  if (!iconResponse.ok) {
+
+                    console.error(
+                      "❌ ICON NOT FOUND:",
+                      icon.src
+                    );
+
+                    continue;
+                  }
+
+                  const blob =
+                    await iconResponse.blob();
+
+                  console.log(
+                    "Actual blob type:",
+                    blob.type
+                  );
+
+                  console.log(
+                    "Actual file size:",
+                    blob.size,
+                    "bytes"
+                  );
+
+                  // Load image to check actual dimensions
+
+                  const image =
+                    new Image();
+
+                  image.onload = () => {
+
+                    console.log(
+                      "Actual dimensions:",
+                      `${image.naturalWidth}x${image.naturalHeight}`
+                    );
+
+                    console.log(
+                      "Expected dimensions:",
+                      icon.sizes
+                    );
+
+                    const expected =
+                      icon.sizes.split("x");
+
+                    const expectedWidth =
+                      Number(expected[0]);
+
+                    const expectedHeight =
+                      Number(expected[1]);
+
+                    if (
+                      image.naturalWidth ===
+                        expectedWidth &&
+                      image.naturalHeight ===
+                        expectedHeight
+                    ) {
+
+                      console.log(
+                        "✅ Icon dimensions are correct."
+                      );
+
+                    } else {
+
+                      console.error(
+                        "❌ Icon dimensions are WRONG."
+                      );
+
+                    }
+
+                  };
+
+                  image.onerror = () => {
+
+                    console.error(
+                      "❌ Browser cannot decode this image:",
+                      icon.src
+                    );
+
+                  };
+
+                  image.src =
+                    URL.createObjectURL(blob);
+
+                } catch (error) {
+
+                  console.error(
+                    "❌ Icon test failed:",
+                    icon.src,
+                    error
+                  );
+
+                }
+
+              }
+
+            }
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "❌ Error reading manifest:",
+            error
+          );
+
+        }
+
+      } else {
+
+        console.error(
+          "❌ No <link rel='manifest'> found."
+        );
+
+      }
+
+
+      // --------------------------------------------------
+      // 4. Service Worker
+      // --------------------------------------------------
+
+      console.log(
+        "========================================"
+      );
+
+      console.log(
+        "        SERVICE WORKER"
+      );
+
+      console.log(
+        "========================================"
+      );
+
+      if (
+        "serviceWorker" in navigator
+      ) {
+
+        console.log(
+          "✅ Service Worker API supported."
+        );
+
+        try {
+
+          const registrations =
+            await navigator.serviceWorker
+              .getRegistrations();
+
+          console.log(
+            "Service worker registrations:",
+            registrations
+          );
+
+          if (
+            registrations.length === 0
+          ) {
+
+            console.error(
+              "❌ NO SERVICE WORKER REGISTERED."
+            );
+
+          } else {
+
+            registrations.forEach(
+              (registration, index) => {
+
+                console.log(
+                  `Service Worker ${index + 1}:`
+                );
+
+                console.log(
+                  "Scope:",
+                  registration.scope
+                );
+
+                console.log(
+                  "Installing:",
+                  registration.installing
+                );
+
+                console.log(
+                  "Waiting:",
+                  registration.waiting
+                );
+
+                console.log(
+                  "Active:",
+                  registration.active
+                );
+
+              }
+            );
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "❌ Service worker check failed:",
+            error
+          );
+
+        }
+
+      } else {
+
+        console.error(
+          "❌ Service Workers are not supported."
+        );
+
+      }
+
+
+      // --------------------------------------------------
+      // 5. beforeinstallprompt support
+      // --------------------------------------------------
+
+      console.log(
+        "========================================"
+      );
+
+      console.log(
+        "        INSTALL PROMPT"
+      );
+
+      console.log(
+        "========================================"
+      );
+
+      console.log(
+        "beforeinstallprompt supported:",
+        "onbeforeinstallprompt" in window
+      );
+
+
+      // --------------------------------------------------
+      // 6. Display mode
+      // --------------------------------------------------
+
+      console.log(
+        "========================================"
+      );
+
+      console.log(
+        "        DISPLAY MODE"
+      );
+
+      console.log(
+        "========================================"
+      );
+
+      console.log(
+        "Standalone:",
+        window.matchMedia(
+          "(display-mode: standalone)"
+        ).matches
+      );
+
+      console.log(
+        "Browser:",
+        window.matchMedia(
+          "(display-mode: browser)"
+        ).matches
+      );
+
+
+      console.log(
+        "========================================"
+      );
+
+      console.log(
+        "        UGO PWA DEBUG END"
+      );
+
+      console.log(
+        "========================================"
+      );
+    };
+
+
+    debugPWA();
+
+  }, []);
+
   const loadCurrentUser = async (session) => {
     if (!session?.user) {
       setUserId(null);

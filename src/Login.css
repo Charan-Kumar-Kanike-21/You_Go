@@ -885,3 +885,27 @@ body,
     padding-bottom: 12px;
   }
 }
+
+.install-app-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.install-app-button {
+  width: 100%;
+  padding: 12px 18px;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  background: transparent;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.install-app-button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}

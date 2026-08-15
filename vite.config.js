@@ -1,39 +1,40 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     react(),
 
-    VitePWA({
-      registerType: 'autoUpdate',
+    VitePWA({ 
+      registerType: "autoUpdate",
 
       manifest: {
-        name: 'NITK Cycle Sharing',
-        short_name: 'Cycle Sharing',
-        description: 'NITK Cycle Sharing Platform',
+        name: "UgO - Campus Cycle Exchange",
+        short_name: "UgO",
+        description: "Campus cycle sharing platform",
 
-        theme_color: '#0a2e1f',
-        background_color: '#061a12',
+        start_url: "/",
+        scope: "/",
 
-        display: 'standalone',
+        display: "standalone",
 
-        start_url: '/',
+        background_color: "#031f16",
+        theme_color: "#39e879",
 
         icons: [
           {
-            src: '/icons/icon-192.png.jpeg',
-            sizes: '192x192',
-            type: 'image/png',
+            src: "/icons/icon-192.png",
+            sizes: "192x192",
+            type: "image/png"
           },
           {
-            src: '/icons/icon-512.png.jpeg',
-            sizes: '512x512',
-            type: 'image/png',
-          },
-        ],
-      },
-    }),
-  ],
+            src: "/icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png"
+          }
+        ]
+      }
 })
+  ]
+});
