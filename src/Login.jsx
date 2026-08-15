@@ -357,7 +357,7 @@ function Login({ onCreateAccount, onLoginSuccess, onForgotPassword })  {
         .select("role")
         .eq("id", data.user.id)
         .single();
-
+        console.log(data.user.id);
       if (profileError) {
         console.error("Profile fetch error:", profileError);
         alert("Unable to determine user role.");
