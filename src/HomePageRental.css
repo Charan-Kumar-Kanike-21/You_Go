@@ -1146,12 +1146,13 @@ body {
 }
 
 .footer-brand h2 {
-  margin:
-    0 0 7px;
+  margin:0 0 7px;
 
   color: #f4f8f5;
 
   font-size: 16px;
+
+  text-align: center;
 }
 
 .footer-brand p {
@@ -1164,24 +1165,8 @@ body {
   font-size: 11px;
 
   line-height: 1.6;
-}
 
-.footer-links {
-  display: flex;
-
-  gap: 25px;
-}
-
-.footer-links a {
-  color: #81968a;
-
-  text-decoration: none;
-
-  font-size: 12px;
-}
-
-.footer-links a:hover {
-  color: #42e77a;
+  text-align: center;
 }
 
 .footer-copy p {
@@ -1738,4 +1723,603 @@ body {
     font-size: 21px;
   }
 
+}
+
+/* =========================================================
+   HOME PAGE - TABLET RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .home-navbar {
+    padding: 12px 20px;
+    gap: 15px;
+  }
+
+  .home-logo {
+    min-width: auto;
+  }
+
+  .cycle-search {
+    max-width: none;
+  }
+
+  .home-main {
+    width: 94%;
+    gap: 18px;
+  }
+
+  .filter-sidebar {
+    width: 230px;
+    padding: 18px;
+  }
+
+  .cycle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .cycle-image {
+    height: 190px !important;
+  }
+}
+
+
+/* =========================================================
+   HOME PAGE - MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  /* -------------------------
+     NAVBAR
+  ------------------------- */
+
+  .home-navbar {
+    min-height: auto;
+
+    padding: 10px 14px;
+
+    display: grid;
+
+    grid-template-columns: auto 1fr auto;
+
+    gap: 10px;
+
+    position: sticky;
+
+    top: 0;
+  }
+
+  .home-logo {
+    min-width: auto;
+
+    gap: 7px;
+  }
+
+  .home-logo-icon {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+  }
+
+  .home-logo h2 {
+    font-size: 14px;
+  }
+
+  .home-logo span {
+    font-size: 6px;
+
+    letter-spacing: 2px;
+  }
+
+  .cycle-search {
+    width: 100%;
+
+    height: 40px;
+
+    padding: 0 10px;
+  }
+
+  .cycle-search input {
+    font-size: 12px;
+  }
+
+  .search-icon {
+    margin-right: 6px;
+  }
+
+  .navbar-actions {
+    margin-left: 0;
+
+    gap: 6px;
+  }
+
+  .navbar-actions button {
+    padding: 8px 11px;
+
+    font-size: 11px;
+  }
+
+
+  /* -------------------------
+     MAIN
+  ------------------------- */
+
+  .home-main {
+    width: 100%;
+
+    padding:
+      20px 14px 40px;
+
+    margin: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+  }
+
+
+  /* -------------------------
+     FILTER SIDEBAR
+  ------------------------- */
+
+  .filter-sidebar {
+    width: 100%;
+
+    padding: 16px;
+
+    position: static;
+
+    border-radius: 15px;
+  }
+
+  .filter-heading {
+    margin-bottom: 15px;
+  }
+
+  .filter-heading h2 {
+    font-size: 17px;
+  }
+
+  .filter-section {
+    padding: 14px 0;
+  }
+
+  .filter-section label {
+    font-size: 12px;
+  }
+
+
+  /* -------------------------
+     CONTENT
+  ------------------------- */
+
+  .cycle-content {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+  .content-header {
+    align-items: flex-start;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+  }
+
+  .content-header h1 {
+    font-size: 25px;
+  }
+
+  .content-small-title {
+    font-size: 8px;
+
+    letter-spacing: 2px;
+  }
+
+  .content-header p:last-child {
+    font-size: 11px;
+  }
+
+  .cycle-count {
+    flex-shrink: 0;
+
+    padding: 7px 10px;
+
+    font-size: 10px;
+  }
+
+
+  /* -------------------------
+     CYCLE GRID
+  ------------------------- */
+
+  .cycle-grid {
+    width: 100%;
+
+    grid-template-columns: 1fr;
+
+    gap: 15px;
+  }
+
+
+  /* -------------------------
+     CYCLE CARD
+  ------------------------- */
+
+  .cycle-card {
+    width: 100%;
+
+    border-radius: 15px;
+  }
+
+  .cycle-image {
+    width: 100%;
+
+    height: 200px !important;
+  }
+
+  .cycle-details {
+    padding: 14px;
+  }
+
+
+  /* -------------------------
+     TITLE + RATING
+  ------------------------- */
+
+  .cycle-title-row {
+    gap: 8px;
+  }
+
+  .cycle-title-row h2 {
+    font-size: 16px;
+  }
+
+  .cycle-model {
+    font-size: 9px;
+  }
+
+  .rating {
+    padding: 5px 8px;
+
+    font-size: 10px;
+  }
+
+
+  /* -------------------------
+     LOCATION
+  ------------------------- */
+
+  .cycle-location {
+    margin-bottom: 12px;
+
+    font-size: 10px;
+  }
+
+
+  /* -------------------------
+     PRICE
+  ------------------------- */
+
+  .cycle-info {
+    gap: 8px;
+  }
+
+  .cycle-info > div {
+    padding: 8px;
+  }
+
+  .cycle-info span {
+    font-size: 8px;
+  }
+
+  .cycle-info strong {
+    font-size: 13px;
+  }
+
+
+  /* -------------------------
+     BOTTOM ROW
+  ------------------------- */
+
+  .cycle-bottom-row {
+    gap: 8px;
+  }
+
+  .cycle-type {
+    font-size: 9px;
+  }
+
+  .rent-btn {
+    min-width: 105px;
+
+    min-height: 36px;
+
+    padding: 8px 12px;
+
+    font-size: 10px;
+  }
+
+
+  /* -------------------------
+     FOOTER
+  ------------------------- */
+
+  .home-footer {
+    padding:
+      25px 18px;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 18px;
+  }
+
+  .footer-brand p {
+    max-width: 100%;
+  }
+
+  .footer-links {
+    width: 100%;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+  }
+
+  .footer-copy {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 450px) {
+
+  .home-navbar {
+    grid-template-columns: auto auto;
+
+    justify-content: space-between;
+  }
+
+  .cycle-search {
+    grid-column: 1 / -1;
+
+    grid-row: 2;
+
+    width: 100%;
+  }
+
+  .navbar-actions {
+    justify-content: flex-end;
+  }
+
+  .home-main {
+    padding:
+      16px 10px 30px;
+  }
+
+  .filter-sidebar {
+    padding: 14px;
+  }
+
+  .content-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .content-header h1 {
+    font-size: 22px;
+  }
+
+  .cycle-count {
+    align-self: flex-start;
+  }
+
+  .cycle-image {
+    height: 185px !important;
+  }
+
+  .cycle-details {
+    padding: 13px;
+  }
+
+  .cycle-title-row h2 {
+    font-size: 15px;
+  }
+
+  .cycle-info {
+    gap: 6px;
+  }
+
+  .cycle-info > div {
+    padding: 7px;
+  }
+
+  .cycle-info strong {
+    font-size: 12px;
+  }
+
+  .rent-btn {
+    min-width: 95px;
+
+    padding:
+      7px 10px;
+  }
+}
+
+
+/* =========================================================
+   EXTRA SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .home-logo h2 {
+    font-size: 12px;
+  }
+
+  .home-logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-actions button {
+    padding: 7px 9px;
+
+    font-size: 10px;
+  }
+
+  .cycle-image {
+    height: 170px !important;
+  }
+
+  .cycle-info strong {
+    font-size: 11px;
+  }
+
+  .rent-btn {
+    min-width: 88px;
+
+    font-size: 9px;
+  }
+}
+
+/* =========================================================
+   MOBILE HOME / BACK BUTTON
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .nav-home-btn {
+    display: flex !important;
+
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-width: 70px;
+
+    min-height: 36px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #42e77a;
+
+    border-radius: 20px;
+
+    background: rgba(42, 150, 75, 0.08);
+
+    color: #42e77a;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    visibility: visible !important;
+
+    opacity: 1 !important;
+
+    position: relative;
+
+    z-index: 100;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .nav-home-btn {
+    display: flex !important;
+
+    min-width: 62px;
+
+    min-height: 34px;
+
+    padding: 7px 10px;
+
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   APP LOGO FIX
+========================================================= */
+
+.home-logo-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+}
+
+.home-logo-icon img {
+  width: 100%;
+  height: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+
+/* =========================================================
+   MOBILE LOGO
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .home-logo-icon {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+  }
+
+  .home-logo-icon img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 400px) {
+
+  .home-logo-icon {
+    width: 32px;
+    height: 32px;
+  }
 }

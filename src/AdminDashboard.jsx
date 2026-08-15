@@ -4,11 +4,84 @@ import { supabase } from "./supabase";
 import "./AdminDashboard.css";
 
 import NotificationBell from "./NotificationBell";
+import applogo from "./assets/UGO_logo.jpeg";
 
 function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
   const [activeSection, setActiveSection] = useState("overview");
 
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [activeRentals, setActiveRentals] = useState(0);
+  const [availableCycles, setAvailableCycles] = useState(0);
+
+  const fetchDashboardStats = async () => {
+    try {
+      // ==========================================
+      // TOTAL USERS
+      // ==========================================
+
+      const {
+        count: usersCount,
+        error: usersError,
+      } = await supabase
+        .from("profiles")
+        .select("*", {
+          count: "exact",
+          head: true,
+        });
+
+      if (usersError) throw usersError;
+
+      setTotalUsers(usersCount || 0);
+
+
+      // ==========================================
+      // ACTIVE RENTALS
+      // ==========================================
+
+      const {
+        count: activeRentalCount,
+        error: rentalError,
+      } = await supabase
+        .from("booking_table")
+        .select("*", {
+          count: "exact",
+          head: true,
+        })
+        .eq("status", "ONGOING");
+
+      if (rentalError) throw rentalError;
+
+      setActiveRentals(activeRentalCount || 0);
+
+
+      // ==========================================
+      // AVAILABLE CYCLES
+      // ==========================================
+
+      const {
+        count: availableCycleCount,
+        error: cycleError,
+      } = await supabase
+        .from("cycles")
+        .select("*", {
+          count: "exact",
+          head: true,
+        })
+        .eq("status", "AVAILABLE");
+
+      if (cycleError) throw cycleError;
+
+      setAvailableCycles(availableCycleCount || 0);
+
+    } catch (error) {
+      console.error(
+        "Failed to fetch dashboard statistics:",
+        error
+      );
+    }
+  };
 
   const [currentAdmin, setCurrentAdmin] = useState(null);
 
@@ -57,6 +130,7 @@ function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
 
       await fetchAdminNotifications(user.id);
       await fetchUsers();
+      await fetchDashboardStats();
     } catch (error) {
       console.error("Admin initialization failed:", error);
 
@@ -497,12 +571,15 @@ function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
           <div className="admin-brand">
 
             <div className="admin-logo">
-              A
+              <img
+                src = {applogo}
+                alt = "NITK Cycle Sharing"
+              />
             </div>
 
             <div>
               <strong>
-                Campus Cycle
+                NITK Cycle Sharing
               </strong>
 
               <span>
@@ -695,12 +772,15 @@ function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
         <div className="admin-brand">
 
           <div className="admin-logo">
-            A
+            <img
+              src = {applogo}
+              alt = "NITK Cycle Sharing"
+            />
           </div>
 
           <div>
             <strong>
-              Campus Cycle
+              NITK Cycle Sharing
             </strong>
 
             <span>
@@ -894,7 +974,7 @@ function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
                     </span>
 
                     <strong>
-                      —
+                      {totalUsers}
                     </strong>
 
                     <small>
@@ -919,7 +999,7 @@ function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
                     </span>
 
                     <strong>
-                      —
+                      {activeRentals}
                     </strong>
 
                     <small>
@@ -944,7 +1024,7 @@ function AdminDashboard({ onAdminToStudent, onNotifications, onProfile }) {
                     </span>
 
                     <strong>
-                      —
+                      {availableCycles}
                     </strong>
 
                     <small>

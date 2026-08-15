@@ -1358,3 +1358,71 @@ button.owner-action-card:hover .action-arrow {
   display: flex;
   gap: 20px;
 }
+
+/* =========================================================
+   APP LOGO FIX
+========================================================= */
+
+.owner-brand-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+}
+
+.owner-brand-icon img {
+  width: 100%;
+  height: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+
+/* =========================================================
+   MOBILE LOGO
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .owner-brand-icon {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+  }
+
+  .owner-brand-icon img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 400px) {
+
+  .owner-brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+}

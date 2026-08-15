@@ -341,6 +341,7 @@ function Login({ onCreateAccount, onLoginSuccess, onForgotPassword })  {
       }
 
       console.log("Logged in user:", data.user);
+      console.log(data.user.id);
 
       // -----------------------------
       // SUCCESS

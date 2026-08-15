@@ -31,151 +31,582 @@ function App() {
 
   const [selectedCycleId, setSelectedCycleId] = useState(null);
 
-  const [bookingId, setBookingId] = useState("");
+  const loadCurrentUser = async (session) => {
+    if (!session?.user) {
+      setUserId(null);
+      return null;
+    }
 
-  useEffect(() => {
-    let mounted = true;
+    const user = session.user;
 
-    const restoreSession = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+    setUserId(user.id);
 
-        if (error) {
-          console.error("Session restore error:", error);
+    // Get profile information from Supabase
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select(`
+        id,
+        full_name,
+        phone,
+        avatar_url,
+        role,
+        email
+      `)
+      .eq("id", user.id)
+      .single();
 
-          if (mounted) {
-            localStorage.removeItem("cycle_last_page");
-            setPage("Landing");
-          }
+    if (error) {
+      console.error("Unable to load user profile:", error);
+      return null;
+    }
 
-          return;
-        }
+    console.log("Current user profile:", profile);
 
-        // =========================================
-        // NO ACTIVE SESSION
-        // =========================================
+    return profile;
+  };
 
-        if (!session) {
-          localStorage.removeItem("cycle_last_page");
+  const openRazorpay = (payment) => {
 
-          if (mounted) {
-            setPage("Landing");
-          }
+    if (!window.Razorpay) {
+      console.error("Razorpay Checkout is not loaded");
+      return;
+    }
 
-          return;
-        }
+    console.log("Opening Razorpay with:");
+    console.log("Key:", "rzp_test_TNLQlLSlXg9lGR");
+    console.log("Order:", payment.provider_order_id);
+    console.log("Amount:", Number(payment.amount) * 100);
 
-        // =========================================
-        // VALID SESSION
-        // =========================================
+    const options = {
+      key: "rzp_test_TNLQlLSlXg9lGR",
 
-        const savedPage = localStorage.getItem(
-          "cycle_last_page"
+      amount: Math.round(Number(payment.amount) * 100),
+
+      currency: payment.currency,
+
+      name: "UgO",
+
+      description: "Cycle Rental",
+
+      order_id: payment.provider_order_id,
+
+      handler: function (response) {
+
+        console.log("PAYMENT SUCCESS");
+        console.log(response);
+
+        console.log(
+          "Payment ID:",
+          response.razorpay_payment_id
         );
 
-        // Pages that should NEVER be restored
-        const invalidPages = [
-          "Landing",
-          "Login",
-          "SignUp",
-          "ForgotPassword",
-          "TermsAndConditions",
-        ];
+        console.log(
+          "Order ID:",
+          response.razorpay_order_id
+        );
 
-        if (
-          savedPage &&
-          !invalidPages.includes(savedPage)
-        ) {
-          if (mounted) {
-            setPage(savedPage);
-          }
-        } else {
-          // User is authenticated but there is
-          // no usable previous page.
+        console.log(
+          "Signature:",
+          response.razorpay_signature
+        );
+      }
+    };
 
-          if (mounted) {
-            setPage("ChoicePage");
-          }
-        }
+    const razorpay = new window.Razorpay(options);
 
-      } catch (error) {
+    razorpay.open();
+  };
+
+  useEffect(() => {
+  const script = document.createElement("script");
+
+  script.src = "https://checkout.razorpay.com/v1/checkout.js";
+  script.async = true;
+
+  script.onload = () => {
+    console.log("Razorpay Checkout loaded");
+  };
+
+  script.onerror = () => {
+    console.error("Failed to load Razorpay Checkout");
+  };
+
+  document.body.appendChild(script);
+
+  return () => {
+    document.body.removeChild(script);
+  };
+}, []);
+
+  const [userId, setUserId] = useState(null);
+
+  const [bookingId, setBookingId] = useState("");
+useEffect(() => {
+  if (!userId) return;
+
+  const channel = supabase
+    .channel(`payment-updates-${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'payment_table',
+        filter: `renter_id=eq.${userId}`
+      },
+      (payload) => {
+        console.log("NEW PAYMENT:", payload.new);
+
+        openRazorpay(payload.new);
+      }
+    )
+    .subscribe((status) => {
+      console.log("Payment realtime status:", status);
+    });
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, [userId]);
+
+useEffect(() => {
+  let mounted = true;
+
+  // ============================================================
+  // RESTORE / REFRESH SUPABASE SESSION
+  // ============================================================
+
+  const restoreSession = async () => {
+    try {
+      console.log("Checking Supabase session...");
+
+      /*
+       * getSession() gets the persisted session.
+       *
+       * Supabase will normally refresh an expired access token
+       * using the stored refresh token.
+       */
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
         console.error(
-          "Unexpected session restoration error:",
+          "Session restore error:",
           error
         );
 
         if (mounted) {
+          setUserId(null);
           setPage("Landing");
         }
-      } finally {
-        if (mounted) {
-          setAuthLoading(false);
-        }
+
+        return;
       }
-    };
 
-    restoreSession();
+      // ========================================================
+      // NO SESSION AT ALL
+      // ========================================================
 
-    // =========================================
-    // LISTEN FOR LOGIN / LOGOUT / SESSION CHANGE
-    // =========================================
-
-    const {
-      data: authListener,
-    } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-
+      if (!session) {
         console.log(
-          "Auth event:",
-          event
+          "No active Supabase session."
         );
 
-        // USER LOGGED OUT
-        if (event === "SIGNED_OUT" || !session) {
+        if (mounted) {
+          setUserId(null);
+
           localStorage.removeItem(
             "cycle_last_page"
           );
 
+          setPage("Landing");
+        }
+
+        return;
+      }
+
+      // ========================================================
+      // SESSION EXISTS
+      // ========================================================
+
+      console.log(
+        "Supabase session found:",
+        session.user.email
+      );
+
+      console.log(
+        "Access token expires at:",
+        new Date(
+          session.expires_at * 1000
+        )
+      );
+
+      console.log(
+        "Refresh token exists:",
+        !!session.refresh_token
+      );
+
+      // ========================================================
+      // LOAD USER PROFILE
+      // ========================================================
+
+      const profile =
+        await loadCurrentUser(session);
+
+      if (!profile) {
+        console.error(
+          "Unable to load profile for authenticated user."
+        );
+
+        if (mounted) {
+          setPage("Login");
+        }
+
+        return;
+      }
+
+      // ========================================================
+      // RESTORE LAST PAGE
+      // ========================================================
+
+      const savedPage =
+        localStorage.getItem(
+          "cycle_last_page"
+        );
+
+      const restorablePages = [
+        "ChoicePage",
+        "HomePageRental",
+        "Listing",
+        "Profile",
+        "CycleOwner",
+        "OnGoingRents",
+        "AdminDashboard",
+        "NotificationPage",
+      ];
+
+      if (
+        savedPage &&
+        restorablePages.includes(savedPage)
+      ) {
+        console.log(
+          "Restoring previous page:",
+          savedPage
+        );
+
+        if (mounted) {
+          setPage(savedPage);
+        }
+      } else {
+        if (mounted) {
+          if (
+            profile.role === "admin"
+          ) {
+            setPage("AdminDashboard");
+          } else {
+            setPage("ChoicePage");
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error(
+        "Unexpected session restoration error:",
+        error
+      );
+
+      if (mounted) {
+        setUserId(null);
+        setPage("Landing");
+      }
+
+    } finally {
+      if (mounted) {
+        setAuthLoading(false);
+      }
+    }
+  };
+
+
+  // ============================================================
+  // RUN SESSION RESTORATION
+  // ============================================================
+
+  restoreSession();
+
+
+  // ============================================================
+  // AUTH STATE LISTENER
+  // ============================================================
+
+  const {
+    data: authListener,
+  } =
+    supabase.auth.onAuthStateChange(
+      async (event, session) => {
+
+        console.log(
+          "Supabase Auth event:",
+          event
+        );
+
+
+        // ======================================================
+        // SIGNED OUT
+        // ======================================================
+
+        if (
+          event === "SIGNED_OUT"
+        ) {
+
+          console.log(
+            "User signed out."
+          );
+
           if (mounted) {
+
+            setUserId(null);
+
+            localStorage.removeItem(
+              "cycle_last_page"
+            );
+
             setPage("Login");
           }
 
           return;
         }
 
-        // USER LOGGED IN
-        if (event === "SIGNED_IN") {
+
+        // ======================================================
+        // TOKEN REFRESHED
+        // ======================================================
+
+        /*
+         * THIS IS VERY IMPORTANT.
+         *
+         * When the access token expires, Supabase should use
+         * the refresh token to generate a new access token.
+         *
+         * The event received here is:
+         *
+         * TOKEN_REFRESHED
+         *
+         * We DO NOT send the user to Login.
+         */
+
+        if (
+          event === "TOKEN_REFRESHED"
+        ) {
+
+          if (!session) {
+
+            console.warn(
+              "TOKEN_REFRESHED received without session."
+            );
+
+            return;
+          }
+
+          console.log(
+            "Supabase access token refreshed."
+          );
+
+          console.log(
+            "New expiry:",
+            new Date(
+              session.expires_at * 1000
+            )
+          );
+
+          /*
+           * The user is still authenticated.
+           *
+           * Do NOT change page.
+           * Do NOT send user to Login.
+           */
+
+          if (mounted) {
+            setUserId(
+              session.user.id
+            );
+          }
+
+          return;
+        }
+
+
+        // ======================================================
+        // USER UPDATED
+        // ======================================================
+
+        if (
+          event === "USER_UPDATED"
+        ) {
+
+          if (!session) {
+            return;
+          }
+
+          console.log(
+            "User information updated."
+          );
+
+          if (mounted) {
+            setUserId(
+              session.user.id
+            );
+          }
+
+          return;
+        }
+
+
+        // ======================================================
+        // SIGNED IN
+        // ======================================================
+
+        if (
+          event === "SIGNED_IN"
+        ) {
+
+          if (!session) {
+
+            console.warn(
+              "SIGNED_IN event without session."
+            );
+
+            return;
+          }
+
+          console.log(
+            "User signed in:",
+            session.user.email
+          );
+
+
+          // ----------------------------------------------------
+          // LOAD PROFILE
+          // ----------------------------------------------------
+
+          const profile =
+            await loadCurrentUser(
+              session
+            );
+
+          if (!profile) {
+
+            console.error(
+              "Unable to detect user profile."
+            );
+
+            if (mounted) {
+              setPage("Login");
+            }
+
+            return;
+          }
+
+
+          // ----------------------------------------------------
+          // SAVE USER ID
+          // ----------------------------------------------------
+
+          if (mounted) {
+            setUserId(
+              session.user.id
+            );
+          }
+
+
+          // ----------------------------------------------------
+          // RESTORE LAST PAGE
+          // ----------------------------------------------------
+
           const savedPage =
             localStorage.getItem(
               "cycle_last_page"
             );
 
+          const restorablePages = [
+            "ChoicePage",
+            "HomePageRental",
+            "Listing",
+            "Profile",
+            "CycleOwner",
+            "OnGoingRents",
+            "AdminDashboard",
+            "NotificationPage",
+          ];
+
+
           if (
             savedPage &&
-            ![
-              "Landing",
-              "Login",
-              "SignUp",
-              "ForgotPassword",
-              "TermsAndConditions",
-            ].includes(savedPage)
+            restorablePages.includes(
+              savedPage
+            )
           ) {
-            setPage(savedPage);
+
+            console.log(
+              "Restoring previous page after login:",
+              savedPage
+            );
+
+            if (mounted) {
+              setPage(savedPage);
+            }
+
           } else {
-            setPage("ChoicePage");
+
+            if (mounted) {
+
+              if (
+                profile.role === "admin"
+              ) {
+                setPage(
+                  "AdminDashboard"
+                );
+              } else {
+                setPage(
+                  "ChoicePage"
+                );
+              }
+
+            }
           }
+
+          return;
         }
+
+
+        // ======================================================
+        // OTHER AUTH EVENTS
+        // ======================================================
+
+        console.log(
+          "Unhandled Supabase auth event:",
+          event
+        );
+
       }
     );
 
-    return () => {
-      mounted = false;
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+
+  // ============================================================
+  // CLEANUP
+  // ============================================================
+
+  return () => {
+
+    mounted = false;
+
+    authListener.subscription.unsubscribe();
+
+  };
+
+}, []);
 
   useEffect(() => {
     if (!page) {
@@ -190,11 +621,6 @@ function App() {
       "CycleOwner",
       "OnGoingRents",
       "AdminDashboard",
-      "BookingPage",
-      "OwnerDetails",
-      "ReportPage",
-      "ReturnPage",
-      "CycleVerification",
       "NotificationPage",
     ];
 
@@ -1181,7 +1607,7 @@ const handleNotificationAction = async (
 
     case "report_owner":
 
-      setPage("Report");
+      setPage("ReportPage");
 
       break;
 
@@ -1221,7 +1647,7 @@ const handleNotificationAction = async (
 
     case "view_rental":
 
-      setPage("myRentals");
+      setPage("OnGoingRents");
 
       break;
 
@@ -1283,7 +1709,7 @@ const handleNotificationAction = async (
 
     case "view_report":
 
-      setPage("Report");
+      setPage("CycleVerification");
 
       break;
 
@@ -1294,7 +1720,7 @@ const handleNotificationAction = async (
 
     case "view_account":
 
-      setPage("userProfile");
+      setPage("Profile");
 
       break;
 
@@ -1707,12 +2133,32 @@ const handleNotificationAction = async (
 
       {page === "Profile" && (
         <Profile
-        onBack={handleProfileBack}
-        onLogout={() => {
-        setPage("Login");
-      }}
-  />
-)}
+          onBack={handleProfileBack}
+          onLogout={async () => {
+
+            const { error } =
+              await supabase.auth.signOut();
+
+            if (error) {
+              console.error(
+                "Logout error:",
+                error
+              );
+
+              alert(
+                "Unable to log out. Please try again."
+              );
+
+              return;
+            }
+
+            localStorage.removeItem(
+              "cycle_last_page"
+            );
+
+          }}
+        />
+      )}
 
       {/* =====================================================
           FORGOT PASSWORD

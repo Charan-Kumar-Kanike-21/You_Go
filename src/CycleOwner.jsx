@@ -3,6 +3,7 @@ import "./CycleOwner.css";
 import { supabase } from "./supabase";
 
 import NotificationBell from "./NotificationBell";
+import applogo from "./assets/UGO_logo.jpeg";
 
 function CycleOwner({ onBack, onListCycle, onNotifications, onEditCycle }) {
   const [cycles, setCycles] = useState([]);
@@ -267,7 +268,10 @@ function CycleOwner({ onBack, onListCycle, onNotifications, onEditCycle }) {
 
         <div className="owner-brand">
           <div className="owner-brand-icon">
-            🚲
+            <img
+              src = {applogo}
+              alt = "NITK Cycle Sharing"
+            />
           </div>
 
           <div>

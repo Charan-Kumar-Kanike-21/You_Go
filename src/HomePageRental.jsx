@@ -4,6 +4,7 @@ import "./HomePageRental.css";
 import { supabase } from "./supabase";
 
 import NotificationBell from "./NotificationBell";
+import applogo from "./assets/UGO_logo.jpeg";
 
 function Home({ onProfile, BackToChoice, onViewDetails, onNotifications }) {
   // =========================================
@@ -253,7 +254,10 @@ function Home({ onProfile, BackToChoice, onViewDetails, onNotifications }) {
         <div className="home-logo">
 
           <div className="home-logo-icon">
-            🚲
+            <img
+              src = {applogo}
+              alt = "NITK Cycle Sharing"
+            />
           </div>
 
           <div>
@@ -852,7 +856,7 @@ function Home({ onProfile, BackToChoice, onViewDetails, onNotifications }) {
 
         </div>
 
-
+{/* 
         <div className="footer-links">
 
           <a href="#home">
@@ -871,7 +875,7 @@ function Home({ onProfile, BackToChoice, onViewDetails, onNotifications }) {
             Help
           </a>
 
-        </div>
+        </div> */}
 
 
         <div className="footer-copy">

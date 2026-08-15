@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import "./Profile.css";
 
-import appLogo from "./assets/app_logo.png";
+import appLogo from "./assets/UGO_logo.jpeg";
 
-function ProfilePage({ onBack },onLogout) {
+function ProfilePage({ onBack, onLogout }) {
   const [user, setUser] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
@@ -25,36 +25,69 @@ function ProfilePage({ onBack },onLogout) {
   // =========================================
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+    const getProfile = async () => {
+      try {
+        // Get currently logged-in user
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
 
-      if (error || !user) {
-        console.log("No logged-in user found");
-        return;
+        if (authError || !user) {
+          console.error(
+            "No logged-in user found:",
+            authError
+          );
+          return;
+        }
+
+        setUser(user);
+
+        // Get profile details from profiles table
+        const {
+          data: profile,
+          error: profileError,
+        } = await supabase
+          .from("profiles")
+          .select(`
+            id,
+            full_name,
+            phone,
+            avatar_url,
+            email
+          `)
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error(
+            "Error loading profile:",
+            profileError
+          );
+
+          // Email can still come from Auth
+          setEmail(user.email || "");
+
+          return;
+        }
+
+        console.log("Profile loaded:", profile);
+
+        // Set profile information
+        setFullName(profile.full_name || "");
+        setPhone(profile.phone || "");
+        setProfilePhoto(profile.avatar_url || "");
+        setEmail(profile.email || user.email || "");
+
+      } catch (error) {
+        console.error(
+          "Unexpected profile loading error:",
+          error
+        );
       }
-
-      setUser(user);
-
-      setFullName(
-        user.user_metadata?.full_name || ""
-      );
-
-      setPhone(
-        user.user_metadata?.phone || ""
-      );
-
-      setProfilePhoto(
-        user.user_metadata?.profile_photo || ""
-      );
-
-      // Email comes directly from Supabase Auth
-      setEmail(user.email || "");
     };
 
-    getUser();
+    getProfile();
   }, []);
 
 
@@ -129,40 +162,95 @@ function ProfilePage({ onBack },onLogout) {
     }
 
     try {
-      const updateData = {
-        data: {
-          full_name: fullName.trim(),
-          phone: phone,
-          profile_photo: profilePhoto,
-        },
-      };
-
-      // Change password only if entered
-      if (newPassword.trim() !== "") {
-        updateData.password = newPassword;
-      }
-
+      // Make sure we have logged-in user
       const {
-        data,
-        error: updateError,
-      } = await supabase.auth.updateUser(updateData);
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (updateError) {
-        setError(updateError.message);
+      if (userError || !user) {
+        setError("User session not found.");
         return;
       }
 
-      // Update local user
-      if (data?.user) {
-        setUser(data.user);
+      // ==========================================
+      // UPDATE PROFILES TABLE
+      // ==========================================
+
+      const {
+        data: updatedProfile,
+        error: profileError,
+      } = await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName.trim(),
+          phone: phone,
+          avatar_url: profilePhoto || null,
+        })
+        .eq("id", user.id)
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error(
+          "Profile update error:",
+          profileError
+        );
+
+        setError(
+          "Unable to update profile details."
+        );
+
+        return;
       }
+
+      console.log(
+        "Updated profile:",
+        updatedProfile
+      );
+
+      // ==========================================
+      // UPDATE PASSWORD IF PROVIDED
+      // ==========================================
+
+      if (newPassword.trim() !== "") {
+        const {
+          error: passwordError,
+        } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+
+        if (passwordError) {
+          setError(passwordError.message);
+          return;
+        }
+      }
+
+      // ==========================================
+      // UPDATE LOCAL STATE
+      // ==========================================
+
+      setFullName(
+        updatedProfile.full_name || ""
+      );
+
+      setPhone(
+        updatedProfile.phone || ""
+      );
+
+      setProfilePhoto(
+        updatedProfile.avatar_url || ""
+      );
 
       setNewPassword("");
 
       setIsEditing(false);
 
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(
+        "Unexpected profile update error:",
+        error
+      );
 
       setError(
         "Unable to update profile. Please try again."
@@ -191,41 +279,51 @@ function ProfilePage({ onBack },onLogout) {
       : "U";
 
  // handlelogging out 
-
   const handleLogout = async () => {
-  const confirmed = window.confirm(
-    "Are you sure you want to logout?"
-  );
+    const confirmed = window.confirm(
+      "Are you sure you want to logout?"
+    );
 
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-    // Remove saved page
-    localStorage.removeItem("cycle_last_page");
-
-    // Sign out from Supabase
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error("Logout error:", error);
-
-      alert("Unable to logout. Please try again.");
+    if (!confirmed) {
       return;
     }
 
-    // Tell App.jsx that logout happened
-    if (onLogout) {
-      onLogout();
+    try {
+      // Remove saved page
+      localStorage.removeItem("cycle_last_page");
+
+      // Sign out from Supabase
+      const { error } =
+        await supabase.auth.signOut();
+
+      if (error) {
+        console.error(
+          "Logout error:",
+          error
+        );
+
+        alert(
+          "Unable to logout. Please try again."
+        );
+
+        return;
+      }
+
+      // App.jsx will automatically receive
+      // the SIGNED_OUT event and navigate to Login.
+
+    } catch (error) {
+
+      console.error(
+        "Unexpected logout error:",
+        error
+      );
+
+      alert(
+        "Something went wrong while logging out."
+      );
     }
-
-  } catch (error) {
-    console.error("Unexpected logout error:", error);
-
-    alert("Something went wrong while logging out.");
-  }
-};
+  };
 
 
   return (

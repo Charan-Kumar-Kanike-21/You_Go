@@ -1277,6 +1277,7 @@ form.elements.description.value =
                   name="ownerName"
                   placeholder="Enter your name"
                   required
+                  readOnly
                 />
 
               </div>
@@ -1293,6 +1294,7 @@ form.elements.description.value =
                   name="phone"
                   placeholder="Enter phone number"
                   required
+                  readOnly
                 />
 
               </div>

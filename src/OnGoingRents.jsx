@@ -24,6 +24,7 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
   const [rental, setRental] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isRenter, setIsRenter] = useState(false);
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -81,7 +82,7 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
             )
             )
         `)
-        .eq("renter_id", user.id)
+        .or(`renter_id.eq.${user.id},owner_id.eq.${user.id}`)
         .is("returned_at", null)
         .is("cancelled_at", null)
         .order("created_at", { ascending: false })
@@ -92,6 +93,7 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
         throw error;
       }
 
+      setIsRenter(data?.renter_id === user.id);
       setRental(data);
     } catch (err) {
       console.error("Error fetching rental:", err);
@@ -664,12 +666,12 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
                 ⚠️ Report an Issue
                 </button>
 
-                <button
+                {isRenter && <button
                 className="return-cycle-btn"
                 onClick={openReturnModal}
                 >
                 Return Cycle
-                </button>
+                </button>}
 
             </div>
 
