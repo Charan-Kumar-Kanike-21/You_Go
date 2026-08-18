@@ -39,7 +39,7 @@ function ForgotPassword({ onBackToLogin }) {
         await supabase.auth.resetPasswordForEmail(
           cleanEmail,
           {
-            redirectTo: "http://localhost:5174/",
+            redirectTo: "https://ugo-cyclesharing.vercel.app/reset-password",
           }
         );
 

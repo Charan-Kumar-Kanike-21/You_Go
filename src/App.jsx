@@ -20,6 +20,7 @@ import AdminDashboard from "./AdminDashboard";
 import OwnerDetails from "./OwnerDetails";
 import CycleVerification from "./CycleVerification";
 import TermsAndConditions from "./TermsAndConditions";
+import ResetPassword from "./ResetPassword";
 
 function App() {
   // =========================================================
@@ -31,6 +32,36 @@ function App() {
 
   const [selectedCycleId, setSelectedCycleId] = useState(null);
 
+  useEffect(() => {
+    if (window.location.pathname === "/reset-password") {
+      setPage("ResetPassword");
+    }
+  }, []);
+useEffect(() => {
+  const checkRecovery = async () => {
+    // Direct reset-password URL
+    if (window.location.pathname === "/reset-password") {
+      setPage("ResetPassword");
+      return;
+    }
+
+    // Listen for Supabase recovery event
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      console.log("Supabase auth event:", event);
+
+      if (event === "PASSWORD_RECOVERY") {
+        console.log("Password recovery detected");
+        setPage("ResetPassword");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  };
+
+  checkRecovery();
+}, []);
   useEffect(() => {
     const debugPWA = async () => {
       console.log("========================================");
@@ -2788,6 +2819,15 @@ const handleNotificationAction = async (
           onBack={() =>
             setPage("SignUp")
           }
+        />
+      )}
+
+      {page === "ResetPassword" && (
+        <ResetPassword
+          onBackToLogin={() => {
+            window.history.replaceState({}, "", "/");
+            setPage("Login");
+          }}
         />
       )}
     </>
