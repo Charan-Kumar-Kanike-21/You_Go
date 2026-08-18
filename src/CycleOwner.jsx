@@ -5,13 +5,51 @@ import { supabase } from "./supabase";
 import NotificationBell from "./NotificationBell";
 import applogo from "./assets/UGO_logo.jpeg";
 
-function CycleOwner({ onBack, onListCycle, onNotifications, onEditCycle }) {
+function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, handleBackToLogin }) {
   const [cycles, setCycles] = useState([]);
   const [profile, setProfile] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState("");
+
+    // =========================================
+    // AUTHENTICATION STATE
+    // =========================================
+  
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+    useEffect(() => {
+      let mounted = true;
+  
+      const loadAuthState = async () => {
+        const { data, error } = await supabase.auth.getSession();
+  
+        if (error) {
+          console.error("Error checking auth state:", error);
+          return;
+        }
+  
+        if (mounted) {
+          setIsLoggedIn(Boolean(data.session));
+        }
+      };
+  
+      loadAuthState();
+  
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (mounted) {
+          setIsLoggedIn(Boolean(session));
+        }
+      });
+  
+      return () => {
+        mounted = false;
+        subscription.unsubscribe();
+      };
+    }, []);
 
   // =========================================
   // GET CURRENT USER + PROFILE + CYCLES
@@ -286,12 +324,31 @@ function CycleOwner({ onBack, onListCycle, onNotifications, onEditCycle }) {
           onClick={onNotifications}
         />
 
-        <button
+        <div classNmae = "navbar-actions-cycle">
+          {isLoggedIn ? (
+            <button
+              className="nav-profile-btn"
+              onClick={onProfile}
+              type="button"
+            >
+              Profile
+            </button>
+          ) : (
+            <button
+              className="nav-login-btn"
+              onClick={handleBackToLogin}
+              type="button"
+            >
+              Login / Sign Up
+            </button>
+        )}
+        </div>
+        {/* <button
           className="owner-back-btn"
           onClick={onBack}
         >
           ← Home
-        </button>
+        </button> */}
         </div>
 
       </nav>

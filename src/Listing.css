@@ -1,7 +1,13 @@
+/* =========================================================
+   NITK CYCLE SHARING
+   LIST / EDIT CYCLE PAGE
+   COMPLETE PREMIUM THEME
+========================================================= */
 
-/* =========================================
+
+/* =========================================================
    RESET
-========================================= */
+========================================================= */
 
 * {
   box-sizing: border-box;
@@ -10,793 +16,1782 @@
 html,
 body,
 #root {
-  margin: 0;
-  padding: 0;
   width: 100%;
   min-height: 100%;
-  font-family: Inter, Arial, Helvetica, sans-serif;
+
+  margin: 0;
+  padding: 0;
+
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+body {
+  background: #F7F9FC;
+  color: #172027;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 
-/* =========================================
+/* =========================================================
    PAGE
-========================================= */
+========================================================= */
 
 .my-cycles-page {
-  min-height: 100vh;
+  position: relative;
+
   width: 100%;
-  padding-bottom: 50px;
+  min-height: 100vh;
+  min-height: 100svh;
+
+  padding-bottom: 70px;
+
+  overflow-x: hidden;
 
   background:
     radial-gradient(
-      circle at 50% 45%,
-      rgba(45, 130, 72, 0.75) 0%,
-      rgba(28, 92, 53, 0.58) 20%,
-      rgba(13, 47, 33, 0.88) 45%,
-      rgba(6, 27, 20, 1) 75%
-    );
+      circle at 8% 5%,
+      rgba(234, 242, 248, 0.95) 0%,
+      rgba(234, 242, 248, 0) 30%
+    ),
+    radial-gradient(
+      circle at 94% 76%,
+      rgba(234, 245, 241, 0.75) 0%,
+      rgba(234, 245, 241, 0) 28%
+    ),
+    #F7F9FC;
 
-  color: white;
+  color: #172027;
 }
 
 
-/* =========================================
-   NAVBAR
-========================================= */
+/* Decorative background */
 
-.my-cycles-navbar {
-  width: 100%;
-  height: 75px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 0 6%;
-
-  background: rgba(5, 25, 18, 0.84);
-
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
-  border-bottom:
-    1px solid rgba(70, 225, 120, 0.20);
-}
-
-.my-cycles-logo {
-  font-size: 22px;
-  font-weight: 700;
-
-  color: #f4f8f5;
-}
-
-.back-btn {
-  padding: 10px 20px;
-
-  border:
-    1px solid rgba(105, 180, 125, 0.25);
-
-  border-radius: 10px;
-
-  background: rgba(255, 255, 255, 0.05);
-
-  color: #dce8e0;
-
-  cursor: pointer;
-
-  font-size: 15px;
-
-  transition: 0.3s;
-}
-
-.back-btn:hover {
-  background: rgba(66, 231, 122, 0.12);
-
-  border-color: rgba(66, 231, 122, 0.45);
-
-  color: #42e77a;
-}
-
-
-/* =========================================
-   FORM WRAPPER
-========================================= */
-
-.cycle-form-wrapper {
-  width: min(900px, 92%);
-  margin: 45px auto 0;
-
-  padding: 35px;
-
-  background: rgba(5, 25, 18, 0.84);
-
-  border:
-    1px solid rgba(70, 225, 120, 0.30);
-
-  border-radius: 22px;
-
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
-  box-shadow:
-    0 0 50px rgba(42, 170, 80, 0.14),
-    0 25px 60px rgba(0, 0, 0, 0.45);
-}
-
-
-/* =========================================
-   HEADER
-========================================= */
-
-.cycle-form-header {
-  text-align: center;
-  margin-bottom: 35px;
-}
-
-.cycle-form-header h1 {
-  margin: 0 0 10px;
-
-  font-size: 34px;
-
-  color: #f4f8f5;
-}
-
-.cycle-form-header p {
-  margin: 0;
-
-  color: #9db3a6;
-
-  font-size: 15px;
-}
-
-
-/* =========================================
-   FORM SECTION
-========================================= */
-
-.form-section {
-  margin-bottom: 30px;
-
-  padding: 25px;
-
-  border-radius: 16px;
-
-  background: rgba(2, 17, 12, 0.45);
-
-  border:
-    1px solid rgba(105, 180, 125, 0.18);
-}
-
-.form-section h2 {
-  margin: 0 0 20px;
-
-  font-size: 20px;
-
-  color: #f4f8f5;
-}
-
-.section-description {
-  margin-top: -10px;
-  margin-bottom: 20px;
-
-  color: #9db3a6;
-
-  font-size: 14px;
-
-  line-height: 1.5;
-}
-
-
-/* =========================================
-   FORM GRID
-========================================= */
-
-.form-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: 20px;
-}
-
-.input-group {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-}
-
-.full-width {
-  grid-column: 1 / -1;
-}
-
-
-/* =========================================
-   LABEL
-========================================= */
-
-.input-group label {
-  font-size: 14px;
-
-  font-weight: 600;
-
-  color: #dce8e0;
-}
-
-
-/* =========================================
-   INPUTS
-========================================= */
-
-.input-group input,
-.input-group select,
-.input-group textarea {
-  width: 100%;
-
-  padding: 13px 15px;
-
-  border-radius: 10px;
-
-  border:
-    1px solid rgba(105, 180, 125, 0.25);
-
-  background:
-    rgba(2, 17, 12, 0.72);
-
-  color: white;
-
-  outline: none;
-
-  font-size: 14px;
-
-  transition:
-    border 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
-}
-
-.input-group input::placeholder,
-.input-group textarea::placeholder {
-  color: #61796b;
-}
-
-
-/* =========================================
-   INPUT FOCUS
-========================================= */
-
-.input-group input:focus,
-.input-group select:focus,
-.input-group textarea:focus {
-  border-color: #42e77a;
-
-  background:
-    rgba(3, 22, 15, 0.88);
-
-  box-shadow:
-    0 0 0 3px rgba(66, 231, 122, 0.08);
-}
-
-.input-group select {
-  cursor: pointer;
-}
-
-.input-group select option {
-  background: #0d2f21;
-
-  color: white;
-}
-
-.input-group textarea {
-  resize: vertical;
-}
-
-
-/* =========================================
-   PRICE / INPUT HINT
-========================================= */
-
-.input-hint {
-  font-size: 12px;
-
-  color: #70877a;
-
-  line-height: 1.4;
-}
-
-
-/* =========================================
-   AVAILABILITY
-========================================= */
-
-/* Time input */
-
-.input-group input[type="time"] {
-  color-scheme: dark;
-
-  cursor: pointer;
-}
-
-
-/* Clock icon */
-
-.input-group input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-
-  cursor: pointer;
-
-  opacity: 0.75;
-}
-
-.input-group input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-
-
-/* =========================================
-   AVAILABLE DAYS
-========================================= */
-
-.availability-days-group {
-  margin-top: 28px;
-}
-
-
-/* Days grid */
-
-.days-grid {
-  display: grid;
-
-  grid-template-columns: repeat(4, 1fr);
-
-  gap: 12px;
-
-  margin-top: 10px;
-}
-
-
-/* =========================================
-   AVAILABLE DAYS
-========================================= */
-
-.availability-days-group {
-  margin-top: 28px;
-}
-
-.days-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-}
-
-
-/* =========================================
-   DAY CARD
-========================================= */
-
-.day-option {
-  position: relative;
-
-  min-height: 52px;
-  padding: 12px 16px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  border: 1px solid rgba(105, 180, 125, 0.25);
-  border-radius: 12px;
-
-  background: rgba(255, 255, 255, 0.035);
-
-  color: #dce8e0;
-
-  cursor: pointer;
-  user-select: none;
-
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
-}
-
-
-/* Hover */
-
-.day-option:hover {
-  border-color: rgba(66, 231, 122, 0.65);
-
-  background: rgba(66, 231, 122, 0.07);
-
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.18);
-}
-
-
-/* =========================================
-   CUSTOM CHECKBOX
-========================================= */
-
-.day-option input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-
-  width: 10px;
-  height: 10px;
-  min-width: 15px;
-
-  margin: 0;
-
-  border: 1.8px solid #688576;
-  border-radius: 6px;
-
-  background: rgba(2, 17, 12, 0.75);
-
-  cursor: pointer;
-
-  position: relative;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease;
-}
-
-
-/* Checkbox hover */
-
-.day-option input[type="checkbox"]:hover {
-  border-color: #42e77a;
-
-  box-shadow:
-    0 0 0 3px rgba(66, 231, 122, 0.08);
-}
-
-
-/* =========================================
-   CHECKED CHECKBOX
-========================================= */
-
-.day-option input[type="checkbox"]:checked {
-  background: #42e77a;
-  border-color: #42e77a;
-
-  box-shadow:
-    0 0 12px rgba(66, 231, 122, 0.35);
-
-  transform: scale(1.05);
-}
-
-
-/* Check mark */
-
-.day-option input[type="checkbox"]:checked::after {
+.my-cycles-page::before {
   content: "";
 
   position: absolute;
 
-  width: 4px;
-  height: 7px;
+  width: 420px;
+  height: 420px;
 
-  left: 50%;
-  top: 47%;
+  top: -240px;
+  right: -180px;
 
-  border: solid #062016;
-  border-width: 0 1.5px 1.5px 0;
-
-  transform: translate(-50%, -55%) rotate(45deg);
-}
-
-
-/* =========================================
-   SELECTED DAY CARD
-========================================= */
-
-.day-option:has(input[type="checkbox"]:checked) {
-  border-color: #42e77a;
+  border-radius: 50%;
 
   background:
-    linear-gradient(
-      135deg,
-      rgba(66, 231, 122, 0.14),
-      rgba(66, 231, 122, 0.045)
+    radial-gradient(
+      circle,
+      rgba(22, 58, 95, 0.09) 0%,
+      rgba(22, 58, 95, 0.025) 48%,
+      transparent 72%
     );
 
-  box-shadow:
-    0 0 18px rgba(66, 231, 122, 0.10);
+  pointer-events: none;
 
-  transform: translateY(-1px);
+  z-index: 0;
 }
 
 
-/* Selected text */
+/* =========================================================
+   NAVBAR
+========================================================= */
 
-.day-option:has(input[type="checkbox"]:checked) span {
-  color: #42e77a;
-  font-weight: 600;
-}
+.my-cycles-navbar {
+  position: sticky;
 
+  top: 0;
 
-/* =========================================
-   DAY TEXT
-========================================= */
+  z-index: 100;
 
-.day-option span {
-  font-size: 14px;
-  font-weight: 500;
+  width: 100%;
 
-  color: #dce8e0;
+  min-height: 72px;
 
-  transition:
-    color 0.2s ease;
-}
-
-
-/* =========================================
-   KEYBOARD FOCUS
-========================================= */
-
-.day-option input[type="checkbox"]:focus-visible {
-  outline: 2px solid #42e77a;
-  outline-offset: 3px;
-}
-
-/* =========================================
-   IMAGE UPLOAD
-========================================= */
-
-.image-upload-grid {
-  display: grid;
-
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 18px;
-}
-
-.image-upload-box {
-  height: 180px;
-
-  border:
-    2px dashed rgba(105, 180, 125, 0.30);
-
-  border-radius: 14px;
+  padding: 0 6%;
 
   display: flex;
-
-  flex-direction: column;
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: space-between;
 
-  gap: 8px;
+  background: #FFFFFF;
 
-  cursor: pointer;
-
-  overflow: hidden;
-
-  position: relative;
-
-  background:
-    rgba(2, 17, 12, 0.45);
-
-  transition: 0.3s;
-}
-
-.image-upload-box:hover {
-  border-color: #42e77a;
-
-  background:
-    rgba(42, 150, 75, 0.10);
+  border-bottom:
+    1px solid
+    #E5E7EB;
 
   box-shadow:
-    0 0 20px rgba(66, 231, 122, 0.08);
-}
-
-.image-upload-box input {
-  display: none;
-}
-
-.upload-icon {
-  font-size: 35px;
-
-  color: #42e77a;
-}
-
-.image-upload-box span {
-  font-size: 13px;
-
-  color: #9db3a6;
-}
-
-.image-upload-box img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
+    0 4px 16px
+    rgba(22, 58, 95, 0.05);
 }
 
 
-/* =========================================
-   SUBMIT
-========================================= */
+/* =========================================================
+   LOGO
+========================================================= */
 
-.submit-area {
-  display: flex;
+.my-cycles-logo {
+  color: #163A5F;
 
-  justify-content: center;
+  font-size: 21px;
 
-  margin-top: 10px;
+  line-height: 1;
 
-  gap: 30px;
+  font-weight: 750;
+
+  letter-spacing: -0.025em;
+
+  white-space: nowrap;
 }
 
-.list-cycle-btn {
-  width: 250px;
 
-  padding: 15px;
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.back-btn {
+  min-height: 39px;
+
+  padding:
+    9px 17px;
 
   border:
-    1.5px solid #42e77a;
+    1px solid
+    #D8E1E8;
 
-  border-radius: 12px;
+  border-radius:
+    9px;
 
   background:
-    rgba(42, 150, 75, 0.08);
+    #FFFFFF;
 
-  color: white;
+  color:
+    #163A5F;
 
-  font-size: 16px;
+  cursor:
+    pointer;
 
-  font-weight: 700;
+  font-size:
+    12px;
 
-  cursor: pointer;
+  font-weight:
+    700;
 
   transition:
-    background 0.25s ease,
-    color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
-.list-cycle-btn:hover {
-  background: #42e77a;
+.back-btn:hover {
+  background:
+    #EAF2F8;
 
-  color: #062016;
+  border-color:
+    #BFD2DF;
+
+  color:
+    #0F2D4A;
+
+  transform:
+    translateY(-1px);
 
   box-shadow:
-    0 0 25px rgba(66, 231, 122, 0.30);
+    0 5px 14px
+    rgba(22, 58, 95, 0.07);
+}
 
-  transform: translateY(-2px);
+.back-btn:active {
+  transform:
+    translateY(0);
 }
 
 
-/* =========================================
-   MOBILE RESPONSIVE
-========================================= */
+/* =========================================================
+   FORM WRAPPER
+========================================================= */
+
+.cycle-form-wrapper {
+  position: relative;
+
+  z-index: 1;
+
+  width:
+    min(900px, 92%);
+
+  margin:
+    38px auto 0;
+
+  padding:
+    35px;
+
+  background:
+    #FFFFFF;
+
+  border:
+    1px solid
+    #E1E7EC;
+
+  border-radius:
+    20px;
+
+  box-shadow:
+    0 18px 48px
+    rgba(22, 58, 95, 0.07),
+
+    0 3px 10px
+    rgba(22, 58, 95, 0.035);
+}
+
+
+/* =========================================================
+   FORM HEADER
+========================================================= */
+
+.cycle-form-header {
+  margin-bottom:
+    35px;
+
+  text-align:
+    center;
+}
+
+.cycle-form-header h1 {
+  margin:
+    0 0 9px;
+
+  color:
+    #163A5F;
+
+  font-size:
+    clamp(
+      28px,
+      4vw,
+      36px
+    );
+
+  line-height:
+    1.15;
+
+  font-weight:
+    750;
+
+  letter-spacing:
+    -0.035em;
+}
+
+.cycle-form-header p {
+  max-width:
+    620px;
+
+  margin:
+    0 auto;
+
+  color:
+    #667085;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.55;
+}
+
+
+/* =========================================================
+   FORM SECTION
+========================================================= */
+
+.form-section {
+  margin-bottom:
+    25px;
+
+  padding:
+    24px;
+
+  border:
+    1px solid
+    #E5E7EB;
+
+  border-radius:
+    15px;
+
+  background:
+    #FFFFFF;
+
+  box-shadow:
+    0 4px 14px
+    rgba(22, 58, 95, 0.025);
+}
+
+.form-section:last-of-type {
+  margin-bottom:
+    20px;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.form-section h2 {
+  margin:
+    0 0 19px;
+
+  color:
+    #163A5F;
+
+  font-size:
+    19px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    720;
+
+  letter-spacing:
+    -0.015em;
+}
+
+
+/* =========================================================
+   SECTION DESCRIPTION
+========================================================= */
+
+.section-description {
+  margin:
+    -8px 0 20px;
+
+  color:
+    #667085;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.55;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap:
+    19px;
+}
+
+.input-group {
+  min-width:
+    0;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    7px;
+}
+
+.full-width {
+  grid-column:
+    1 / -1;
+}
+
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+.input-group label {
+  color:
+    #172027;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
+}
+
+
+/* =========================================================
+   INPUTS / SELECT / TEXTAREA
+========================================================= */
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width:
+    100%;
+
+  min-height:
+    45px;
+
+  padding:
+    11px 13px;
+
+  border:
+    1px solid
+    #DDE3E8;
+
+  border-radius:
+    9px;
+
+  outline:
+    none;
+
+  background:
+    #F7F9FC;
+
+  color:
+    #172027;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.4;
+
+  transition:
+    border-color 0.20s ease,
+    box-shadow 0.20s ease,
+    background 0.20s ease,
+    transform 0.18s ease;
+}
+
+
+/* =========================================================
+   PLACEHOLDERS
+========================================================= */
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+  color:
+    #98A2B3;
+
+  opacity:
+    1;
+}
+
+
+/* =========================================================
+   INPUT HOVER
+========================================================= */
+
+.input-group input:hover,
+.input-group select:hover,
+.input-group textarea:hover {
+  border-color:
+    #C8D6E0;
+
+  background:
+    #FFFFFF;
+}
+
+
+/* =========================================================
+   INPUT FOCUS
+========================================================= */
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color:
+    #163A5F;
+
+  background:
+    #FFFFFF;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(22, 58, 95, 0.08);
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.input-group select {
+  cursor:
+    pointer;
+
+  appearance:
+    auto;
+}
+
+.input-group select option {
+  background:
+    #FFFFFF;
+
+  color:
+    #172027;
+}
+
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+.input-group textarea {
+  min-height:
+    125px;
+
+  resize:
+    vertical;
+}
+
+
+/* =========================================================
+   READ ONLY INPUTS
+========================================================= */
+
+.input-group input[readonly] {
+  background:
+    #F1F4F6;
+
+  color:
+    #52606D;
+
+  border-color:
+    #E1E6EA;
+
+  cursor:
+    not-allowed;
+}
+
+.input-group input[readonly]:focus {
+  border-color:
+    #E1E6EA;
+
+  background:
+    #F1F4F6;
+
+  box-shadow:
+    none;
+}
+
+
+/* =========================================================
+   INPUT HINT
+========================================================= */
+
+.input-hint {
+  color:
+    #98A2B3;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.4;
+}
+
+
+/* =========================================================
+   TIME INPUT
+========================================================= */
+
+.input-group input[type="time"] {
+  color-scheme:
+    light;
+
+  cursor:
+    pointer;
+}
+
+.input-group input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity:
+    0.55;
+
+  cursor:
+    pointer;
+
+  filter:
+    none;
+}
+
+.input-group input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity:
+    0.9;
+}
+
+
+/* =========================================================
+   AVAILABLE DAYS
+   COMPACT CIRCULAR CHECKPOINT DESIGN
+========================================================= */
+
+.availability-days-group {
+  margin-top:
+    18px;
+}
+
+
+/* =========================================================
+   DAYS GRID
+========================================================= */
+
+.days-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap:
+    7px;
+
+  margin-top:
+    8px;
+}
+
+
+/* =========================================================
+   DAY OPTION
+========================================================= */
+
+.day-option {
+  position:
+    relative;
+
+  min-height:
+    36px;
+
+  padding:
+    6px 8px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+
+  border:
+    1px solid
+    #E0E6EA;
+
+  border-radius:
+    8px;
+
+  background:
+    #FFFFFF;
+
+  color:
+    #52606D;
+
+  cursor:
+    pointer;
+
+  user-select:
+    none;
+
+  -webkit-tap-highlight-color:
+    transparent;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+/* =========================================================
+   DAY HOVER
+========================================================= */
+
+.day-option:hover {
+  border-color:
+    #B8C9D5;
+
+  background:
+    #F7F9FC;
+
+  color:
+    #163A5F;
+}
+
+
+/* =========================================================
+   HIDE ORIGINAL CHECKBOX
+   The checkbox remains functional.
+========================================================= */
+
+.day-option input[type="checkbox"] {
+  position:
+    absolute;
+
+  width:
+    1px;
+
+  height:
+    1px;
+
+  margin:
+    -1px;
+
+  padding:
+    0;
+
+  overflow:
+    hidden;
+
+  clip:
+    rect(0, 0, 0, 0);
+
+  white-space:
+    nowrap;
+
+  border:
+    0;
+}
+
+
+/* =========================================================
+   CIRCULAR CHECKPOINT
+========================================================= */
+
+.day-option::before {
+  content:
+    "";
+
+  width:
+    16px;
+
+  height:
+    16px;
+
+  flex:
+    0 0 16px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border:
+    1.5px solid
+    #AEBCC6;
+
+  border-radius:
+    50%;
+
+  background:
+    #FFFFFF;
+
+  color:
+    #FFFFFF;
+
+  font-size:
+    9px;
+
+  font-weight:
+    800;
+
+  line-height:
+    1;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+/* =========================================================
+   SELECTED CHECKPOINT
+========================================================= */
+
+.day-option:has(
+  input[type="checkbox"]:checked
+)::before {
+  content:
+    "✓";
+
+  border-color:
+    #2E8B70;
+
+  background:
+    #2E8B70;
+
+  color:
+    #FFFFFF;
+
+  box-shadow:
+    0 2px 6px
+    rgba(46, 139, 112, 0.18);
+}
+
+
+/* =========================================================
+   SELECTED DAY
+========================================================= */
+
+.day-option:has(
+  input[type="checkbox"]:checked
+) {
+  border-color:
+    #BFDCCF;
+
+  background:
+    #F1F8F5;
+
+  color:
+    #2E8B70;
+}
+
+
+/* =========================================================
+   DAY TEXT
+========================================================= */
+
+.day-option span {
+  color:
+    #52606D;
+
+  font-size:
+    10px;
+
+  line-height:
+    1;
+
+  font-weight:
+    600;
+
+  white-space:
+    nowrap;
+
+  transition:
+    color 0.18s ease;
+}
+
+
+/* =========================================================
+   SELECTED DAY TEXT
+========================================================= */
+
+.day-option:has(
+  input[type="checkbox"]:checked
+) span {
+  color:
+    #2E8B70;
+
+  font-weight:
+    700;
+}
+
+
+/* =========================================================
+   DAY FOCUS
+========================================================= */
+
+.day-option:has(
+  input[type="checkbox"]:focus-visible
+) {
+  outline:
+    2px solid
+    rgba(22, 58, 95, 0.18);
+
+  outline-offset:
+    2px;
+}
+
+
+/* =========================================================
+   IMAGE UPLOAD
+   COMPACT DESIGN
+========================================================= */
+
+.image-upload-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap:
+    10px;
+
+  margin-top:
+    8px;
+}
+
+
+/* =========================================================
+   IMAGE UPLOAD BOX
+========================================================= */
+
+.image-upload-box {
+  position:
+    relative;
+
+  height:
+    125px;
+
+  overflow:
+    hidden;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+
+  border:
+    1.5px dashed
+    #C9D7E0;
+
+  border-radius:
+    10px;
+
+  background:
+    #F7F9FC;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+
+/* =========================================================
+   IMAGE UPLOAD HOVER
+========================================================= */
+
+.image-upload-box:hover {
+  border-color:
+    #163A5F;
+
+  background:
+    #EAF2F8;
+
+  box-shadow:
+    0 5px 14px
+    rgba(22, 58, 95, 0.06);
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* =========================================================
+   HIDDEN FILE INPUT
+========================================================= */
+
+.image-upload-box input {
+  display:
+    none;
+}
+
+
+/* =========================================================
+   UPLOAD ICON
+========================================================= */
+
+.upload-icon {
+  width:
+    32px;
+
+  height:
+    32px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    8px;
+
+  background:
+    #EAF2F8;
+
+  color:
+    #163A5F;
+
+  font-size:
+    18px;
+
+  line-height:
+    1;
+
+  font-weight:
+    400;
+}
+
+
+/* =========================================================
+   UPLOAD TEXT
+========================================================= */
+
+.image-upload-box span {
+  color:
+    #667085;
+
+  font-size:
+    10px;
+
+  font-weight:
+    600;
+}
+
+.image-upload-box:hover span {
+  color:
+    #163A5F;
+}
+
+
+/* =========================================================
+   IMAGE PREVIEW
+========================================================= */
+
+.image-upload-box img {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  display:
+    block;
+
+  object-fit:
+    cover;
+}
+
+
+/* =========================================================
+   SUBMIT AREA
+========================================================= */
+
+.submit-area {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    12px;
+
+  margin-top:
+    8px;
+}
+
+
+/* =========================================================
+   MAIN BUTTON
+========================================================= */
+
+.list-cycle-btn {
+  flex:
+    1;
+
+  min-height:
+    47px;
+
+  max-width:
+    300px;
+
+  padding:
+    12px 18px;
+
+  border:
+    1px solid
+    #163A5F;
+
+  border-radius:
+    10px;
+
+  background:
+    #163A5F;
+
+  color:
+    #FFFFFF;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  box-shadow:
+    0 5px 13px
+    rgba(22, 58, 95, 0.11);
+
+  transition:
+    background 0.20s ease,
+    border-color 0.20s ease,
+    transform 0.18s ease,
+    box-shadow 0.20s ease;
+}
+
+.list-cycle-btn:hover:not(:disabled) {
+  background:
+    #0F2D4A;
+
+  border-color:
+    #0F2D4A;
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 8px 18px
+    rgba(15, 45, 74, 0.16);
+}
+
+.list-cycle-btn:active:not(:disabled) {
+  transform:
+    translateY(0);
+}
+
+
+/* =========================================================
+   DISABLED BUTTON
+========================================================= */
+
+.list-cycle-btn:disabled {
+  background:
+    #E5E7EB;
+
+  border-color:
+    #E5E7EB;
+
+  color:
+    #98A2B3;
+
+  cursor:
+    not-allowed;
+
+  box-shadow:
+    none;
+
+  transform:
+    none;
+}
+
+
+/* =========================================================
+   GENERAL FOCUS
+========================================================= */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline:
+    3px solid
+    rgba(22, 58, 95, 0.13);
+
+  outline-offset:
+    2px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 850px) {
+
+  .cycle-form-wrapper {
+    width:
+      94%;
+
+    padding:
+      28px;
+  }
+
+  .days-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+  }
+
+  .day-option {
+    min-height:
+      35px;
+
+    padding:
+      6px 7px;
+  }
+
+  .day-option span {
+    font-size:
+      10px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 700px) {
 
   .my-cycles-navbar {
-    padding: 0 20px;
+    min-height:
+      64px;
+
+    padding:
+      0 18px;
   }
 
   .my-cycles-logo {
-    font-size: 18px;
+    font-size:
+      18px;
   }
 
+  .back-btn {
+    min-height:
+      36px;
+
+    padding:
+      8px 13px;
+
+    font-size:
+      11px;
+  }
+
+
+  /* Form */
+
   .cycle-form-wrapper {
-    width: 94%;
+    width:
+      94%;
 
-    margin-top: 25px;
+    margin-top:
+      23px;
 
-    padding: 20px;
+    padding:
+      21px;
 
-    border-radius: 17px;
+    border-radius:
+      17px;
+  }
+
+
+  /* Header */
+
+  .cycle-form-header {
+    margin-bottom:
+      27px;
   }
 
   .cycle-form-header h1 {
-    font-size: 27px;
+    font-size:
+      28px;
   }
+
+  .cycle-form-header p {
+    font-size:
+      12px;
+  }
+
+
+  /* Sections */
 
   .form-section {
-    padding: 18px;
+    margin-bottom:
+      18px;
+
+    padding:
+      18px;
+
+    border-radius:
+      13px;
   }
 
+  .form-section h2 {
+    margin-bottom:
+      17px;
+
+    font-size:
+      18px;
+  }
+
+
+  /* Form */
+
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
+
+    gap:
+      17px;
   }
 
   .full-width {
-    grid-column: auto;
+    grid-column:
+      auto;
   }
 
 
-  /* Availability days */
+  /* Inputs */
 
-  
-  .day-option {
-    min-height: 48px;
-    gap :8px;
-    padding: 9px 6px;
+  .input-group input,
+  .input-group select,
+  .input-group textarea {
+    min-height:
+      45px;
+
+    padding:
+      11px 12px;
+
+    font-size:
+      13px;
   }
-  
+
+
+  /* =======================================================
+     MOBILE AVAILABLE DAYS
+  ======================================================= */
+
+  .availability-days-group {
+    margin-top:
+      15px;
+  }
+
   .days-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
 
-    gap: 10px;
+    gap:
+      6px;
+
+    margin-top:
+      7px;
   }
+
+  .day-option {
+    min-height:
+      34px;
+
+    padding:
+      5px 5px;
+
+    justify-content:
+      center;
+
+    gap:
+      5px;
+
+    border-radius:
+      7px;
+  }
+
+  .day-option::before {
+    width:
+      14px;
+
+    height:
+      14px;
+
+    flex-basis:
+      14px;
+
+    font-size:
+      8px;
+  }
+
+  .day-option span {
+    font-size:
+      9px;
+  }
+
 
   /* Images */
 
   .image-upload-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap:
+      8px;
   }
 
   .image-upload-box {
-    height: 160px;
+    height:
+      105px;
+
+    gap:
+      5px;
+
+    border-radius:
+      9px;
+  }
+
+  .upload-icon {
+    width:
+      28px;
+
+    height:
+      28px;
+
+    border-radius:
+      7px;
+
+    font-size:
+      16px;
+  }
+
+  .image-upload-box span {
+    font-size:
+      9px;
   }
 
 
-  /* Submit */
+  /* Buttons */
+
+  .submit-area {
+    flex-direction:
+      column;
+
+    gap:
+      9px;
+  }
 
   .list-cycle-btn {
-    width: 100%;
+    width:
+      100%;
+
+    max-width:
+      none;
+
+    flex:
+      none;
+
+    min-height:
+      46px;
   }
 }
 
 
-/* =========================================
+/* =========================================================
    SMALL MOBILE
-========================================= */
+========================================================= */
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
 
-  .cycle-form-wrapper {
-    width: 96%;
-
-    padding: 15px;
+  .my-cycles-navbar {
+    padding:
+      0 12px;
   }
 
-  .form-section {
-    padding: 15px;
-  }
-
-  .days-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .day-option {
-    justify-content: flex-start;
-
-    padding-left: 15px;
+  .my-cycles-logo {
+    font-size:
+      16px;
   }
 
   .back-btn {
-    padding: 8px 14px;
+    padding:
+      7px 11px;
 
-    font-size: 13px;
+    font-size:
+      10px;
+  }
+
+
+  .cycle-form-wrapper {
+    width:
+      96%;
+
+    padding:
+      16px;
+
+    border-radius:
+      15px;
+  }
+
+
+  .cycle-form-header h1 {
+    font-size:
+      25px;
+  }
+
+
+  .form-section {
+    padding:
+      15px;
+  }
+
+
+  .form-section h2 {
+    font-size:
+      17px;
+  }
+
+
+  /* Days */
+
+  .days-grid {
+    gap:
+      5px;
+  }
+
+  .day-option {
+    min-height:
+      32px;
+
+    padding:
+      4px;
+  }
+
+  .day-option::before {
+    width:
+      13px;
+
+    height:
+      13px;
+
+    flex-basis:
+      13px;
+
+    border-width:
+      1.3px;
+
+    font-size:
+      7px;
+  }
+
+  .day-option span {
+    font-size:
+      8px;
+  }
+
+
+  /* Images */
+
+  .image-upload-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap:
+      6px;
+  }
+
+  .image-upload-box {
+    height:
+      90px;
+
+    border-radius:
+      8px;
+  }
+
+  .upload-icon {
+    width:
+      25px;
+
+    height:
+      25px;
+
+    font-size:
+      14px;
+  }
+
+  .image-upload-box span {
+    font-size:
+      8px;
   }
 }
 
-/* Fixed owner email */
 
-/* .input-group input[readonly] {
-  background: #eef2ef;
-  color: #46534b;
-  cursor: not-allowed;
-  border: 1px solid #c8d3cc;
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 350px) {
+
+  .my-cycles-logo {
+    font-size:
+      14px;
+  }
+
+  .back-btn {
+    padding:
+      6px 9px;
+
+    font-size:
+      9px;
+  }
+
+  .cycle-form-wrapper {
+    width:
+      97%;
+
+    padding:
+      13px;
+  }
+
+  .form-section {
+    padding:
+      13px;
+  }
+
+  .cycle-form-header h1 {
+    font-size:
+      23px;
+  }
+
+
+  /* Days */
+
+  .days-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap:
+      6px;
+  }
+
+  .day-option {
+    min-height:
+      32px;
+
+    padding:
+      5px 6px;
+
+    gap:
+      5px;
+  }
+
+  .day-option::before {
+    width:
+      13px;
+
+    height:
+      13px;
+
+    flex-basis:
+      13px;
+  }
+
+  .day-option span {
+    font-size:
+      8px;
+  }
+
+
+  /* Images */
+
+  .image-upload-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap:
+      5px;
+  }
+
+  .image-upload-box {
+    height:
+      82px;
+  }
+
+  .upload-icon {
+    width:
+      23px;
+
+    height:
+      23px;
+
+    font-size:
+      13px;
+  }
+
+  .image-upload-box span {
+    font-size:
+      7px;
+  }
+
+  .list-cycle-btn {
+    font-size:
+      12px;
+  }
 }
 
-.input-group input[readonly]:focus {
-  outline: none;
-  border-color: #c8d3cc;
-  box-shadow: none;
-} */
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .back-btn,
+  .input-group input,
+  .input-group select,
+  .input-group textarea,
+  .day-option,
+  .day-option::before,
+  .image-upload-box,
+  .list-cycle-btn {
+    transition:
+      none;
+  }
+}

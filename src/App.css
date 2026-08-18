@@ -182,3 +182,258 @@
     border-right-color: var(--border);
   }
 }
+
+
+/* =========================================================
+   NITK CYCLE SHARING — RENTAL SECTION NAVIGATION
+   Applies only while HomePageRental / OnGoingRents /
+   CycleOwner is active.
+========================================================= */
+
+.rental-bottom-nav {
+  position: fixed;
+
+  left: 50%;
+  bottom: 18px;
+
+  transform: translateX(-50%);
+
+  width: min(560px, calc(100vw - 36px));
+  height: 64px;
+
+  padding: 6px;
+
+  display: flex;
+  align-items: stretch;
+
+  z-index: 99990;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  border: 1px solid #E5E7EB;
+
+  border-radius: 17px;
+
+  box-shadow:
+    0 14px 38px rgba(22, 58, 95, 0.14),
+    0 3px 10px rgba(22, 58, 95, 0.06);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+.rental-nav-item {
+  min-width: 0;
+  flex: 1;
+
+  position: relative;
+
+  border: 0;
+  border-radius: 12px;
+
+  padding: 7px 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  background: transparent;
+
+  color: #667085;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.rental-nav-item:hover {
+  background: #F7F9FC;
+  color: #163A5F;
+}
+
+.rental-nav-item:active {
+  transform: scale(0.98);
+}
+
+.rental-nav-item.active {
+  background: #EAF2F8;
+  color: #163A5F;
+}
+
+.rental-nav-item.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 4px;
+
+  width: 20px;
+  height: 3px;
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+
+  background: #2E8B70;
+}
+
+.rental-nav-icon {
+  width: 22px;
+  height: 22px;
+
+  flex: 0 0 22px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rental-nav-icon svg {
+  width: 19px;
+  height: 19px;
+
+  display: block;
+
+  fill: none;
+
+  stroke: currentColor;
+
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rental-nav-item.active .rental-nav-icon {
+  color: #163A5F;
+}
+
+.rental-nav-label {
+  white-space: nowrap;
+}
+
+/* Keep page content from being hidden behind the fixed nav. */
+body:has(.rental-bottom-nav) {
+  padding-bottom: 98px;
+}
+
+/* =========================================================
+   MOBILE RENTAL NAVIGATION
+   Names become symbols/icons as requested.
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .rental-bottom-nav {
+    left: 10px;
+    right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+
+    transform: none;
+
+    width: auto;
+
+    height: 65px;
+
+    padding: 5px;
+
+    border-radius: 17px;
+  }
+
+  .rental-nav-item {
+    gap: 0;
+
+    padding: 7px 4px;
+
+    font-size: 0;
+  }
+
+  .rental-nav-label {
+    display: none;
+  }
+
+  .rental-nav-icon {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+
+  .rental-nav-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rental-nav-item.active {
+    background: #EAF2F8;
+  }
+
+  .rental-nav-item.active::after {
+    bottom: 3px;
+
+    width: 18px;
+    height: 3px;
+  }
+
+  body:has(.rental-bottom-nav) {
+    padding-bottom: 88px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .rental-bottom-nav {
+    left: 8px;
+    right: 8px;
+
+    height: 62px;
+
+    border-radius: 15px;
+  }
+
+  .rental-nav-icon {
+    width: 25px;
+    height: 25px;
+    flex-basis: 25px;
+  }
+
+  .rental-nav-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.rental-nav-item:focus-visible {
+  outline: 3px solid rgba(22, 58, 95, 0.18);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rental-nav-item {
+    transition: none;
+  }
+}

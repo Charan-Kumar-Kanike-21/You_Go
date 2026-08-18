@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState } from "react";
 import "./OnGoingRents.css";
 
 // Change this import path according to your project
 import { supabase } from "./supabase";
 
-function OnGoingRents( { onBack, onReportIssue, onReturn}) {
+function OnGoingRents({ onReportIssue, onReturn }) {
   // ============================================================
   // CONFIGURATION
   // ============================================================
@@ -306,16 +305,6 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
     return (
       <div className="my-rental-page">
 
-        <div className="empty-page-header">
-          <button
-            type="button"
-            className="ongoing-back-button"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
-        </div>
-
         <div className="rental-loading">
           Loading your active rental...
         </div>
@@ -331,16 +320,6 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
   if (error) {
     return (
       <div className="my-rental-page">
-
-        <div className="empty-page-header">
-          <button
-            type="button"
-            className="ongoing-back-button"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
-        </div>
 
         <div className="rental-message">
 
@@ -367,16 +346,6 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
   if (!rental) {
     return (
       <div className="my-rental-page">
-
-        <div className="empty-page-header">
-          <button
-            type="button"
-            className="ongoing-back-button"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
-        </div>
 
         <div className="rental-message">
           <div className="empty-icon">🚲</div>
@@ -431,11 +400,6 @@ function OnGoingRents( { onBack, onReportIssue, onReturn}) {
         </div>
 
         <div>
-          <button className="ongoing-back-button"
-            onClick={onBack}
-          >
-            ← Back
-          </button>
           <div className="active-badge">
             <span></span>
             Active Rental

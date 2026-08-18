@@ -21,8 +21,219 @@ import OwnerDetails from "./OwnerDetails";
 import CycleVerification from "./CycleVerification";
 import TermsAndConditions from "./TermsAndConditions";
 import ResetPassword from "./ResetPassword";
+import "./App.css";
 
 function App() {
+  // ============================================================
+// PUSH NOTIFICATION HELPERS
+// ============================================================
+
+const urlBase64ToUint8Array = (base64String) => {
+  const padding = "=".repeat(
+    (4 - (base64String.length % 4)) % 4
+  );
+
+  const base64 = (
+    base64String + padding
+  )
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map((char) =>
+      char.charCodeAt(0)
+    )
+  );
+};
+const enablePushNotifications = async () => {
+  try {
+    console.log("🔔 Starting push notification setup...");
+
+    if (!userId) {
+      alert("Please log in first.");
+      return;
+    }
+
+    if (!("Notification" in window)) {
+      alert(
+        "This browser does not support notifications."
+      );
+      return;
+    }
+
+    if (!("serviceWorker" in navigator)) {
+      alert(
+        "Service Worker is not supported."
+      );
+      return;
+    }
+
+    if (!("PushManager" in window)) {
+      alert(
+        "Push notifications are not supported."
+      );
+      return;
+    }
+
+    // --------------------------------------------------------
+    // 1. Ask for notification permission
+    // --------------------------------------------------------
+
+    const permission =
+      await Notification.requestPermission();
+
+    console.log(
+      "Notification permission:",
+      permission
+    );
+
+    if (permission !== "granted") {
+      alert(
+        "Notification permission was not granted."
+      );
+      return;
+    }
+
+    // --------------------------------------------------------
+    // 2. Get the active service worker
+    // --------------------------------------------------------
+
+    const registration =
+      await navigator.serviceWorker.ready;
+
+    console.log(
+      "✅ Service Worker ready:",
+      registration
+    );
+
+    // --------------------------------------------------------
+    // 3. Check whether subscription already exists
+    // --------------------------------------------------------
+
+    let subscription =
+      await registration.pushManager.getSubscription();
+
+    // --------------------------------------------------------
+    // 4. Create subscription if necessary
+    // --------------------------------------------------------
+
+    if (!subscription) {
+      const vapidPublicKey =
+        import.meta.env.VITE_VAPID_PUBLIC_KEY;
+
+      if (!vapidPublicKey) {
+        throw new Error(
+          "VITE_VAPID_PUBLIC_KEY is missing from .env"
+        );
+      }
+
+      console.log(
+        "Creating new push subscription..."
+      );
+
+      subscription =
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey:
+            urlBase64ToUint8Array(
+              vapidPublicKey
+            ),
+        });
+    }
+
+    console.log(
+      "✅ Push subscription:",
+      subscription
+    );
+
+    // --------------------------------------------------------
+    // 5. Convert subscription to JSON
+    // --------------------------------------------------------
+
+    const subscriptionJSON =
+      subscription.toJSON();
+
+    console.log(
+      "Subscription JSON:",
+      subscriptionJSON
+    );
+
+    // --------------------------------------------------------
+    // 6. Check whether this device is already saved
+    // --------------------------------------------------------
+
+    const { data: existingSubscription, error: checkError } =
+      await supabase
+        .from("push_subscriptions")
+        .select("id")
+        .eq("user_id", userId)
+        .eq(
+          "endpoint",
+          subscription.endpoint
+        )
+        .maybeSingle();
+
+    if (checkError) {
+      console.error(
+        "Subscription check error:",
+        checkError
+      );
+
+      throw checkError;
+    }
+
+    // --------------------------------------------------------
+    // 7. Save only if not already present
+    // --------------------------------------------------------
+
+    if (!existingSubscription) {
+      const { error: insertError } =
+        await supabase
+          .from("push_subscriptions")
+          .insert({
+            user_id: userId,
+            endpoint: subscription.endpoint,
+            p256dh:
+              subscriptionJSON.keys?.p256dh,
+            auth:
+              subscriptionJSON.keys?.auth,
+          });
+
+      if (insertError) {
+        console.error(
+          "Subscription insert error:",
+          insertError
+        );
+
+        throw insertError;
+      }
+
+      console.log(
+        "✅ Push subscription saved to Supabase."
+      );
+    } else {
+      console.log(
+        "✅ This device is already registered."
+      );
+    }
+
+    alert(
+      "🔔 Notifications enabled successfully!"
+    );
+
+  } catch (error) {
+    console.error(
+      "❌ Push notification setup failed:",
+      error
+    );
+
+    alert(
+      "Failed to enable notifications. Check the console."
+    );
+  }
+};
   // =========================================================
   // CURRENT PAGE
   // =========================================================
@@ -675,7 +886,7 @@ useEffect(() => {
 
         if (mounted) {
           setUserId(null);
-          setPage("Landing");
+          setPage("Landing");//........................................
         }
 
         return;
@@ -737,7 +948,7 @@ useEffect(() => {
         );
 
         if (mounted) {
-          setPage("Login");
+          setPage("Landing");//.......................................
         }
 
         return;
@@ -849,7 +1060,7 @@ useEffect(() => {
               "cycle_last_page"
             );
 
-            setPage("Login");
+            setPage("HomePageRental");
           }
 
           return;
@@ -1391,17 +1602,16 @@ useEffect(() => {
   // =========================================================
 
   const handleLandingFinish = () => {
-    setPage("Login");
+    setPage("HomePageRental");
   };
 
   // =========================================================
   // ADMIN → CHOICE PAGE
   // =========================================================
 
-  const handleBackToChoice = () => {
-    setPage("ChoicePage");
+  const handleBackToHomePageRental = () => {
+    setPage("HomePageRental");
 
-    setIsAdminChoicePage(true);
   };
 
   // =========================================================
@@ -1951,6 +2161,188 @@ useEffect(() => {
 
 
 
+
+  // =========================================================
+  // MOBILE / RENTAL SECTION NAVIGATION
+  // =========================================================
+  // This navigation is intentionally limited to the three
+  // student rental pages. Existing page connections remain
+  // unchanged; these are additional shortcuts.
+  // =========================================================
+
+  const rentalNavPages = [
+    "HomePageRental",
+    "OnGoingRents",
+    "CycleOwner",
+  ];
+
+  const handleRentalNav = (targetPage) => {
+    if (!rentalNavPages.includes(targetPage)) return;
+
+    if (targetPage === "HomePageRental") {
+      setPage("HomePageRental");
+      return;
+    }
+
+    if (targetPage === "OnGoingRents") {
+      setOngoingRentsReturnPage("HomePageRental");
+      setPage("OnGoingRents");
+      return;
+    }
+
+    if (targetPage === "CycleOwner") {
+      setPage("CycleOwner");
+    }
+  };
+
+  // Swipe left  = next rental section
+  // Swipe right = previous rental section
+  useEffect(() => {
+    if (!rentalNavPages.includes(page)) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    const handleTouchStart = (event) => {
+      if (!event.touches || event.touches.length !== 1) return;
+
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+      tracking = true;
+    };
+
+    const handleTouchEnd = (event) => {
+      if (!tracking || !event.changedTouches?.length) return;
+
+      const endX = event.changedTouches[0].clientX;
+      const endY = event.changedTouches[0].clientY;
+
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+
+      tracking = false;
+
+      // Ignore normal vertical scrolling.
+      if (Math.abs(deltaX) < 70) return;
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+      const currentIndex = rentalNavPages.indexOf(page);
+      if (currentIndex === -1) return;
+
+      if (deltaX < 0 && currentIndex < rentalNavPages.length - 1) {
+        handleRentalNav(rentalNavPages[currentIndex + 1]);
+      }
+
+      if (deltaX > 0 && currentIndex > 0) {
+        handleRentalNav(rentalNavPages[currentIndex - 1]);
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+
+    window.addEventListener("touchend", handleTouchEnd, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [page]);
+
+  const RentalBottomNav = () => {
+    if (!rentalNavPages.includes(page)) return null;
+
+    return (
+      <nav
+        className="rental-bottom-nav"
+        aria-label="Rental navigation"
+      >
+        <button
+          type="button"
+          className={`rental-nav-item ${
+            page === "HomePageRental" ? "active" : ""
+          }`}
+          onClick={() =>
+            handleRentalNav("HomePageRental")
+          }
+          aria-label="Home rentals"
+          aria-current={
+            page === "HomePageRental" ? "page" : undefined
+          }
+        >
+          <span className="rental-nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 10.5 12 3l9 7.5" />
+              <path d="M5.5 9.5V21h13V9.5" />
+              <path d="M9.5 21v-6h5v6" />
+            </svg>
+          </span>
+          <span className="rental-nav-label">
+            Home Rentals
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className={`rental-nav-item ${
+            page === "OnGoingRents" ? "active" : ""
+          }`}
+          onClick={() =>
+            handleRentalNav("OnGoingRents")
+          }
+          aria-label="Ongoing rentals"
+          aria-current={
+            page === "OnGoingRents" ? "page" : undefined
+          }
+        >
+          <span className="rental-nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 12a8 8 0 0 1 13.7-5.7" />
+              <path d="M18 4v5h-5" />
+              <path d="M20 12a8 8 0 0 1-13.7 5.7" />
+              <path d="M6 20v-5h5" />
+            </svg>
+          </span>
+          <span className="rental-nav-label">
+            Ongoing Rentals
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className={`rental-nav-item ${
+            page === "CycleOwner" ? "active" : ""
+          }`}
+          onClick={() =>
+            handleRentalNav("CycleOwner")
+          }
+          aria-label="My cycles"
+          aria-current={
+            page === "CycleOwner" ? "page" : undefined
+          }
+        >
+          <span className="rental-nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="6" cy="17" r="3" />
+              <circle cx="18" cy="17" r="3" />
+              <path d="M6 17l4-8h4l4 8" />
+              <path d="M10 9 7.5 6H5" />
+              <path d="M14 9h3l2 3" />
+              <path d="M10 9l3 8" />
+            </svg>
+          </span>
+          <span className="rental-nav-label">
+            My Cycles
+          </span>
+        </button>
+      </nav>
+    );
+  };
+
 const handleNotificationAction = async (
   action,
   notification
@@ -2475,6 +2867,27 @@ const handleNotificationAction = async (
 
   return (
     <>
+
+      {/* {userId && (
+        <button
+          onClick={enablePushNotifications}
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "20px",
+            zIndex: 99999,
+            padding: "12px 18px",
+            borderRadius: "10px",
+            border: "none",
+            background: "#39e879",
+            color: "#031f16",
+            fontWeight: "700",
+            cursor: "pointer",
+          }}
+        >
+          🔔 Enable Notifications
+        </button>
+      )} */}
       {/* =====================================================
           LANDING PAGE
       ===================================================== */}
@@ -2578,9 +2991,6 @@ const handleNotificationAction = async (
               "HomePageRental"
             )
           }
-          BackToChoice={
-            handleBackToChoice
-          }
           onViewDetails={
             handleViewDetails
           }
@@ -2588,6 +2998,10 @@ const handleNotificationAction = async (
             handleOpenNotifications(
               "HomePageRental"
             )
+          }
+          handleBackToLogin={
+            () =>
+            handleBackToLogin()
           }
         />
       )}
@@ -2657,9 +3071,6 @@ const handleNotificationAction = async (
           onListCycle={
             handleListingChoice
           }
-          onBack={
-            handleBackToChoice
-          }
           onNotifications={() =>
             handleOpenNotifications(
               "CycleOwner"
@@ -2669,6 +3080,15 @@ const handleNotificationAction = async (
             setEditingCycleId(cycleId);
             setPage("Listing");
           }}
+          handleBackToLogin={
+            () =>
+            handleBackToLogin()
+          }
+          onProfile={() =>
+            handleOpenProfile(
+              "CycleOwner"
+            )
+          }
         />
       )}
 
@@ -2760,7 +3180,7 @@ const handleNotificationAction = async (
         <ReturnPage 
            bookingId = {selectedBookingId}
            onBack={handleOnGoingRents}
-           onBackHome={handleBackToChoice}
+           onBackHome={handleBackToHomePageRental}
         />
       )}
 
@@ -2776,7 +3196,7 @@ const handleNotificationAction = async (
             )
           }
           onAdminToStudent={
-            handleBackToChoice
+            handleBackToHomePageRental
           }
           onProfile={() => handleOpenProfile("AdminDashboard")}
         />
@@ -2830,6 +3250,14 @@ const handleNotificationAction = async (
           }}
         />
       )}
+
+      {/* =====================================================
+          RENTAL SECTION BOTTOM NAVIGATION
+          Visible only on HomePageRental, OnGoingRents,
+          and CycleOwner. This is an additional connection
+          and does not replace existing navigation.
+      ===================================================== */}
+      <RentalBottomNav />
     </>
   );
 }

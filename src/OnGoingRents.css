@@ -1,5 +1,13 @@
 /* =========================================================
-   RESET
+   NITK CYCLE SHARING
+   ONGOING RENTALS — COMPLETE CSS
+   Theme:
+   White / Soft Gray / Navy / Light Blue / Green
+========================================================= */
+
+
+/* =========================================================
+   GLOBAL RESET
 ========================================================= */
 
 * {
@@ -9,16 +17,32 @@
 html,
 body,
 #root {
-  margin: 0;
-  padding: 0;
   width: 100%;
   min-height: 100%;
 
+  margin: 0;
+  padding: 0;
+}
+
+body {
   font-family:
     Inter,
-    Arial,
+    "Segoe UI",
+    Roboto,
     Helvetica,
+    Arial,
     sans-serif;
+
+  background: #F7F9FC;
+
+  color: #172027;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 
@@ -27,21 +51,65 @@ body,
 ========================================================= */
 
 .my-rental-page {
-  min-height: 100vh;
-  width: 100%;
+  position: relative;
 
-  padding: 45px 7% 60px;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+
+  padding:
+    38px 28px 125px;
+
+  overflow-x: hidden;
 
   background:
     radial-gradient(
-      circle at 50% 40%,
-      rgba(45, 130, 72, 0.75) 0%,
-      rgba(28, 92, 53, 0.58) 20%,
-      rgba(13, 47, 33, 0.88) 45%,
-      rgba(6, 27, 20, 1) 75%
+      circle at 8% 7%,
+      rgba(234, 242, 248, 0.95) 0%,
+      rgba(234, 242, 248, 0) 31%
+    ),
+    radial-gradient(
+      circle at 92% 82%,
+      rgba(234, 245, 241, 0.80) 0%,
+      rgba(234, 245, 241, 0) 28%
+    ),
+    linear-gradient(
+      135deg,
+      #EAF2F8 0%,
+      #F7F9FC 45%,
+      #FFFFFF 100%
+    );
+}
+
+
+/* =========================================================
+   BACKGROUND DECORATION
+========================================================= */
+
+.my-rental-page::before {
+  content: "";
+
+  position: absolute;
+
+  width: 430px;
+  height: 430px;
+
+  top: -230px;
+  right: -180px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(22, 58, 95, 0.10) 0%,
+      rgba(22, 58, 95, 0.035) 45%,
+      transparent 72%
     );
 
-  color: white;
+  pointer-events: none;
+
+  z-index: 0;
 }
 
 
@@ -50,113 +118,172 @@ body,
 ========================================================= */
 
 .my-rental-header {
-  max-width: 1000px;
+  position: relative;
 
-  margin: 0 auto 30px;
+  z-index: 1;
+
+  width: min(1050px, 100%);
+
+  margin:
+    0 auto 25px;
 
   display: flex;
-  justify-content: space-between;
+
   align-items: flex-start;
 
-  gap: 20px;
+  justify-content: space-between;
+
+  gap: 25px;
 }
 
-.page-small-title {
-  margin: 0 0 8px;
 
-  font-size: 13px;
-  font-weight: 700;
+/* =========================================================
+   HEADER TEXT
+========================================================= */
+
+.page-small-title {
+  margin:
+    0 0 7px;
+
+  color: #2E8B70;
+
+  font-size: 11px;
+
+  font-weight: 800;
 
   letter-spacing: 1.5px;
 
-  color: #42e77a;
+  line-height: 1.2;
 }
 
 .my-rental-header h1 {
   margin: 0;
 
-  font-size: 34px;
+  color: #172027;
+
+  font-size: clamp(
+    27px,
+    3vw,
+    36px
+  );
+
+  line-height: 1.15;
+
   font-weight: 750;
 
-  color: #f4f8f5;
+  letter-spacing: -0.035em;
 }
 
 .page-description {
-  margin: 8px 0 0;
+  margin:
+    8px 0 0;
 
-  color: #9db3a6;
+  max-width: 570px;
 
-  font-size: 15px;
+  color: #667085;
+
+  font-size: 14px;
+
+  line-height: 1.55;
 }
 
 
 /* =========================================================
-   ACTIVE BADGE
+   HEADER RIGHT SIDE
+========================================================= */
+
+.my-rental-header > div:last-child {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ACTIVE RENTAL BADGE
 ========================================================= */
 
 .active-badge {
-  display: flex;
+  display: inline-flex;
+
   align-items: center;
 
   gap: 8px;
 
-  padding: 9px 15px;
-
-  border-radius: 20px;
-
-  background:
-    rgba(66, 231, 122, 0.08);
+  padding:
+    9px 14px;
 
   border:
-    1px solid rgba(66, 231, 122, 0.35);
+    1px solid
+    rgba(46, 139, 112, 0.25);
 
-  color: #42e77a;
+  border-radius: 999px;
 
-  font-size: 13px;
-  font-weight: 700;
+  background:
+    #EAF5F1;
 
-  box-shadow:
-    0 0 18px rgba(66, 231, 122, 0.08);
+  color:
+    #2E8B70;
+
+  font-size: 11px;
+
+  font-weight: 750;
+
+  white-space: nowrap;
 }
 
 .active-badge span {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
 
   border-radius: 50%;
 
-  background: #42e77a;
+  background:
+    #2E8B70;
 
   box-shadow:
-    0 0 10px rgba(66, 231, 122, 0.7);
+    0 0 0 4px
+    rgba(46, 139, 112, 0.10);
 }
 
 
 /* =========================================================
-   MAIN CARD
+   MAIN RENTAL CARD
 ========================================================= */
 
 .rental-card {
-  width: min(1000px, 100%);
+  position: relative;
 
-  margin: auto;
+  z-index: 1;
 
-  background:
-    rgba(5, 25, 18, 0.84);
+  width: min(1050px, 100%);
 
-  border:
-    1px solid rgba(70, 225, 120, 0.30);
-
-  border-radius: 22px;
-
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
-  box-shadow:
-    0 0 50px rgba(42, 170, 80, 0.14),
-    0 25px 60px rgba(0, 0, 0, 0.45);
+  margin:
+    0 auto;
 
   overflow: hidden;
+
+  background:
+    #FFFFFF;
+
+  border:
+    1px solid
+    #E5E7EB;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 55px
+    rgba(22, 58, 95, 0.09),
+
+    0 4px 12px
+    rgba(22, 58, 95, 0.04);
 }
 
 
@@ -166,72 +293,110 @@ body,
 
 .cycle-section {
   display: flex;
+
   align-items: center;
 
-  gap: 28px;
+  gap: 26px;
 
-  padding: 30px 32px;
+  padding:
+    29px 31px;
 
   border-bottom:
-    1px solid rgba(105, 180, 125, 0.16);
+    1px solid
+    #E5E7EB;
 }
 
+
+/* =========================================================
+   CYCLE IMAGE
+========================================================= */
+
 .cycle-image-container {
-  width: 190px;
-  height: 140px;
+  width: 205px;
+  height: 145px;
 
-  flex-shrink: 0;
-
-  border-radius: 14px;
+  flex:
+    0 0 205px;
 
   overflow: hidden;
 
-  background:
-    rgba(2, 17, 12, 0.7);
-
   border:
-    1px solid rgba(66, 231, 122, 0.20);
+    1px solid
+    #E5E7EB;
+
+  border-radius: 13px;
+
+  background:
+    #F7F9FC;
 
   box-shadow:
-    0 0 20px rgba(66, 231, 122, 0.08);
+    0 5px 15px
+    rgba(22, 58, 95, 0.05);
 }
 
 .cycle-image {
   width: 100%;
   height: 100%;
 
+  display: block;
+
   object-fit: cover;
 }
 
+
+/* =========================================================
+   CYCLE DETAILS
+========================================================= */
+
 .cycle-details {
+  min-width: 0;
+
   flex: 1;
 }
 
 .cycle-label {
-  margin: 0 0 7px;
+  margin:
+    0 0 7px;
 
-  font-size: 11px;
-  font-weight: 700;
+  color:
+    #667085;
 
-  letter-spacing: 1.2px;
+  font-size: 10px;
 
-  color: #42e77a;
+  font-weight: 750;
+
+  letter-spacing: 1.15px;
 }
 
 .cycle-details h2 {
   margin: 0;
 
+  color:
+    #163A5F;
+
   font-size: 27px;
 
-  color: #f4f8f5;
+  line-height: 1.25;
+
+  font-weight: 720;
+
+  letter-spacing:
+    -0.025em;
+
+  overflow-wrap:
+    anywhere;
 }
 
 .cycle-location {
-  margin: 9px 0 0;
+  margin:
+    9px 0 0;
 
-  color: #9db3a6;
+  color:
+    #667085;
 
-  font-size: 14px;
+  font-size: 13px;
+
+  line-height: 1.45;
 }
 
 
@@ -240,71 +405,79 @@ body,
 ========================================================= */
 
 .time-section {
-  padding: 32px;
+  padding:
+    29px 31px;
 
   border-bottom:
-    1px solid rgba(105, 180, 125, 0.16);
+    1px solid
+    #E5E7EB;
 }
 
 .section-label {
-  margin: 0 0 8px;
+  margin:
+    0 0 8px;
 
-  font-size: 12px;
-  font-weight: 700;
+  color:
+    #667085;
 
-  color: #9db3a6;
+  font-size: 10px;
 
-  letter-spacing: 1px;
+  font-weight: 800;
+
+  letter-spacing:
+    1.15px;
 }
 
 .time-value {
-  margin-bottom: 18px;
+  margin:
+    0 0 18px;
 
-  font-size: 42px;
-  font-weight: 750;
+  color:
+    #163A5F;
 
-  color: #f4f8f5;
+  font-size:
+    clamp(34px, 5vw, 47px);
 
-  font-variant-numeric: tabular-nums;
+  line-height:
+    1;
 
-  text-shadow:
-    0 0 18px rgba(66, 231, 122, 0.15);
+  font-weight:
+    760;
+
+  letter-spacing:
+    0.025em;
+
+  font-variant-numeric:
+    tabular-nums;
 }
 
 
 /* =========================================================
-   TIME BAR
+   TIME PROGRESS BAR
 ========================================================= */
 
 .time-bar {
   width: 100%;
-  height: 12px;
+  height: 10px;
 
   overflow: hidden;
 
-  border-radius: 20px;
+  border-radius: 999px;
 
   background:
-    rgba(255, 255, 255, 0.08);
-
-  border:
-    1px solid rgba(105, 180, 125, 0.18);
+    #EAF2F8;
 }
 
 .time-bar-fill {
   height: 100%;
 
-  border-radius: inherit;
+  min-width: 0;
+
+  border-radius:
+    inherit;
 
   background:
-    linear-gradient(
-      90deg,
-      #2a964b,
-      #42e77a
-    );
-
-  box-shadow:
-    0 0 14px rgba(66, 231, 122, 0.45);
+    #2E8B70;
 
   transition:
     width 1s linear;
@@ -312,13 +485,22 @@ body,
 
 .time-bar-labels {
   display: flex;
+
+  align-items: center;
+
   justify-content: space-between;
 
-  margin-top: 9px;
+  margin-top:
+    8px;
 
-  font-size: 12px;
+  color:
+    #98A2B3;
 
-  color: #70877a;
+  font-size:
+    10px;
+
+  line-height:
+    1.3;
 }
 
 
@@ -328,66 +510,94 @@ body,
 
 .grace-box {
   display: flex;
+
   align-items: flex-start;
 
-  gap: 16px;
+  gap: 15px;
 
-  padding: 18px;
-
-  border-radius: 14px;
-
-  background:
-    rgba(66, 231, 122, 0.06);
+  padding:
+    18px;
 
   border:
-    1px solid rgba(66, 231, 122, 0.35);
+    1px solid
+    rgba(46, 139, 112, 0.24);
 
-  box-shadow:
-    0 0 20px rgba(66, 231, 122, 0.07);
+  border-radius:
+    13px;
+
+  background:
+    #EAF5F1;
 }
 
 .grace-icon {
-  width: 44px;
-  height: 44px;
+  width: 43px;
+  height: 43px;
 
-  flex-shrink: 0;
+  flex:
+    0 0 43px;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  border-radius: 12px;
+  border-radius:
+    11px;
 
   background:
-    rgba(66, 231, 122, 0.12);
+    #FFFFFF;
 
-  color: #42e77a;
+  color:
+    #2E8B70;
 
-  font-size: 22px;
+  font-size:
+    20px;
+
+  box-shadow:
+    0 4px 10px
+    rgba(46, 139, 112, 0.07);
 }
 
 .grace-box h3 {
-  margin: 0 0 6px;
+  margin:
+    0 0 6px;
 
-  color: #42e77a;
+  color:
+    #2E8B70;
 
-  font-size: 17px;
+  font-size:
+    16px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
 }
 
 .grace-box p {
-  margin: 0 0 8px;
+  margin:
+    0 0 8px;
 
-  color: #9db3a6;
+  color:
+    #52606D;
 
-  font-size: 13px;
+  font-size:
+    12px;
 
-  line-height: 1.5;
+  line-height:
+    1.55;
 }
 
 .grace-box strong {
-  color: #f4f8f5;
+  color:
+    #163A5F;
 
-  font-size: 15px;
+  font-size:
+    14px;
+
+  font-weight:
+    750;
 }
 
 
@@ -396,332 +606,585 @@ body,
 ========================================================= */
 
 .extra-time-box {
-  padding: 20px;
-
-  border-radius: 14px;
-
-  background:
-    rgba(120, 80, 20, 0.12);
+  padding:
+    19px;
 
   border:
-    1px solid rgba(220, 170, 70, 0.35);
+    1px solid
+    rgba(217, 154, 36, 0.30);
 
-  box-shadow:
-    0 0 20px rgba(220, 170, 70, 0.06);
+  border-radius:
+    13px;
+
+  background:
+    #FFF9EC;
 }
 
 .extra-time-header {
   display: flex;
 
-  justify-content: space-between;
   align-items: center;
 
-  margin-bottom: 10px;
+  justify-content: space-between;
 
-  color: #e8c76b;
+  gap: 15px;
 
-  font-size: 15px;
-  font-weight: 700;
+  margin:
+    0 0 9px;
+
+  color:
+    #9B6B12;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    750;
 }
 
 .extra-time-box p {
-  margin: 0 0 12px;
+  margin:
+    0 0 12px;
 
-  color: #b8b7a5;
+  color:
+    #667085;
 
-  font-size: 13px;
+  font-size:
+    12px;
 
-  line-height: 1.5;
+  line-height:
+    1.55;
 }
 
 .extra-rate {
-  display: inline-block;
+  display:
+    inline-flex;
 
-  padding: 7px 11px;
+  align-items:
+    center;
 
-  border-radius: 8px;
+  padding:
+    6px 10px;
+
+  border-radius:
+    7px;
 
   background:
-    rgba(220, 170, 70, 0.10);
+    #FFF1C9;
 
-  color: #e8c76b;
+  color:
+    #9B6B12;
 
-  font-size: 13px;
-  font-weight: 700;
+  font-size:
+    12px;
+
+  font-weight:
+    750;
 }
 
 
 /* =========================================================
-   RENTAL INFORMATION
+   RENTAL INFORMATION SECTION
 ========================================================= */
 
 .rental-info {
-  padding: 30px 32px;
+  padding:
+    28px 31px;
 
   border-bottom:
-    1px solid rgba(105, 180, 125, 0.16);
+    1px solid
+    #E5E7EB;
 }
 
 .rental-info h3 {
-  margin: 0 0 18px;
+  margin:
+    0 0 16px;
 
-  font-size: 19px;
+  color:
+    #172027;
 
-  color: #f4f8f5;
+  font-size:
+    18px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
 }
 
+
+/* =========================================================
+   INFORMATION TABLE
+========================================================= */
+
 .info-table {
+  width: 100%;
+
   overflow: hidden;
 
   border:
-    1px solid rgba(105, 180, 125, 0.18);
+    1px solid
+    #E5E7EB;
 
-  border-radius: 14px;
+  border-radius:
+    12px;
 
   background:
-    rgba(2, 17, 12, 0.35);
+    #FFFFFF;
 }
 
 .info-row {
+  min-height:
+    50px;
+
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
 
-  padding: 15px 18px;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding:
+    13px 17px;
 
   border-bottom:
-    1px solid rgba(105, 180, 125, 0.12);
+    1px solid
+    #E5E7EB;
 
-  font-size: 14px;
+  color:
+    #667085;
 
-  color: #9db3a6;
+  font-size:
+    13px;
+
+  line-height:
+    1.4;
 }
 
 .info-row:last-child {
-  border-bottom: none;
+  border-bottom:
+    none;
+}
+
+.info-row span {
+  min-width:
+    0;
 }
 
 .info-row strong {
-  color: #f4f8f5;
+  flex-shrink:
+    0;
+
+  color:
+    #172027;
+
+  font-weight:
+    700;
+
+  text-align:
+    right;
 }
 
 .info-row .deduction {
-  color: #ff8c8c;
+  color:
+    #D64545;
 }
+
+
+/* =========================================================
+   REMAINING DEPOSIT
+========================================================= */
 
 .remaining-row {
   background:
-    rgba(66, 231, 122, 0.06);
+    #F7F9FC;
+}
+
+.remaining-row span {
+  color:
+    #163A5F;
+
+  font-weight:
+    650;
 }
 
 .remaining-row strong {
-  font-size: 17px;
+  color:
+    #2E8B70;
 
-  color: #42e77a;
+  font-size:
+    16px;
+
+  font-weight:
+    750;
 }
 
 
 /* =========================================================
-   RETURN SECTION
+   ACTION SECTION
 ========================================================= */
 
 .return-section {
-  padding: 28px 32px 32px;
+  padding:
+    25px 31px 29px;
 
-  text-align: center;
-}
-
-.return-cycle-btn {
-  width: 100%;
-  max-width: 360px;
-
-  padding: 14px 20px;
-
-  border:
-    1.5px solid #42e77a;
-
-  border-radius: 12px;
-
-  background:
-    rgba(42, 150, 75, 0.08);
-
-  color: white;
-
-  font-size: 15px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    background 0.25s ease,
-    color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
-}
-
-.return-cycle-btn:hover {
-  background: #42e77a;
-
-  color: #062016;
-
-  box-shadow:
-    0 0 25px rgba(66, 231, 122, 0.30);
-
-  transform: translateY(-2px);
-}
-
-.return-section p {
-  margin: 10px 0 0;
-
-  font-size: 12px;
-
-  color: #70877a;
+  text-align:
+    center;
 }
 
 
 /* =========================================================
-   MODAL
+   ACTION BUTTON WRAPPER
+========================================================= */
+
+.rental-action-buttons {
+  width: 100%;
+
+  display: flex;
+
+  align-items:
+    stretch;
+
+  gap:
+    11px;
+}
+
+
+/* =========================================================
+   BOTH ACTION BUTTONS
+========================================================= */
+
+.report-issue-btn,
+.return-cycle-btn {
+  flex:
+    1;
+
+  min-height:
+    48px;
+
+  padding:
+    0 17px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    10px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+  line-height:
+    1.2;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+/* =========================================================
+   REPORT ISSUE
+========================================================= */
+
+.report-issue-btn {
+  border:
+    1px solid
+    rgba(214, 69, 69, 0.25);
+
+  background:
+    #FDF2F2;
+
+  color:
+    #C63E3E;
+}
+
+.report-issue-btn:hover {
+  background:
+    #FBE5E5;
+
+  border-color:
+    rgba(214, 69, 69, 0.40);
+
+  transform:
+    translateY(-1px);
+}
+
+.report-issue-btn:active {
+  transform:
+    translateY(0);
+}
+
+
+/* =========================================================
+   RETURN CYCLE
+========================================================= */
+
+.return-cycle-btn {
+  border:
+    1px solid
+    #163A5F;
+
+  background:
+    #163A5F;
+
+  color:
+    #FFFFFF;
+
+  box-shadow:
+    0 6px 15px
+    rgba(22, 58, 95, 0.13);
+}
+
+.return-cycle-btn:hover {
+  background:
+    #0F2D4A;
+
+  border-color:
+    #0F2D4A;
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 9px 20px
+    rgba(15, 45, 74, 0.18);
+}
+
+.return-cycle-btn:active {
+  transform:
+    translateY(0);
+}
+
+
+/* =========================================================
+   ACTION DESCRIPTION
+========================================================= */
+
+.return-section > p {
+  margin:
+    10px 0 0;
+
+  color:
+    #98A2B3;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.45;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
 ========================================================= */
 
 .modal-overlay {
-  position: fixed;
+  position:
+    fixed;
 
-  inset: 0;
+  inset:
+    0;
 
-  z-index: 1000;
+  z-index:
+    1000;
 
-  display: flex;
+  display:
+    flex;
 
-  align-items: center;
-  justify-content: center;
+  align-items:
+    center;
 
-  padding: 20px;
+  justify-content:
+    center;
+
+  padding:
+    20px;
 
   background:
-    rgba(2, 10, 7, 0.78);
+    rgba(15, 45, 74, 0.34);
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter:
+    blur(7px);
+
+  -webkit-backdrop-filter:
+    blur(7px);
 }
 
-.ongoing-back-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 
-  padding: 10px 18px;
-  margin: 0;
-
-  border: 1px solid rgba(66, 231, 122, 0.5);
-  border-radius: 10px;
-
-  background: rgba(66, 231, 122, 0.08);
-  color: #42e77a;
-
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition: all 0.25s ease;
-}
-
-.ongoing-back-button:hover {
-  background: #42e77a;
-  color: #062016;
-
-  border-color: #42e77a;
-
-  box-shadow: 0 0 20px rgba(66, 231, 122, 0.3);
-
-  transform: translateY(-2px);
-}
-
-.header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.back-button:hover {
-  background: rgba(66, 231, 122, 0.14);
-  border-color: #42e77a;
-}
+/* =========================================================
+   RETURN MODAL
+========================================================= */
 
 .return-modal {
-  position: relative;
+  position:
+    relative;
 
-  width: 100%;
-  max-width: 470px;
+  width:
+    min(460px, 100%);
 
-  padding: 30px;
+  max-height:
+    calc(100vh - 40px);
 
-  border-radius: 20px;
+  max-height:
+    calc(100svh - 40px);
 
-  background:
-    rgba(5, 25, 18, 0.96);
+  overflow-y:
+    auto;
+
+  padding:
+    29px;
 
   border:
-    1px solid rgba(66, 231, 122, 0.30);
+    1px solid
+    #E5E7EB;
+
+  border-radius:
+    17px;
+
+  background:
+    #FFFFFF;
 
   box-shadow:
-    0 0 50px rgba(42, 170, 80, 0.16),
-    0 25px 70px rgba(0, 0, 0, 0.55);
+    0 25px 70px
+    rgba(22, 58, 95, 0.20),
 
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+    0 5px 16px
+    rgba(22, 58, 95, 0.08);
 }
 
+
+/* =========================================================
+   MODAL CLOSE
+========================================================= */
+
 .close-modal {
-  position: absolute;
+  position:
+    absolute;
 
-  top: 15px;
-  right: 17px;
+  top:
+    13px;
 
-  width: 34px;
-  height: 34px;
+  right:
+    14px;
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    0;
 
   border:
-    1px solid rgba(105, 180, 125, 0.20);
+    1px solid
+    #E5E7EB;
 
-  border-radius: 50%;
+  border-radius:
+    50%;
 
   background:
-    rgba(255, 255, 255, 0.05);
+    #F7F9FC;
 
-  color: #9db3a6;
+  color:
+    #667085;
 
-  font-size: 22px;
+  font-size:
+    21px;
 
-  cursor: pointer;
+  line-height:
+    1;
 
-  transition: 0.25s;
+  cursor:
+    pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .close-modal:hover {
   background:
-    rgba(66, 231, 122, 0.12);
+    #EAF2F8;
 
-  border-color: #42e77a;
+  color:
+    #163A5F;
 
-  color: #42e77a;
+  border-color:
+    #CBD5E1;
 }
 
+
+/* =========================================================
+   MODAL HEADING
+========================================================= */
+
 .return-modal h2 {
-  margin: 0;
+  margin:
+    0;
 
-  font-size: 24px;
+  padding-right:
+    40px;
 
-  color: #f4f8f5;
+  color:
+    #163A5F;
+
+  font-size:
+    23px;
+
+  line-height:
+    1.25;
+
+  font-weight:
+    730;
+
+  letter-spacing:
+    -0.02em;
 }
 
 .return-modal > p {
-  margin: 8px 0 22px;
+  margin:
+    8px 0 21px;
 
-  font-size: 14px;
+  color:
+    #667085;
 
-  color: #9db3a6;
+  font-size:
+    13px;
+
+  line-height:
+    1.5;
 }
 
 
@@ -730,347 +1193,933 @@ body,
 ========================================================= */
 
 .return-options {
-  display: flex;
+  display:
+    flex;
 
-  flex-direction: column;
+  flex-direction:
+    column;
 
-  gap: 12px;
+  gap:
+    10px;
 }
 
 .return-option {
-  display: flex;
-  align-items: center;
+  width:
+    100%;
 
-  gap: 14px;
+  min-height:
+    70px;
 
-  width: 100%;
+  display:
+    flex;
 
-  padding: 16px;
+  align-items:
+    center;
+
+  gap:
+    13px;
+
+  padding:
+    13px;
 
   border:
-    1px solid rgba(105, 180, 125, 0.20);
+    1px solid
+    #E5E7EB;
 
-  border-radius: 13px;
+  border-radius:
+    11px;
 
   background:
-    rgba(255, 255, 255, 0.035);
+    #FFFFFF;
 
-  color: white;
+  color:
+    #172027;
 
-  text-align: left;
+  text-align:
+    left;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
   transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .return-option:hover {
+  background:
+    #F7F9FC;
+
   border-color:
-    rgba(66, 231, 122, 0.55);
+    #CBD5E1;
 
-  background:
-    rgba(66, 231, 122, 0.06);
-
-  transform: translateY(-1px);
+  transform:
+    translateY(-1px);
 }
 
-.return-option.selected {
-  border-color: #42e77a;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(66, 231, 122, 0.14),
-      rgba(66, 231, 122, 0.045)
-    );
-
-  box-shadow:
-    0 0 18px rgba(66, 231, 122, 0.10);
-}
-
-.option-icon {
-  width: 44px;
-  height: 44px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 11px;
-
-  background:
-    rgba(66, 231, 122, 0.10);
-
-  color: #42e77a;
-
-  font-size: 19px;
-}
-
-.return-option strong {
-  display: block;
-
-  margin-bottom: 4px;
-
-  font-size: 14px;
-
-  color: #f4f8f5;
-}
-
-.return-option small {
-  display: block;
-
-  font-size: 12px;
-
-  line-height: 1.4;
-
-  color: #8fa99a;
+.return-option:active {
+  transform:
+    translateY(0);
 }
 
 
 /* =========================================================
-   CONFIRM RETURN
+   SELECTED RETURN OPTION
+========================================================= */
+
+.return-option.selected {
+  border-color:
+    #2E8B70;
+
+  background:
+    #EAF5F1;
+
+  box-shadow:
+    0 5px 14px
+    rgba(46, 139, 112, 0.08);
+}
+
+
+/* =========================================================
+   RETURN OPTION ICON
+========================================================= */
+
+.option-icon {
+  width:
+    43px;
+
+  height:
+    43px;
+
+  flex:
+    0 0 43px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    10px;
+
+  background:
+    #EAF2F8;
+
+  color:
+    #163A5F;
+
+  font-size:
+    18px;
+}
+
+.return-option.selected .option-icon {
+  background:
+    #FFFFFF;
+
+  color:
+    #2E8B70;
+}
+
+
+/* =========================================================
+   RETURN OPTION TEXT
+========================================================= */
+
+.return-option strong {
+  display:
+    block;
+
+  margin:
+    0 0 3px;
+
+  color:
+    #172027;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
+}
+
+.return-option small {
+  display:
+    block;
+
+  color:
+    #667085;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.45;
+}
+
+
+/* =========================================================
+   CONFIRM RETURN BUTTON
 ========================================================= */
 
 .confirm-return-btn {
-  width: 100%;
+  width:
+    100%;
 
-  margin-top: 20px;
+  min-height:
+    47px;
 
-  padding: 14px;
+  margin-top:
+    18px;
+
+  padding:
+    0 15px;
 
   border:
-    1px solid #42e77a;
+    1px solid
+    #163A5F;
 
-  border-radius: 11px;
+  border-radius:
+    10px;
 
   background:
-    linear-gradient(
-      90deg,
-      #42e77a,
-      #2a964b
-    );
+    #163A5F;
 
-  color: #062016;
+  color:
+    #FFFFFF;
 
-  font-size: 14px;
+  font-size:
+    13px;
 
-  font-weight: 700;
+  font-weight:
+    700;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .confirm-return-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
+  background:
+    #0F2D4A;
+
+  border-color:
+    #0F2D4A;
+
+  transform:
+    translateY(-1px);
 
   box-shadow:
-    0 0 22px rgba(66, 231, 122, 0.25);
+    0 8px 18px
+    rgba(15, 45, 74, 0.16);
+}
+
+.confirm-return-btn:active:not(:disabled) {
+  transform:
+    translateY(0);
 }
 
 .confirm-return-btn:disabled {
   background:
-    rgba(255, 255, 255, 0.08);
+    #E5E7EB;
 
   border-color:
-    rgba(255, 255, 255, 0.12);
+    #E5E7EB;
 
-  color: #68796f;
+  color:
+    #98A2B3;
 
-  cursor: not-allowed;
-}
+  cursor:
+    not-allowed;
 
-.otp-note {
-  margin: 12px 0 0 !important;
-
-  text-align: center;
-
-  font-size: 11px !important;
-
-  color: #70877a !important;
+  box-shadow:
+    none;
 }
 
 
 /* =========================================================
-   LOADING
+   OTP NOTE
+========================================================= */
+
+.otp-note {
+  margin:
+    10px 0 0 !important;
+
+  padding:
+    0 !important;
+
+  color:
+    #98A2B3 !important;
+
+  text-align:
+    center;
+
+  font-size:
+    10px !important;
+
+  line-height:
+    1.4 !important;
+}
+
+
+/* =========================================================
+   LOADING STATE
 ========================================================= */
 
 .rental-loading {
-  min-height: 70vh;
+  width:
+    min(1050px, 100%);
 
-  display: flex;
+  min-height:
+    65vh;
 
-  align-items: center;
-  justify-content: center;
+  margin:
+    0 auto;
 
-  color: #9db3a6;
+  display:
+    flex;
 
-  font-size: 15px;
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  color:
+    #667085;
+
+  font-size:
+    14px;
+
+  font-weight:
+    500;
+
+  text-align:
+    center;
 }
 
 
 /* =========================================================
-   ERROR / EMPTY
+   ERROR / EMPTY MESSAGE
 ========================================================= */
 
 .rental-message {
-  min-height: 70vh;
+  width:
+    min(450px, 100%);
 
-  max-width: 450px;
+  min-height:
+    65vh;
 
-  margin: auto;
+  margin:
+    0 auto;
 
-  display: flex;
+  display:
+    flex;
 
-  flex-direction: column;
+  flex-direction:
+    column;
 
-  align-items: center;
-  justify-content: center;
+  align-items:
+    center;
 
-  text-align: center;
+  justify-content:
+    center;
+
+  text-align:
+    center;
 }
 
 .rental-message h2 {
-  margin: 12px 0 5px;
+  margin:
+    17px 0 7px;
 
-  color: #f4f8f5;
+  color:
+    #163A5F;
+
+  font-size:
+    22px;
+
+  line-height:
+    1.25;
+
+  font-weight:
+    720;
 }
 
 .rental-message p {
-  margin: 0;
+  margin:
+    0;
 
-  color: #9db3a6;
+  max-width:
+    390px;
 
-  font-size: 14px;
-}
+  color:
+    #667085;
 
-.empty-icon {
-  font-size: 55px;
+  font-size:
+    13px;
 
-  filter:
-    drop-shadow(
-      0 0 15px
-      rgba(66, 231, 122, 0.25)
-    );
-}
-
-.retry-btn {
-  margin-top: 20px;
-
-  padding: 11px 22px;
-
-  border:
-    1px solid #42e77a;
-
-  border-radius: 10px;
-
-  background:
-    rgba(42, 150, 75, 0.10);
-
-  color: #42e77a;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition: 0.25s;
-}
-
-.retry-btn:hover {
-  background: #42e77a;
-
-  color: #062016;
-
-  box-shadow:
-    0 0 20px rgba(66, 231, 122, 0.25);
+  line-height:
+    1.55;
 }
 
 
 /* =========================================================
-   RESPONSIVE
+   EMPTY CYCLE ICON
+========================================================= */
+
+.empty-icon {
+  width:
+    70px;
+
+  height:
+    70px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    18px;
+
+  background:
+    #EAF2F8;
+
+  color:
+    #163A5F;
+
+  font-size:
+    34px;
+
+  box-shadow:
+    0 8px 20px
+    rgba(22, 58, 95, 0.08);
+}
+
+
+/* =========================================================
+   RETRY BUTTON
+========================================================= */
+
+.retry-btn {
+  min-height:
+    43px;
+
+  margin-top:
+    18px;
+
+  padding:
+    0 20px;
+
+  border:
+    1px solid
+    #163A5F;
+
+  border-radius:
+    9px;
+
+  background:
+    #163A5F;
+
+  color:
+    #FFFFFF;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.retry-btn:hover {
+  background:
+    #0F2D4A;
+
+  border-color:
+    #0F2D4A;
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 7px 16px
+    rgba(15, 45, 74, 0.15);
+}
+
+.retry-btn:active {
+  transform:
+    translateY(0);
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .my-rental-page {
+    padding:
+      32px 20px 120px;
+  }
+
+  .my-rental-header {
+    width:
+      min(800px, 100%);
+  }
+
+  .rental-card {
+    width:
+      min(800px, 100%);
+  }
+
+  .cycle-image-container {
+    width:
+      185px;
+
+    height:
+      135px;
+
+    flex-basis:
+      185px;
+  }
+
+  .cycle-details h2 {
+    font-size:
+      24px;
+  }
+}
+
+
+/* =========================================================
+   TABLET / MOBILE TRANSITION
 ========================================================= */
 
 @media (max-width: 700px) {
 
-  .header-right {
-    width: 100%;
-    align-items: flex-start;
-  }
-
-  .ongoing-back-button {
-    order: 1;
-  }
-
   .my-rental-page {
-    padding: 25px 15px 40px;
+    padding:
+      27px 16px 110px;
   }
 
   .my-rental-header {
-    flex-direction: column;
+    flex-direction:
+      column;
 
-    margin-bottom: 22px;
+    align-items:
+      flex-start;
+
+    gap:
+      13px;
+
+    margin-bottom:
+      20px;
+  }
+
+  .my-rental-header > div:last-child {
+    width:
+      100%;
+
+    justify-content:
+      flex-start;
   }
 
   .my-rental-header h1 {
-    font-size: 27px;
-  }
-
-  .active-badge {
-    align-self: flex-start;
-  }
-
-  .rental-card {
-    border-radius: 17px;
+    font-size:
+      29px;
   }
 
   .cycle-section {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    padding: 22px;
+    padding:
+      24px;
   }
 
-  .cycle-image-container {
-    width: 100%;
-    height: 190px;
+  .time-section {
+    padding:
+      25px 24px;
   }
 
-  .cycle-details h2 {
-    font-size: 23px;
-  }
-
-  .time-section,
   .rental-info {
-    padding-left: 22px;
-    padding-right: 22px;
-  }
-
-  .time-value {
-    font-size: 32px;
+    padding:
+      25px 24px;
   }
 
   .return-section {
-    padding: 22px;
-  }
-
-  .return-modal {
-    padding: 25px 20px;
+    padding:
+      23px 24px 27px;
   }
 
   .info-row {
-    padding: 14px;
+    padding:
+      14px;
+  }
+}
 
-    gap: 20px;
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .my-rental-page {
+    padding:
+      22px 12px 105px;
+  }
+
+  .my-rental-header {
+    margin-bottom:
+      17px;
+  }
+
+  .page-small-title {
+    font-size:
+      10px;
+  }
+
+  .my-rental-header h1 {
+    font-size:
+      26px;
+  }
+
+  .page-description {
+    max-width:
+      340px;
+
+    font-size:
+      12px;
+  }
+
+  .active-badge {
+    padding:
+      8px 11px;
+
+    font-size:
+      10px;
+  }
+
+
+  /* -------------------------------------------------------
+     CARD
+  ------------------------------------------------------- */
+
+  .rental-card {
+    border-radius:
+      15px;
+  }
+
+
+  /* -------------------------------------------------------
+     CYCLE
+  ------------------------------------------------------- */
+
+  .cycle-section {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    gap:
+      16px;
+
+    padding:
+      18px;
+  }
+
+  .cycle-image-container {
+    width:
+      100%;
+
+    height:
+      190px;
+
+    flex:
+      none;
+
+    border-radius:
+      11px;
+  }
+
+  .cycle-details h2 {
+    font-size:
+      22px;
+  }
+
+  .cycle-label {
+    font-size:
+      9px;
+  }
+
+  .cycle-location {
+    margin-top:
+      8px;
+
+    font-size:
+      12px;
+  }
+
+
+  /* -------------------------------------------------------
+     TIME
+  ------------------------------------------------------- */
+
+  .time-section {
+    padding:
+      21px 18px;
+  }
+
+  .time-value {
+    margin-bottom:
+      14px;
+
+    font-size:
+      31px;
+  }
+
+  .time-bar {
+    height:
+      8px;
+  }
+
+  .time-bar-labels {
+    font-size:
+      9px;
+  }
+
+
+  /* -------------------------------------------------------
+     GRACE
+  ------------------------------------------------------- */
+
+  .grace-box {
+    gap:
+      12px;
+
+    padding:
+      14px;
+  }
+
+  .grace-icon {
+    width:
+      39px;
+
+    height:
+      39px;
+
+    flex-basis:
+      39px;
+
+    font-size:
+      18px;
+  }
+
+  .grace-box h3 {
+    font-size:
+      15px;
+  }
+
+  .grace-box p {
+    font-size:
+      11px;
+  }
+
+
+  /* -------------------------------------------------------
+     EXTRA TIME
+  ------------------------------------------------------- */
+
+  .extra-time-box {
+    padding:
+      14px;
+  }
+
+  .extra-time-header {
+    font-size:
+      13px;
+  }
+
+  .extra-time-box p {
+    font-size:
+      11px;
+  }
+
+
+  /* -------------------------------------------------------
+     INFORMATION
+  ------------------------------------------------------- */
+
+  .rental-info {
+    padding:
+      21px 18px;
+  }
+
+  .rental-info h3 {
+    font-size:
+      17px;
+  }
+
+  .info-table {
+    border-radius:
+      10px;
+  }
+
+  .info-row {
+    min-height:
+      47px;
+
+    padding:
+      12px 13px;
+
+    font-size:
+      12px;
+  }
+
+  .remaining-row strong {
+    font-size:
+      15px;
+  }
+
+
+  /* -------------------------------------------------------
+     ACTIONS
+  ------------------------------------------------------- */
+
+  .return-section {
+    padding:
+      19px 18px 23px;
+  }
+
+  .rental-action-buttons {
+    flex-direction:
+      column;
+
+    gap:
+      9px;
+  }
+
+  .report-issue-btn,
+  .return-cycle-btn {
+    width:
+      100%;
+
+    flex:
+      none;
+
+    min-height:
+      47px;
+  }
+
+  .return-section > p {
+    font-size:
+      10px;
+  }
+
+
+  /* -------------------------------------------------------
+     MODAL
+  ------------------------------------------------------- */
+
+  .modal-overlay {
+    align-items:
+      flex-end;
+
+    padding:
+      10px;
+  }
+
+  .return-modal {
+    width:
+      100%;
+
+    max-height:
+      calc(100vh - 20px);
+
+    max-height:
+      calc(100svh - 20px);
+
+    overflow-y:
+      auto;
+
+    padding:
+      23px 17px 18px;
+
+    border-radius:
+      16px;
+  }
+
+  .return-modal h2 {
+    font-size:
+      21px;
+  }
+
+  .return-modal > p {
+    font-size:
+      12px;
+  }
+
+  .return-option {
+    min-height:
+      67px;
+
+    padding:
+      12px;
+  }
+
+  .option-icon {
+    width:
+      39px;
+
+    height:
+      39px;
+
+    flex-basis:
+      39px;
+
+    font-size:
+      17px;
+  }
+
+  .return-option strong {
+    font-size:
+      12px;
+  }
+
+  .return-option small {
+    font-size:
+      10px;
+  }
+
+  .confirm-return-btn {
+    min-height:
+      46px;
   }
 }
 
@@ -1082,89 +2131,210 @@ body,
 @media (max-width: 400px) {
 
   .my-rental-page {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left:
+      10px;
+
+    padding-right:
+      10px;
   }
 
   .my-rental-header h1 {
-    font-size: 24px;
+    font-size:
+      24px;
   }
 
   .cycle-image-container {
-    height: 165px;
+    height:
+      165px;
+  }
+
+  .cycle-details h2 {
+    font-size:
+      20px;
   }
 
   .time-value {
-    font-size: 28px;
+    font-size:
+      28px;
   }
 
   .time-section {
-    padding: 20px 18px;
+    padding:
+      20px 18px;
   }
 
   .rental-info {
-    padding: 20px 18px;
+    padding:
+      20px 18px;
   }
 
   .info-row {
-    font-size: 13px;
+    gap:
+      12px;
+
+    font-size:
+      11px;
   }
 
   .return-section {
-    padding: 20px 18px 25px;
+    padding:
+      20px 18px 25px;
   }
-}  
 
-
-
-
-.rental-action-buttons {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-}
-
-.report-issue-btn,
-.return-cycle-btn {
-  flex: 1;
-}
-
-.report-issue-btn {
-  padding: 14px 20px;
-
-  border-radius: 12px;
-
-  border: 1px solid rgba(255, 120, 80, 0.35);
-
-  background: rgba(255, 80, 60, 0.08);
-
-  color: #ff9b8c;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-.report-issue-btn:hover {
-  background: rgba(255, 80, 60, 0.15);
-
-  border-color: rgba(255, 120, 80, 0.6);
-
-  transform: translateY(-1px);
-}
-
-@media (max-width: 600px) {
-  .rental-action-buttons {
-    flex-direction: column;
+  .return-modal {
+    padding:
+      21px 15px 17px;
   }
 }
 
-.empty-page-header {
-  width: min(1000px, 100%);
-  margin: 0 auto;
-  display: flex;
-  justify-content: flex-start;
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 350px) {
+
+  .my-rental-page {
+    padding-left:
+      8px;
+
+    padding-right:
+      8px;
+  }
+
+  .my-rental-header h1 {
+    font-size:
+      22px;
+  }
+
+  .cycle-section {
+    padding:
+      15px;
+  }
+
+  .cycle-image-container {
+    height:
+      145px;
+  }
+
+  .time-section,
+  .rental-info {
+    padding:
+      18px 15px;
+  }
+
+  .time-value {
+    font-size:
+      25px;
+  }
+
+  .info-row {
+    padding:
+      11px;
+  }
+
+  .return-section {
+    padding:
+      18px 15px 22px;
+  }
+
+  .report-issue-btn,
+  .return-cycle-btn {
+    font-size:
+      12px;
+  }
+}
+
+
+/* =========================================================
+   SHORT DESKTOP / LAPTOP SCREENS
+========================================================= */
+
+@media (min-width: 701px) and (max-height: 760px) {
+
+  .my-rental-page {
+    padding-top:
+      23px;
+
+    padding-bottom:
+      105px;
+  }
+
+  .my-rental-header {
+    margin-bottom:
+      17px;
+  }
+
+  .cycle-section {
+    padding:
+      22px 28px;
+  }
+
+  .cycle-image-container {
+    width:
+      175px;
+
+    height:
+      125px;
+
+    flex-basis:
+      175px;
+  }
+
+  .time-section {
+    padding:
+      22px 28px;
+  }
+
+  .rental-info {
+    padding:
+      22px 28px;
+  }
+
+  .return-section {
+    padding:
+      20px 28px 23px;
+  }
+}
+
+
+/* =========================================================
+   FOCUS / ACCESSIBILITY
+========================================================= */
+
+button:focus-visible {
+  outline:
+    3px solid
+    rgba(22, 58, 95, 0.17);
+
+  outline-offset:
+    2px;
+}
+
+.return-option:focus-visible {
+  outline:
+    3px solid
+    rgba(46, 139, 112, 0.18);
+
+  outline-offset:
+    2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .time-bar-fill,
+  .report-issue-btn,
+  .return-cycle-btn,
+  .retry-btn,
+  .return-option,
+  .confirm-return-btn,
+  .close-modal {
+    transition:
+      none;
+  }
 }
