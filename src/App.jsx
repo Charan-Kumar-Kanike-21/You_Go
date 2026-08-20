@@ -257,7 +257,7 @@ const enablePushNotifications = async () => {
     Landing: "/",
     Login: "/login",
     SignUp: "/signup",
-    ChoicePage: "/choice",
+    // ChoicePage: "/choice",
     HomePageRental: "/rentals",
     Listing: "/listing",
     Profile: "/profile",
@@ -1049,7 +1049,7 @@ useEffect(() => {
         );
 
       const restorablePages = [
-        "ChoicePage",
+        // "ChoicePage",
         "HomePageRental",
         "Listing",
         "Profile",
@@ -1078,7 +1078,7 @@ useEffect(() => {
           ) {
             setPage("AdminDashboard");
           } else {
-            setPage("ChoicePage");
+            setPage("HomePageRental")
           }
         }
       }
@@ -1303,7 +1303,7 @@ useEffect(() => {
             );
 
           const restorablePages = [
-            "ChoicePage",
+            // "ChoicePage",
             "HomePageRental",
             "Listing",
             "Profile",
@@ -1341,11 +1341,8 @@ useEffect(() => {
                   "AdminDashboard"
                 );
               } else {
-                setPage(
-                  "ChoicePage"
-                );
+                setPage("HomePageRental")
               }
-
             }
           }
 
@@ -1386,7 +1383,7 @@ useEffect(() => {
     }
 
     const pagesToSave = [
-      "ChoicePage",
+      // "ChoicePage",
       "HomePageRental",
       "Listing",
       "Profile",
@@ -1413,9 +1410,6 @@ useEffect(() => {
   // =========================================================
   // PROFILE
   // =========================================================
-
-  const [profileReturnPage, setProfileReturnPage] =
-    useState("ChoicePage");
 
   const [selectedBookingId, setSelectedBookingId] = useState(null);
 
@@ -1454,9 +1448,6 @@ useEffect(() => {
   // =========================================================
   // ONGOING RENT RETURN PAGE
   // =========================================================
-
-  const [ongoingRentsReturnPage, setOngoingRentsReturnPage] =
-    useState("ChoicePage");
 
   // =========================================================
   // HANDLE REPORT ISSUE
@@ -1729,17 +1720,15 @@ useEffect(() => {
     if (role === "admin") {
       setPage("AdminDashboard");
     } else {
-      setPage("ChoicePage");
+      setPage("HomePageRental")
     }
   };
 
-  // =========================================================
-  // CHOICE PAGE → RENTAL HOME PAGE
-  // =========================================================
+  const [ongoingRentsReturnPage, setOngoingRentsReturnPage] =
+    useState("HomePageRental");
 
-  const handleRentalChoice = () => {
-    setPage("HomePageRental");
-  };
+  const [profileReturnPage, setProfileReturnPage] =
+    useState("HomePageRental");
 
   // =========================================================
   // FORGOT PASSWORD
@@ -1762,7 +1751,7 @@ useEffect(() => {
   // =========================================================
 
   const handleOnGoingRents = (
-    returnPage = "ChoicePage"
+    returnPage = "HomePageRental"
   ) => {
     setOngoingRentsReturnPage(returnPage);
 
@@ -3039,7 +3028,7 @@ const handleNotificationAction = async (
       {/* =====================================================
           CHOICE PAGE
       ===================================================== */}
-
+{/* 
       {page === "ChoicePage" && (
         <ChoicePage
           onRentalChoice={
@@ -3067,7 +3056,7 @@ const handleNotificationAction = async (
             )
           }
         />
-      )}
+      )} */}
 
       {/* =====================================================
           RENTAL HOME PAGE

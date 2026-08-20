@@ -286,68 +286,256 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
     }
   };
 
-  // =========================================
-  // CHANGE CYCLE STATUS
-  // =========================================
+// =========================================
+// CHANGE CYCLE STATUS
+// =========================================
 
-  const changeCycleStatus = async (cycle) => {
-    const nextStatus =
-      cycle.status === "available" ? "unavailable" : "available";
+const changeCycleStatus = async (cycle) => {
+  console.log("Changing status for cycle:", cycle.id);
 
-    setStatusChangingId(cycle.id);
+  setStatusChangingId(cycle.id);
 
-    try {
-      const { error: statusError } = await supabase
-        .from("cycles")
-        .update({
-          status: nextStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", cycle.id)
-        .eq("owner_id", cycle.owner_id);
+  try {
+    // ---------------------------------------
+    // GET CURRENT CYCLE FROM DATABASE
+    // ---------------------------------------
 
-      if (statusError) throw statusError;
+    const {
+      data: cycleRow,
+      error: cycleError,
+    } = await supabase
+      .from("cycles")
+      .select("id, owner_id, status, is_verified")
+      .eq("id", cycle.id)
+      .single();
 
-      setCycles((previousCycles) =>
-        previousCycles.map((item) =>
-          item.id === cycle.id
-            ? { ...item, status: nextStatus }
-            : item
-        )
+    if (cycleError) {
+      throw cycleError;
+    }
+
+    if (!cycleRow) {
+      throw new Error("Cycle not found.");
+    }
+
+    // ---------------------------------------
+    // GET CURRENT USER
+    // ---------------------------------------
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      throw authError;
+    }
+
+    if (!user) {
+      throw new Error(
+        "Please login to change the cycle status."
       );
-
-      setStatusConfirmCycle(null);
-    } catch (err) {
-      console.error("Status update error:", err);
-      alert(err.message || "Unable to change the cycle status.");
-    } finally {
-      setStatusChangingId(null);
-    }
-  };
-
-  const requestStatusChange = (cycle) => {
-    if (dontAskStatusAgain) {
-      changeCycleStatus(cycle);
-      return;
     }
 
-    setStatusConfirmCycle(cycle);
-  };
+    // ---------------------------------------
+    // VERIFY OWNER
+    // ---------------------------------------
 
-  const confirmStatusChange = () => {
-    if (statusConfirmCycle) {
-      changeCycleStatus(statusConfirmCycle);
+    if (cycleRow.owner_id !== user.id) {
+      throw new Error(
+        "You are not authorized to change this cycle status."
+      );
     }
-  };
 
-  // =========================================
-  // PROFILE DISPLAY
-  // =========================================
+    // ---------------------------------------
+    // ADMIN APPROVAL CHECK
+    // ---------------------------------------
 
-  const ownerName =
-    profile?.full_name ||
-    profile?.email?.split("@")[0] ||
-    "Cycle Owner";
+    if (
+      cycleRow.is_verified !== true ||
+      cycleRow.status === "pending"
+    ) {
+      throw new Error(
+        "This cycle has not been approved by the admin yet."
+      );
+    }
+
+    // ---------------------------------------
+    // GET AVAILABILITY RECORD
+    // ---------------------------------------
+
+    const {
+      data: availabilityRow,
+      error: availabilityError,
+    } = await supabase
+      .from("cycle_availability")
+      .select("id, cycle_id, status")
+      .eq("cycle_id", cycleRow.id)
+      .maybeSingle();
+
+    if (availabilityError) {
+      throw availabilityError;
+    }
+
+    if (!availabilityRow) {
+      throw new Error(
+        "Availability information for this cycle was not found."
+      );
+    }
+
+    // ---------------------------------------
+    // DETERMINE NEXT STATUS
+    // ---------------------------------------
+
+    const currentStatus = String(
+      availabilityRow.status || ""
+    )
+      .trim()
+      .toLowerCase();
+
+    const nextStatus =
+      currentStatus === "available"
+        ? "unavailable"
+        : "available";
+
+    console.log(
+      "Current availability:",
+      currentStatus
+    );
+
+    console.log(
+      "Next availability:",
+      nextStatus
+    );
+
+    // ---------------------------------------
+    // UPDATE AVAILABILITY
+    // ---------------------------------------
+
+    const {
+      error: statusError,
+    } = await supabase
+      .from("cycle_availability")
+      .update({
+        status: nextStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", availabilityRow.id)
+      .eq("cycle_id", cycleRow.id);
+
+    if (statusError) {
+      throw statusError;
+    }
+
+    // ---------------------------------------
+    // UPDATE LOCAL UI
+    // ---------------------------------------
+
+    setCycles((previousCycles) =>
+      previousCycles.map((item) =>
+        item.id === cycle.id
+          ? {
+              ...item,
+              status: nextStatus,
+            }
+          : item
+      )
+    );
+
+    // Close confirmation popup if it is open.
+    setStatusConfirmCycle(null);
+
+  } catch (err) {
+    console.error(
+      "Status update error:",
+      err
+    );
+
+    alert(
+      err.message ||
+        "Unable to change the cycle status."
+    );
+  } finally {
+    setStatusChangingId(null);
+  }
+};
+
+
+// =========================================
+// REQUEST STATUS CHANGE
+// =========================================
+
+const requestStatusChange = (cycle) => {
+  // ---------------------------------------
+  // PENDING CYCLES CANNOT CHANGE STATUS
+  // ---------------------------------------
+
+  console.log("cycle status:", cycle.status);
+  console.log("verified: ", cycle.is_verified);
+
+  if (
+    cycle.status === "pending" ||
+    cycle.is_verified === false
+  ) {
+    return;
+  }
+
+  // ---------------------------------------
+  // READ THE LATEST "DON'T ASK AGAIN"
+  // DIRECTLY FROM LOCAL STORAGE
+  // ---------------------------------------
+
+  const dontAskAgain =
+    localStorage.getItem(
+      "cycleStatusDontAskAgain"
+    ) === "true";
+
+  console.log(
+    "Don't ask again:",
+    dontAskAgain
+  );
+
+  // ---------------------------------------
+  // IF USER SELECTED "DON'T ASK AGAIN"
+  // ---------------------------------------
+  //
+  // Do NOT show the popup.
+  // Directly execute the status change.
+  // ---------------------------------------
+
+  if (dontAskAgain) {
+    changeCycleStatus(cycle);
+    return;
+  }
+
+  // ---------------------------------------
+  // OTHERWISE SHOW CONFIRMATION
+  // ---------------------------------------
+
+  setStatusConfirmCycle(cycle);
+};
+
+
+// =========================================
+// CONFIRM STATUS CHANGE
+// =========================================
+
+const confirmStatusChange = () => {
+  if (!statusConfirmCycle) {
+    return;
+  }
+
+  // The actual status change ALWAYS happens
+  // when the user confirms.
+  changeCycleStatus(statusConfirmCycle);
+};
+// =========================================
+// PROFILE DISPLAY
+// =========================================
+
+const ownerName =
+  profile?.full_name ||
+  profile?.email?.split("@")[0] ||
+  "Cycle Owner";
 
   // =========================================
   // RENDER

@@ -78,8 +78,10 @@ function BookingPage({ cycle, onBack, onOwnerDetails }) {
     setMessage("");
     setMessageType("");
 
-    // Authentication must be checked before creating/sending any booking.
-    // Logged-in users may continue; logged-out users receive a clear login message.
+    // =========================================================
+    // 1. AUTHENTICATION CHECK
+    // =========================================================
+    // A booking can only be created by a logged-in user.
     try {
       const {
         data: { user },
@@ -89,53 +91,186 @@ function BookingPage({ cycle, onBack, onOwnerDetails }) {
       if (userError) throw userError;
 
       if (!user) {
-        showMessage("You need to login to confirm your booking.");
+        showMessage("Please login to confirm your booking.");
         return;
       }
-    } catch (error) {
-      console.error("Authentication check error:", error);
-      showMessage("Please login before confirming your booking.");
-      return;
-    }
 
-    if (hours === "" || days === "") {
-      showMessage("Please enter the rental duration.");
-      return;
-    }
+      // =======================================================
+      // 2. OWNER CHECK
+      // =======================================================
+      // A cycle owner cannot book their own cycle.
+      // Fetch owner_id from the database for a fresh check.
+      const { data: cycleOwner, error: ownerError } = await supabase
+        .from("cycles")
+        .select("owner_id")
+        .eq("id", cycle.id)
+        .maybeSingle();
 
-    const bookingHours = Number(hours);
-    const bookingDays = Number(days);
+      if (ownerError) throw ownerError;
 
-    if (
-      Number.isNaN(bookingHours) ||
-      Number.isNaN(bookingDays) ||
-      bookingHours < 0 ||
-      bookingDays < 0 ||
-      bookingHours > 23 ||
-      bookingDays > 7
-    ) {
-      showMessage("Please enter a valid rental duration.");
-      return;
-    }
+      if (!cycleOwner) {
+        showMessage("This cycle could not be found.");
+        return;
+      }
 
-    const totalRentalHours = bookingDays * 24 + bookingHours;
+      if (cycleOwner.owner_id === user.id) {
+        showMessage("You can't book your own cycle.");
+        return;
+      }
 
-    if (totalRentalHours > 168) {
-      showMessage("Maximum rental duration is 7 days.");
-      return;
-    }
+      // =======================================================
+      // 3. RENTAL DURATION VALIDATION
+      // =======================================================
 
-    if (totalRentalHours === 0) {
-      showMessage("Rental duration cannot be zero.");
-      return;
-    }
+      if (hours === "" || days === "") {
+        showMessage("Please enter the rental duration.");
+        return;
+      }
 
-    try {
+      const bookingHours = Number(hours);
+      const bookingDays = Number(days);
+
+      if (
+        Number.isNaN(bookingHours) ||
+        Number.isNaN(bookingDays) ||
+        bookingHours < 0 ||
+        bookingDays < 0 ||
+        bookingHours > 23 ||
+        bookingDays > 7
+      ) {
+        showMessage("Please enter a valid rental duration.");
+        return;
+      }
+
+      const totalRentalHours = bookingDays * 24 + bookingHours;
+
+      if (totalRentalHours > 168) {
+        showMessage("Maximum rental duration is 7 days.");
+        return;
+      }
+
+      if (totalRentalHours === 0) {
+        showMessage("Rental duration cannot be zero.");
+        return;
+      }
+
+      // =========================================================
+      // 4. FRESHLY CHECK THE CYCLE FROM DATABASE
+      // =========================================================
+      //
+      // Do NOT rely only on the cycle object received by the page.
+      // The owner/admin could have changed the cycle after this
+      // page was opened.
+      //
+      // Admin approval:
+      //   cycles.is_verified === true
+      //
+      // Cycle status:
+      //   cycles.status === "available"
+      //
+      // Both are required.
+      // =========================================================
+
       setBooking(true);
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: latestCycle,
+        error: cycleError,
+      } = await supabase
+        .from("cycles")
+        .select("id, status, is_verified")
+        .eq("id", cycle.id)
+        .maybeSingle();
+
+      if (cycleError) {
+        throw cycleError;
+      }
+
+      if (!latestCycle) {
+        showMessage("This cycle is no longer available.");
+        return;
+      }
+
+      // Admin must have approved/verified the cycle.
+      if (latestCycle.is_verified !== true) {
+        showMessage(
+          "This cycle has not been approved by the admin yet."
+        );
+        return;
+      }
+
+      // Cycle itself must currently be available.
+      const cycleStatus = String(
+        latestCycle.status || ""
+      )
+        .trim()
+        .toLowerCase();
+
+      if (cycleStatus !== "available") {
+        showMessage(
+          "This cycle is not available for booking."
+        );
+        return;
+      }
+
+      // =========================================================
+      // 5. FRESH OWNER AVAILABILITY CHECK
+      // =========================================================
+      //
+      // cycle_availability is the source of the owner's current
+      // availability. We check it again immediately before
+      // creating the booking request.
+      //
+      // The same availability field variants already used by
+      // HomePageRental are supported.
+      // =========================================================
+
+      const {
+        data: availabilityRows,
+        error: availabilityError,
+      } = await supabase
+        .from("cycle_availability")
+        .select("*")
+        .eq("cycle_id", cycle.id);
+
+      if (availabilityError) {
+        throw availabilityError;
+      }
+
+      if (!availabilityRows || availabilityRows.length === 0) {
+        showMessage(
+          "This cycle is not available for booking."
+        );
+        return;
+      }
+
+      const getAvailabilityStatus = (availability) =>
+        String(
+          availability?.availability_status ??
+            availability?.availability ??
+            availability?.availability_type ??
+            availability?.status ??
+            availability?.type ??
+            ""
+        )
+          .trim()
+          .toLowerCase();
+
+      const hasAvailableOwnerStatus = availabilityRows.some(
+        (availability) =>
+          getAvailabilityStatus(availability) === "available"
+      );
+
+      if (!hasAvailableOwnerStatus) {
+        showMessage(
+          "This cycle is currently not available from the owner."
+        );
+        return;
+      }
+
+      // =========================================================
+      // 6. SEND BOOKING REQUEST
+      // =========================================================
 
       const bookingData = {
         cycle_id: cycle.id,
@@ -171,8 +306,15 @@ function BookingPage({ cycle, onBack, onOwnerDetails }) {
         "success"
       );
     } catch (error) {
-      console.error("Booking error:", error);
-      showMessage("Unable to send booking request. Please try again.");
+      console.error("Booking validation/request error:", error);
+
+      // Keep database/API errors separate from the specific
+      // availability/login messages shown above.
+      if (!message) {
+        showMessage(
+          "Unable to confirm the booking right now. Please try again."
+        );
+      }
     } finally {
       setBooking(false);
     }
@@ -459,9 +601,7 @@ function BookingPage({ cycle, onBack, onOwnerDetails }) {
             <button
               className="book-cycle-btn"
               onClick={handleBooking}
-              disabled={
-                booking || (numericHours === 0 && numericDays === 0)
-              }
+              disabled={booking}
             >
               <span>
                 {booking
