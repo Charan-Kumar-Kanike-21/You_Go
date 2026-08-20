@@ -1694,3 +1694,448 @@
     padding: 8px !important;
   }
 }
+
+
+/* =========================================================
+   RELATED CYCLE SUGGESTIONS
+   ---------------------------------------------------------
+   Maximum 4 cards.
+   Desktop: HomeRental-style vertical cards.
+   Mobile: compact horizontal cards.
+========================================================= */
+
+.booking-page :is(.cycle-suggestions) {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 7px 25px rgba(22, 58, 95, 0.045);
+}
+
+.booking-page :is(.suggestions-heading) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.booking-page :is(.suggestions-heading h2) {
+  margin: 4px 0 3px;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.35px;
+}
+
+.booking-page :is(.suggestions-heading p) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.booking-page :is(.suggestions-count) {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.booking-page :is(.suggestions-grid) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.booking-page :is(.suggestion-card) {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(22, 58, 95, 0.05);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.booking-page :is(.suggestion-card:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(22, 58, 95, 0.09);
+}
+
+.booking-page :is(.suggestion-image) {
+  height: 142px;
+  position: relative;
+  overflow: hidden;
+  background: #f2f5f8;
+}
+
+.booking-page :is(.suggestion-image img) {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.booking-page :is(.suggestion-image-placeholder) {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 42px;
+  background: #f2f5f8;
+}
+
+.booking-page :is(.suggestion-availability) {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border: 1px solid #d2eadf;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #2e8c62;
+  font-size: 6.5px;
+  font-weight: 800;
+}
+
+.booking-page :is(.suggestion-availability > span) {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.booking-page :is(.suggestion-details) {
+  min-width: 0;
+  padding: 9px;
+  display: flex;
+  gap: 7px;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.booking-page :is(.suggestion-main) {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-page :is(.suggestion-main h3) {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-page :is(.suggestion-location) {
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-page :is(.suggestion-rating) {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.booking-page :is(.suggestion-rating span) {
+  color: #e0a62d;
+}
+
+.booking-page :is(.suggestion-tags) {
+  margin-top: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.booking-page :is(.suggestion-tags span) {
+  padding: 3px 5px;
+  border: 1px solid #e4e9ef;
+  border-radius: 4px;
+  background: #f7f9fb;
+  color: #596675;
+  font-size: 6px;
+  font-weight: 600;
+}
+
+.booking-page :is(.suggestion-owner) {
+  min-width: 0;
+  margin-top: auto;
+  padding-top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.booking-page :is(.suggestion-owner-avatar) {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 6px;
+  font-weight: 800;
+}
+
+.booking-page :is(.suggestion-owner strong) {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 6.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-page :is(.suggestion-side) {
+  flex: 0 0 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.booking-page :is(.suggestion-prices) {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 3px;
+  row-gap: 3px;
+  align-items: baseline;
+  justify-content: end;
+}
+
+.booking-page :is(.suggestion-prices strong) {
+  color: var(--text);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.booking-page :is(.suggestion-prices span) {
+  color: var(--muted);
+  font-size: 6px;
+}
+
+.booking-page :is(.suggestion-view-btn) {
+  width: 100%;
+  min-height: 25px;
+  padding: 5px 6px;
+  border: 1px solid var(--navy);
+  border-radius: 5px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 6.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.booking-page :is(.suggestion-view-btn:hover:not(:disabled)) {
+  background: var(--navy-dark);
+}
+
+.booking-page :is(.suggestion-view-btn:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.booking-page :is(.suggestions-loading,
+.suggestions-empty) {
+  min-height: 80px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #dce3ea;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 9px;
+  background: #fafbfd;
+}
+
+/* Keep suggestions below the booking block on tablet too. */
+@media (max-width: 980px) and (min-width: 681px) {
+  .booking-page :is(.suggestions-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   MOBILE SUGGESTIONS — SAME COMPACT CARD LANGUAGE AS
+   HOMEPAGERENTAL MOBILE CARDS
+========================================================= */
+
+@media screen and (max-width: 680px) {
+  .booking-page :is(.cycle-suggestions) {
+    margin-top: 9px !important;
+    padding: 10px !important;
+    border-radius: 11px !important;
+  }
+
+  .booking-page :is(.suggestions-heading) {
+    margin-bottom: 8px !important;
+    align-items: center !important;
+  }
+
+  .booking-page :is(.suggestions-heading h2) {
+    margin: 2px 0 !important;
+    font-size: 15px !important;
+  }
+
+  .booking-page :is(.suggestions-heading p) {
+    display: none !important;
+  }
+
+  .booking-page :is(.suggestions-count) {
+    font-size: 6px !important;
+  }
+
+  .booking-page :is(.suggestions-grid) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+  }
+
+  .booking-page :is(.suggestion-card) {
+    min-height: 88px !important;
+    height: 88px !important;
+    display: grid !important;
+    grid-template-columns: 112px minmax(0, 1fr) !important;
+    flex-direction: row !important;
+    border-radius: 8px !important;
+  }
+
+  .booking-page :is(.suggestion-image) {
+    width: 112px !important;
+    height: 88px !important;
+  }
+
+  .booking-page :is(.suggestion-image-placeholder) {
+    font-size: 28px !important;
+  }
+
+  .booking-page :is(.suggestion-availability) {
+    top: 5px !important;
+    left: 5px !important;
+    padding: 3px 5px !important;
+    font-size: 5.5px !important;
+  }
+
+  .booking-page :is(.suggestion-details) {
+    min-width: 0 !important;
+    height: 88px !important;
+    padding: 7px 7px 6px !important;
+    gap: 6px !important;
+  }
+
+  .booking-page :is(.suggestion-main h3) {
+    font-size: 9px !important;
+  }
+
+  .booking-page :is(.suggestion-location) {
+    margin-top: 3px !important;
+    font-size: 6px !important;
+  }
+
+  .booking-page :is(.suggestion-rating) {
+    margin-top: 3px !important;
+    font-size: 6px !important;
+  }
+
+  .booking-page :is(.suggestion-tags) {
+    margin-top: 3px !important;
+    gap: 3px !important;
+  }
+
+  .booking-page :is(.suggestion-tags span) {
+    padding: 2px 4px !important;
+    font-size: 5px !important;
+  }
+
+  .booking-page :is(.suggestion-owner) {
+    padding-top: 4px !important;
+    gap: 3px !important;
+  }
+
+  .booking-page :is(.suggestion-owner-avatar) {
+    width: 14px !important;
+    height: 14px !important;
+    flex-basis: 14px !important;
+    font-size: 5px !important;
+  }
+
+  .booking-page :is(.suggestion-owner strong) {
+    font-size: 5.5px !important;
+  }
+
+  .booking-page :is(.suggestion-side) {
+    flex-basis: 58px !important;
+    gap: 4px !important;
+  }
+
+  .booking-page :is(.suggestion-prices) {
+    column-gap: 2px !important;
+    row-gap: 2px !important;
+  }
+
+  .booking-page :is(.suggestion-prices strong) {
+    font-size: 7px !important;
+  }
+
+  .booking-page :is(.suggestion-prices span) {
+    font-size: 5px !important;
+  }
+
+  .booking-page :is(.suggestion-view-btn) {
+    min-height: 22px !important;
+    padding: 4px 5px !important;
+    font-size: 5.5px !important;
+  }
+
+  .booking-page :is(.suggestions-loading,
+  .suggestions-empty) {
+    min-height: 55px !important;
+    font-size: 7px !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .booking-page :is(.cycle-suggestions) {
+    padding: 8px !important;
+  }
+
+  .booking-page :is(.suggestion-card) {
+    grid-template-columns: 100px minmax(0, 1fr) !important;
+    height: 82px !important;
+    min-height: 82px !important;
+  }
+
+  .booking-page :is(.suggestion-image) {
+    width: 100px !important;
+    height: 82px !important;
+  }
+
+  .booking-page :is(.suggestion-details) {
+    height: 82px !important;
+    padding: 6px !important;
+  }
+
+  .booking-page :is(.suggestion-side) {
+    flex-basis: 54px !important;
+  }
+}

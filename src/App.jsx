@@ -2816,7 +2816,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://stem61.app.n8n.cloud/webhook/booking-acceptance",
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking-acceptance",
           {
             method: "POST",
 
@@ -2867,7 +2867,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://stem61.app.n8n.cloud/webhook/booking-acceptance",
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking-acceptance",
           {
             method: "POST",
 

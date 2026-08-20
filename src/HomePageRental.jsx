@@ -534,8 +534,9 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
                 availability.location || "Location not specified",
               owner_id: cycle.owner_id,
               ownerName:
-                ownerProfile?.full_name ||
-                ownerProfile?.name ||
+                ownerProfile?.full_name?.trim() ||
+                ownerProfile?.name?.trim() ||
+                ownerProfile?.email?.split("@")[0] ||
                 "NITK Owner",
               ownerLocation: ownerProfile?.location || "NITK",
               rating,

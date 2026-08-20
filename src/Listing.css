@@ -648,106 +648,16 @@ select {
 
 
 /* =========================================================
-   AVAILABLE DAYS
-   COMPACT CIRCULAR CHECKPOINT DESIGN
-========================================================= */
-
-.availability-days-group {
-  margin-top:
-    18px;
-}
-
-
-/* =========================================================
    DAYS GRID
 ========================================================= */
-
-.days-grid {
-  display:
-    grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  gap:
-    7px;
-
-  margin-top:
-    8px;
-}
-
 
 /* =========================================================
    DAY OPTION
 ========================================================= */
 
-.day-option {
-  position:
-    relative;
-
-  min-height:
-    36px;
-
-  padding:
-    6px 8px;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  gap:
-    6px;
-
-  border:
-    1px solid
-    #E0E6EA;
-
-  border-radius:
-    8px;
-
-  background:
-    #FFFFFF;
-
-  color:
-    #52606D;
-
-  cursor:
-    pointer;
-
-  user-select:
-    none;
-
-  -webkit-tap-highlight-color:
-    transparent;
-
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-
 /* =========================================================
    DAY HOVER
 ========================================================= */
-
-.day-option:hover {
-  border-color:
-    #B8C9D5;
-
-  background:
-    #F7F9FC;
-
-  color:
-    #163A5F;
-}
-
 
 /* =========================================================
    HIDE ORIGINAL CHECKBOX
@@ -1270,19 +1180,6 @@ textarea:focus-visible {
       28px;
   }
 
-  .days-grid {
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-  }
-
-  .day-option {
-    min-height:
-      35px;
-
-    padding:
-      6px 7px;
-  }
-
   .day-option span {
     font-size:
       10px;
@@ -1413,39 +1310,6 @@ textarea:focus-visible {
   /* =======================================================
      MOBILE AVAILABLE DAYS
   ======================================================= */
-
-  .availability-days-group {
-    margin-top:
-      15px;
-  }
-
-  .days-grid {
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-
-    gap:
-      6px;
-
-    margin-top:
-      7px;
-  }
-
-  .day-option {
-    min-height:
-      34px;
-
-    padding:
-      5px 5px;
-
-    justify-content:
-      center;
-
-    gap:
-      5px;
-
-    border-radius:
-      7px;
-  }
 
   .day-option::before {
     width:
@@ -1591,19 +1455,6 @@ textarea:focus-visible {
 
   /* Days */
 
-  .days-grid {
-    gap:
-      5px;
-  }
-
-  .day-option {
-    min-height:
-      32px;
-
-    padding:
-      4px;
-  }
-
   .day-option::before {
     width:
       13px;
@@ -1703,25 +1554,6 @@ textarea:focus-visible {
 
   /* Days */
 
-  .days-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    gap:
-      6px;
-  }
-
-  .day-option {
-    min-height:
-      32px;
-
-    padding:
-      5px 6px;
-
-    gap:
-      5px;
-  }
-
   .day-option::before {
     width:
       13px;
@@ -1793,5 +1625,46 @@ textarea:focus-visible {
   .list-cycle-btn {
     transition:
       none;
+  }
+}
+
+/* =========================================================
+   FIXED NITK CAMPUS LOCATION SELECTOR
+========================================================= */
+
+.input-group select[name="location"] {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #DCE3E8;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #172027;
+  font-size: 14px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.input-group select[name="location"]:focus {
+  border-color: #163A5F;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(22, 58, 95, 0.08);
+  outline: none;
+}
+
+.input-group select[name="location"]:invalid {
+  color: #98A2B3;
+}
+
+.input-group select[name="location"] option {
+  color: #172027;
+  background: #FFFFFF;
+}
+
+@media screen and (max-width: 700px) {
+  .input-group select[name="location"] {
+    min-height: 42px;
+    font-size: 13px;
+    padding: 9px 10px;
   }
 }

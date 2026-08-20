@@ -1,14 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./BookingPage.css";
 import { supabase } from "./supabase";
 
-function BookingPage({ cycle, onBack, onOwnerDetails }) {
+function BookingPage({
+  cycle,
+  onBack,
+  onOwnerDetails,
+  onCycleSelect,
+  activeFilters,
+}) {
   const [hours, setHours] = useState("0");
   const [days, setDays] = useState("0");
   const [booking, setBooking] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
+  const [suggestedCycles, setSuggestedCycles] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
   const numericHours = Number(hours) || 0;
   const numericDays = Number(days) || 0;
@@ -19,6 +27,628 @@ function BookingPage({ cycle, onBack, onOwnerDetails }) {
   const hourlyAmount = numericHours * pricePerHour;
   const dailyAmount = numericDays * pricePerDay;
   const totalPrice = hourlyAmount + dailyAmount;
+
+  // =========================================================
+  // RELATED CYCLE SUGGESTIONS
+  // =========================================================
+  // Suggestions are based on the cycle currently being viewed
+  // and, when supplied by the parent, the filters used by the user.
+  // Only verified + currently available cycles are suggested.
+  const getText = (value) =>
+    String(value ?? "").trim().toLowerCase();
+
+  const getCycleImages = (item) => {
+    if (Array.isArray(item?.images) && item.images.length > 0) {
+      return item.images;
+    }
+
+    return item?.image ? [item.image] : [];
+  };
+
+  const getGearValue = (item) =>
+    getText(
+      item?.gear_type ??
+        item?.gear ??
+        item?.gearType ??
+        item?.cycle_gear ??
+        item?.transmission
+    );
+
+  const getAvailabilityValue = (item) =>
+    getText(
+      item?.availability_status ??
+        item?.availability ??
+        item?.status
+    );
+
+  const isCycleAvailable = (item) => {
+    const status = getText(item?.status);
+    return status === "available";
+  };
+
+  const filterType = getText(
+    activeFilters?.cycle_type ??
+      activeFilters?.type ??
+      activeFilters?.cycleType
+  );
+
+  const filterGear = getText(
+    activeFilters?.gear_type ??
+      activeFilters?.gear ??
+      activeFilters?.gearType
+  );
+
+  const filterLocation = getText(activeFilters?.location);
+
+  const scoreSuggestion = (item) => {
+    let score = 0;
+
+    const currentType = getText(
+      cycle?.cycle_type ?? cycle?.type
+    );
+    const itemType = getText(
+      item?.cycle_type ?? item?.type
+    );
+
+    const currentGear =
+      cycle?.geared === true
+        ? "geared"
+        : cycle?.geared === false
+          ? "non-geared"
+          : getGearValue(cycle);
+
+    const itemGear =
+      item?.geared === true
+        ? "geared"
+        : item?.geared === false
+          ? "non-geared"
+          : getGearValue(item);
+
+    const currentLocation = getText(cycle?.location);
+    const itemLocation = getText(item?.location);
+
+    const currentBrand = getText(cycle?.brand);
+    const itemBrand = getText(item?.brand);
+
+    const currentCondition = getText(cycle?.condition);
+    const itemCondition = getText(item?.condition);
+
+    if (currentType && itemType && currentType === itemType) score += 8;
+    if (currentGear && itemGear && currentGear === itemGear) score += 7;
+    if (
+      currentLocation &&
+      itemLocation &&
+      currentLocation === itemLocation
+    ) score += 6;
+    if (currentBrand && itemBrand && currentBrand === itemBrand) score += 4;
+    if (
+      currentCondition &&
+      itemCondition &&
+      currentCondition === itemCondition
+    ) score += 2;
+
+    const currentRating = Number(cycle?.rating) || 0;
+    const itemRating = Number(item?.rating) || 0;
+    if (currentRating && itemRating >= currentRating) score += 2;
+
+    const currentHourly = Number(cycle?.price_per_hour) || 0;
+    const itemHourly = Number(item?.price_per_hour) || 0;
+    if (currentHourly && itemHourly) {
+      const difference = Math.abs(currentHourly - itemHourly);
+      score += Math.max(0, 4 - difference / Math.max(currentHourly, 1));
+    }
+
+    // Match filters if the parent already has them.
+    if (filterType && itemType === filterType) score += 10;
+    if (filterGear && itemGear === filterGear) score += 10;
+    if (filterLocation && itemLocation === filterLocation) score += 10;
+
+    return score;
+  };
+
+useEffect(() => {
+  let cancelled = false;
+
+  const loadSuggestions = async () => {
+    if (!cycle?.id) {
+      setSuggestedCycles([]);
+      setSuggestionsLoading(false);
+      return;
+    }
+
+    setSuggestionsLoading(true);
+
+    try {
+      // =====================================================
+      // 1. GET AVAILABILITY FIRST
+      //    This is the SAME source used by HomePageRental.
+      // =====================================================
+
+      const {
+        data: availabilityRows,
+        error: availabilityError,
+      } = await supabase
+        .from("cycle_availability")
+        .select("*");
+
+      if (availabilityError) {
+        throw availabilityError;
+      }
+
+      console.log(
+        "Suggestion availability rows:",
+        availabilityRows
+      );
+
+      if (!availabilityRows?.length) {
+        if (!cancelled) {
+          setSuggestedCycles([]);
+        }
+        return;
+      }
+
+      // =====================================================
+      // 2. FIND ONLY CURRENTLY AVAILABLE CYCLES
+      //
+      //    Use the same availability logic as HomePageRental.
+      // =====================================================
+
+      const getAvailabilityStatusForSuggestion = (
+        availability
+      ) => {
+        if (!availability) {
+          return "unknown";
+        }
+
+        return String(
+          availability.availability_status ??
+            availability.availability ??
+            availability.availability_type ??
+            availability.status ??
+            availability.type ??
+            "unknown"
+        )
+          .trim()
+          .toLowerCase();
+      };
+
+      const availableRows =
+        availabilityRows.filter(
+          (availability) =>
+            getAvailabilityStatusForSuggestion(
+              availability
+            ) === "available"
+        );
+
+      console.log(
+        "Available suggestion rows:",
+        availableRows
+      );
+
+      if (!availableRows.length) {
+        if (!cancelled) {
+          setSuggestedCycles([]);
+        }
+        return;
+      }
+
+      // =====================================================
+      // 3. GET CYCLE IDS FROM cycle_availability
+      // =====================================================
+
+      const candidateIds = [
+        ...new Set(
+          availableRows
+            .map(
+              (availability) =>
+                availability.cycle_id ??
+                availability.cycleId ??
+                availability.cycle_uuid ??
+                availability.cycleID
+            )
+            .filter(Boolean)
+        ),
+      ].filter(
+        (id) => id !== cycle.id
+      );
+
+      console.log(
+        "Suggestion candidate IDs:",
+        candidateIds
+      );
+
+      if (!candidateIds.length) {
+        if (!cancelled) {
+          setSuggestedCycles([]);
+        }
+        return;
+      }
+
+      // =====================================================
+      // 4. FETCH THE ACTUAL CYCLE DETAILS
+      //
+      //    Do NOT filter by cycles.status here.
+      //    cycle_availability is already telling us that
+      //    the cycle is currently available.
+      // =====================================================
+
+      const {
+        data: cycleRows,
+        error: cycleError,
+      } = await supabase
+        .from("cycles")
+        .select(`
+          *,
+          cycle_images (
+            image_url,
+            display_order
+          )
+        `)
+        .in("id", candidateIds);
+
+      if (cycleError) {
+        throw cycleError;
+      }
+
+      console.log(
+        "Suggestion cycle rows:",
+        cycleRows
+      );
+
+      if (!cycleRows?.length) {
+        if (!cancelled) {
+          setSuggestedCycles([]);
+        }
+        return;
+      }
+
+      // =====================================================
+      // 5. MATCH ONLY ADMIN-VERIFIED CYCLES
+      //
+      //    Admin approval is represented by is_verified.
+      // =====================================================
+
+      const verifiedCycles = cycleRows.filter(
+        (item) =>
+          item.is_verified === true
+      );
+
+      console.log(
+        "Verified suggestion cycles:",
+        verifiedCycles
+      );
+
+      if (!verifiedCycles.length) {
+        if (!cancelled) {
+          setSuggestedCycles([]);
+        }
+        return;
+      }
+
+      // =====================================================
+      // 6. CREATE availability MAP
+      // =====================================================
+
+      const availabilityByCycleId =
+        new Map();
+
+      availableRows.forEach(
+        (availability) => {
+          const cycleId =
+            availability.cycle_id ??
+            availability.cycleId ??
+            availability.cycle_uuid ??
+            availability.cycleID;
+
+          if (
+            cycleId &&
+            !availabilityByCycleId.has(cycleId)
+          ) {
+            availabilityByCycleId.set(
+              cycleId,
+              availability
+            );
+          }
+        }
+      );
+
+      // =====================================================
+      // 7. FETCH OWNER PROFILES
+      // =====================================================
+
+      const ownerIds = [
+        ...new Set(
+          verifiedCycles
+            .map(
+              (item) => item.owner_id
+            )
+            .filter(Boolean)
+        ),
+      ];
+
+      const ownerProfilesById =
+        new Map();
+
+      if (ownerIds.length) {
+        const {
+          data: ownerProfiles,
+          error: ownerProfilesError,
+        } = await supabase
+          .from("profiles")
+          .select("*")
+          .in("id", ownerIds);
+
+        if (ownerProfilesError) {
+          console.warn(
+            "Unable to fetch suggestion owner profiles:",
+            ownerProfilesError
+          );
+        } else {
+          (
+            ownerProfiles || []
+          ).forEach((profile) => {
+            ownerProfilesById.set(
+              profile.id,
+              profile
+            );
+          });
+        }
+      }
+
+      // =====================================================
+      // 8. NORMALIZE CYCLES
+      // =====================================================
+
+      const normalizedCandidates =
+        verifiedCycles
+          .filter((item) =>
+            availabilityByCycleId.has(
+              item.id
+            )
+          )
+          .map((item) => {
+            const availability =
+              availabilityByCycleId.get(
+                item.id
+              );
+
+            const ownerProfile =
+              ownerProfilesById.get(
+                item.owner_id
+              );
+
+            // ---------------------------------------------
+            // Images
+            // ---------------------------------------------
+
+            const sortedImages = [
+              ...(item.cycle_images || []),
+            ].sort(
+              (a, b) =>
+                (a.display_order ?? 0) -
+                (b.display_order ?? 0)
+            );
+
+            const imageUrls =
+              sortedImages
+                .map((image) => {
+                  const {
+                    data,
+                  } =
+                    supabase.storage
+                      .from(
+                        "cycle-images"
+                      )
+                      .getPublicUrl(
+                        image.image_url
+                      );
+
+                  return data?.publicUrl;
+                })
+                .filter(Boolean);
+
+            // ---------------------------------------------
+            // Gear
+            // ---------------------------------------------
+
+            const cycleType =
+              String(
+                item.cycle_type || ""
+              )
+                .trim()
+                .toLowerCase();
+
+            const geared =
+              cycleType === "gear" ||
+              cycleType === "geared";
+
+            // ---------------------------------------------
+            // Owner
+            // ---------------------------------------------
+
+            const ownerName =
+              ownerProfile?.full_name ||
+              ownerProfile?.name ||
+              ownerProfile?.email?.split(
+                "@"
+              )[0] ||
+              item.owner_name ||
+              item.ownerName ||
+              "NITK Owner";
+
+            // ---------------------------------------------
+            // Rating
+            // ---------------------------------------------
+
+            const rating = Number(
+              item.rating ??
+                item.owner_rating ??
+                ownerProfile?.rating ??
+                0
+            );
+
+            // ---------------------------------------------
+            // Prices
+            // ---------------------------------------------
+
+            const hourlyPrice =
+              Number(
+                item.price_per_hour ??
+                  item.hourly_price ??
+                  0
+              );
+
+            const dailyPrice =
+              Number(
+                item.price_per_day ??
+                  item.daily_price ??
+                  0
+              );
+
+            // ---------------------------------------------
+            // Location
+            //
+            // cycle_availability is the source.
+            // ---------------------------------------------
+
+            const location =
+              availability?.location ||
+              item.location ||
+              "Location not specified";
+
+            return {
+              ...item,
+
+              id: item.id,
+
+              brand:
+                item.brand ||
+                item.title ||
+                "Cycle",
+
+              model:
+                item.model || "",
+
+              image:
+                imageUrls[0] || null,
+
+              images:
+                imageUrls,
+
+              location,
+
+              description:
+                item.description || "",
+
+              condition:
+                item.condition || "",
+
+              cycle_type:
+                item.cycle_type || "",
+
+              geared,
+
+              gearLabel:
+                geared
+                  ? "Geared"
+                  : "Non-Geared",
+
+              owner_id:
+                item.owner_id,
+
+              ownerName,
+
+              rating,
+
+              review_count:
+                Number(
+                  item.review_count ??
+                    item.reviews ??
+                    ownerProfile?.review_count ??
+                    0
+                ),
+
+              price_per_hour:
+                hourlyPrice,
+
+              price_per_day:
+                dailyPrice,
+
+              hourlyPrice,
+
+              dailyPrice,
+
+              status:
+                "available",
+
+              is_verified:
+                item.is_verified,
+
+              availabilityStatus:
+                "available",
+            };
+          });
+
+      console.log(
+        "Normalized suggestion candidates:",
+        normalizedCandidates
+      );
+
+      // =====================================================
+      // 9. RANK THE CYCLES
+      // =====================================================
+
+      const ranked =
+        normalizedCandidates
+          .map((item) => ({
+            ...item,
+            _suggestionScore:
+              scoreSuggestion(item),
+          }))
+          .sort(
+            (a, b) =>
+              b._suggestionScore -
+              a._suggestionScore
+          )
+          .slice(0, 4);
+
+      console.log(
+        "FINAL SUGGESTIONS:",
+        ranked
+      );
+
+      if (!cancelled) {
+        setSuggestedCycles(ranked);
+      }
+
+    } catch (error) {
+      console.error(
+        "Unable to load cycle suggestions:",
+        error
+      );
+
+      if (!cancelled) {
+        setSuggestedCycles([]);
+      }
+
+    } finally {
+      if (!cancelled) {
+        setSuggestionsLoading(false);
+      }
+    }
+  };
+
+  loadSuggestions();
+
+  return () => {
+    cancelled = true;
+  };
+}, [
+  cycle?.id,
+  filterType,
+  filterGear,
+  filterLocation,
+]);
 
   const images =
     Array.isArray(cycle?.images) && cycle.images.length > 0
@@ -615,6 +1245,154 @@ function BookingPage({ cycle, onBack, onOwnerDetails }) {
               By confirming, your request will be sent to the cycle owner.
             </p>
           </aside>
+        </section>
+
+        {/* =====================================================
+            RELATED CYCLES — MAXIMUM 4 SUGGESTIONS
+            ===================================================== */}
+        <section className="cycle-suggestions" aria-label="Suggested cycles">
+          <div className="suggestions-heading">
+            <div>
+              <span className="eyebrow">YOU MAY ALSO LIKE</span>
+              <h2>More cycles for your ride</h2>
+              <p>
+                Suggestions based on this cycle and the preferences you used.
+              </p>
+            </div>
+
+            {suggestedCycles.length > 0 && (
+              <span className="suggestions-count">
+                {suggestedCycles.length} suggestions
+              </span>
+            )}
+          </div>
+
+          {suggestionsLoading ? (
+            <div className="suggestions-loading">
+              Finding similar cycles...
+            </div>
+          ) : suggestedCycles.length > 0 ? (
+            <div className="suggestions-grid">
+              {suggestedCycles.map((suggestion) => {
+                const suggestionImages = getCycleImages(suggestion);
+                const suggestionImage =
+                  suggestionImages[0] || null;
+
+                const suggestionGear =
+                  suggestion?.gearLabel ||
+                  (suggestion?.geared === true
+                    ? "Geared"
+                    : suggestion?.geared === false
+                      ? "Non-Geared"
+                      : "Not specified");
+
+                const suggestionOwner =
+                  suggestion?.ownerName ||
+                  suggestion?.owner_name ||
+                  suggestion?.owner?.full_name ||
+                  "Cycle owner";
+
+                const suggestionLocation =
+                  suggestion?.location ||
+                  "Location not available";
+
+                const suggestionRating =
+                  Number(suggestion?.rating) || 0;
+
+                return (
+                  <article
+                    className="suggestion-card"
+                    key={suggestion.id}
+                  >
+                    <div className="suggestion-image">
+                      {suggestionImage ? (
+                        <img
+                          src={suggestionImage}
+                          alt={suggestion.brand || "Cycle"}
+                        />
+                      ) : (
+                        <div className="suggestion-image-placeholder">
+                          🚲
+                        </div>
+                      )}
+
+                      <span className="suggestion-availability">
+                        <span />
+                        Available
+                      </span>
+                    </div>
+
+                    <div className="suggestion-details">
+                      <div className="suggestion-main">
+                        <h3>{suggestion.brand || "Cycle"}</h3>
+
+                        <div className="suggestion-location">
+                          ⌖ {suggestionLocation}
+                        </div>
+
+                        <div className="suggestion-rating">
+                          <span>★</span>
+                          {suggestionRating
+                            ? suggestionRating.toFixed(1)
+                            : "New"}
+                        </div>
+
+                        <div className="suggestion-tags">
+                          <span>{suggestionGear}</span>
+                          <span>
+                            {suggestion.condition || "Good Condition"}
+                          </span>
+                        </div>
+
+                        <div className="suggestion-owner">
+                          <span className="suggestion-owner-avatar">
+                            {String(suggestionOwner)
+                              .charAt(0)
+                              .toUpperCase()}
+                          </span>
+                          <strong>{suggestionOwner}</strong>
+                        </div>
+                      </div>
+
+                      <div className="suggestion-side">
+                        <div className="suggestion-prices">
+                          <strong>
+                            ₹{Number(suggestion.price_per_hour || 0).toFixed(0)}
+                          </strong>
+                          <span>/ hour</span>
+
+                          <strong>
+                            ₹{Number(suggestion.price_per_day || 0).toFixed(0)}
+                          </strong>
+                          <span>/ day</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="suggestion-view-btn"
+                          onClick={() => {
+                            if (typeof onCycleSelect === "function") {
+                              onCycleSelect(suggestion);
+                            } else {
+                              console.error(
+                                "BookingPage: onCycleSelect is not connected."
+                              );
+                            }
+                          }}
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="suggestions-empty">
+              No similar available cycles found right now.
+            </div>
+          )}
         </section>
       </main>
     </div>

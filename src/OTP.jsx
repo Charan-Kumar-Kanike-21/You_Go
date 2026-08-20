@@ -5,6 +5,7 @@ function OTP({ onBookingId, onBackToNotifications }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   const inputRefs = useRef([]);
 
@@ -69,9 +70,15 @@ function OTP({ onBookingId, onBackToNotifications }) {
       return;
     }
 
+    if (verifying) return;
+
+    setVerifying(true);
+    setError("");
+    setSuccess(false);
+
     try {
       const response = await fetch(
-        "https://stem61.app.n8n.cloud/webhook/otp-verification",
+        "https://ugo-cyclesharing.app.n8n.cloud/webhook/otp-verification",
         {
           method: "POST",
           headers: {
@@ -84,36 +91,74 @@ function OTP({ onBookingId, onBackToNotifications }) {
         }
       );
 
+      let result = null;
+
+      try {
+        result = await response.json();
+      } catch {
+        result = null;
+      }
+
+      console.log("n8n OTP verification response:", result);
+
       if (!response.ok) {
         throw new Error(
+          result?.message ||
           `OTP verification failed: ${response.status} ${response.statusText}`
         );
       }
 
-      const result = await response.json();
+      /*
+       * IMPORTANT:
+       * Do not show "Rental Started" merely because the HTTP
+       * request succeeded. Wait for the backend's actual
+       * verification response.
+       *
+       * Supported success response formats:
+       *   { verified: true }
+       *   { success: true }
+       *   { status: "verified" }
+       *   { status: "success" }
+       *   { message: "...verified..." }
+       */
+      const backendStatus = String(
+        result?.status ?? ""
+      ).trim().toLowerCase();
 
-      console.log("n8n response:", result);
+      const backendMessage = String(
+        result?.message ??
+        result?.response ??
+        result?.result ??
+        ""
+      ).trim().toLowerCase();
 
-      // OTP verification successful
-      setError("");
-      
+      const otpVerified =
+        result?.verified === true ||
+        result?.success === true ||
+        backendStatus === "verified" ||
+        backendStatus === "success" ||
+        backendMessage.includes("otp verified") ||
+        backendMessage.includes("otp verification successful") ||
+        backendMessage.includes("successfully verified");
+
+      if (!otpVerified) {
+        setError(
+          result?.message ||
+          "OTP verification was not confirmed by the backend. Please try again."
+        );
+        return;
+      }
+
+      setSuccess(true);
     } catch (error) {
       console.error("OTP verification error:", error);
-      setError("Unable to verify OTP. Please try again.");
+      setError(
+        error.message ||
+        "Unable to verify OTP. Please try again."
+      );
+    } finally {
+      setVerifying(false);
     }
-
-    /*
-     * TEMPORARY VERIFICATION
-     *
-     * Later this will call your backend/Supabase
-     * verification logic.
-     */
-
-    console.log("OTP entered:", enteredOtp);
-
-    // Demo success
-    setSuccess(true);
-    setError("");
   };
 
   const handleClear = () => {
@@ -277,17 +322,33 @@ function OTP({ onBookingId, onBackToNotifications }) {
         <button
           className="verify-button"
           onClick={handleVerify}
+          disabled={verifying}
         >
-          Verify & Start Rental
+          {verifying ? (
+            <>
+              <span className="otp-loading-spinner" aria-hidden="true"></span>
+              Verifying OTP...
+            </>
+          ) : (
+            "Verify & Start Rental"
+          )}
         </button>
 
         {/* Clear */}
         <button
           className="clear-button"
           onClick={handleClear}
+          disabled={verifying}
         >
           Clear OTP
         </button>
+
+        {verifying && (
+          <div className="otp-verifying-message" role="status">
+            <span className="otp-loading-spinner" aria-hidden="true"></span>
+            <span>Waiting for backend confirmation...</span>
+          </div>
+        )}
 
         <p className="security-note">
           🔒 The rental will begin only after

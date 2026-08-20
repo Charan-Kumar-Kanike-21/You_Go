@@ -3,6 +3,29 @@ import React, { useState, useEffect } from "react";
 import "./Listing.css";
 import { supabase } from "./supabase";
 
+
+const NITK_CYCLE_LOCATIONS = [
+  "GH-1 Ganga",
+  "GH-2 Kaveri",
+  "GH-3 Yamuna",
+  "GH-4 Sharavathi",
+  "GH-5 Nethravathi",
+  "GH-6 Godavari",
+  "Block-1 Karavali",
+  "Block-2 Aravali",
+  "Block-3 Vindhya",
+  "Block-4 Satpura",
+  "Block-5 Nilgiri",
+  "Block-7 Sahyadri",
+  "Block-8 Trishul",
+  "Block-11 Shiwalik",
+  "MT-1 Everest",
+  "MT-2 Himalaya",
+  "MT-3 Kailash",
+  "Brahmagiri",
+  "Pushpagiri",
+];
+
 function MyCycles({ onBack ,editCycleId}) {
 
   // =====================================================
@@ -1523,6 +1546,9 @@ form.elements.description.value =
               Cycle Location
             </h2>
 
+            <p className="section-description">
+              Select the NITK campus location where your cycle can be picked up.
+            </p>
 
             <div className="input-group">
 
@@ -1530,202 +1556,27 @@ form.elements.description.value =
                 Pickup / Cycle Location
               </label>
 
-
-              <input
-                type="text"
+              <select
                 name="location"
-                placeholder="Example: NITK Main Gate, Hostel Block, Surathkal"
                 required
-              />
-
-            </div>
-
-          </div>
-
-
-          {/* =================================================
-              AVAILABILITY
-          ================================================= */}
-
-          <div className="form-section">
-
-            <h2>
-              Cycle Availability
-            </h2>
-
-
-            <p className="section-description">
-              Set the time during which other students can rent or pick up your cycle.
-              Use the 24-hour clock.
-            </p>
-
-
-            <div className="form-grid">
-
-
-              <div className="input-group">
-
-                <label>
-                  Available From
-                </label>
-
-
-                <input
-                  type="time"
-                  name="availableFrom"
-                  min="00:00"
-                  max="23:59"
-                />
-
-
-                <span className="input-hint">
-                  Example: 09:00 = 9:00 AM
-                </span>
-
-              </div>
-
-
-              <div className="input-group">
-
-                <label>
-                  Available Until
-                </label>
-
-
-                <input
-                  type="time"
-                  name="availableUntil"
-                  min="00:00"
-                  max="23:59"
-                />
-
-
-                <span className="input-hint">
-                  Example: 18:30 = 6:30 PM
-                </span>
-
-              </div>
-
-
-            </div>
-
-
-            <div className="input-group availability-days-group">
-
-              <label>
-                Available Days
-              </label>
-
-
-              <div className="days-grid">
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="monday"
-                  />
-
-                  <span>
-                    Monday
-                  </span>
-
-                </label>
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="tuesday"
-                  />
-
-                  <span>
-                    Tuesday
-                  </span>
-
-                </label>
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="wednesday"
-                  />
-
-                  <span>
-                    Wednesday
-                  </span>
-
-                </label>
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="thursday"
-                  />
-
-                  <span>
-                    Thursday
-                  </span>
-
-                </label>
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="friday"
-                  />
-
-                  <span>
-                    Friday
-                  </span>
-
-                </label>
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="saturday"
-                  />
-
-                  <span>
-                    Saturday
-                  </span>
-
-                </label>
-
-
-                <label className="day-option">
-
-                  <input
-                    type="checkbox"
-                    name="availableDays"
-                    value="sunday"
-                  />
-
-                  <span>
-                    Sunday
-                  </span>
-
-                </label>
-
-
-              </div>
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Select a campus location
+                </option>
+
+                {NITK_CYCLE_LOCATIONS.map(
+                  (location) => (
+                    <option
+                      key={location}
+                      value={location}
+                    >
+                      {location}
+                    </option>
+                  )
+                )}
+
+              </select>
 
             </div>
 

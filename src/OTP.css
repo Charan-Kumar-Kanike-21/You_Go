@@ -882,3 +882,66 @@
     right: 9px !important;
   }
 }
+
+/* =========================================================
+   BACKEND OTP VERIFICATION LOADING STATE
+========================================================= */
+
+.verify-button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.clear-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.otp-loading-spinner {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  display: inline-block;
+  vertical-align: middle;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: otp-spin 0.75s linear infinite;
+}
+
+.verify-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.otp-verifying-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 13px 0 0;
+
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.otp-verifying-message .otp-loading-spinner {
+  width: 13px;
+  height: 13px;
+  flex-basis: 13px;
+  border-width: 2px;
+  border-color: #D7E1E8;
+  border-top-color: #163A5F;
+}
+
+@keyframes otp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
