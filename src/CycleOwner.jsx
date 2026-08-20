@@ -11,6 +11,11 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
 
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [statusChangingId, setStatusChangingId] = useState(null);
+  const [statusConfirmCycle, setStatusConfirmCycle] = useState(null);
+  const [dontAskStatusAgain, setDontAskStatusAgain] = useState(
+    localStorage.getItem("cycleStatusDontAskAgain") === "true"
+  );
   const [error, setError] = useState("");
 
     // =========================================
@@ -93,8 +98,7 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
             phone,
             avatar_url,
             hostel,
-            role,
-            is_verified
+            role
           `)
           .eq("id", user.id)
           .maybeSingle();
@@ -279,6 +283,60 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
       );
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  // =========================================
+  // CHANGE CYCLE STATUS
+  // =========================================
+
+  const changeCycleStatus = async (cycle) => {
+    const nextStatus =
+      cycle.status === "available" ? "unavailable" : "available";
+
+    setStatusChangingId(cycle.id);
+
+    try {
+      const { error: statusError } = await supabase
+        .from("cycles")
+        .update({
+          status: nextStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", cycle.id)
+        .eq("owner_id", cycle.owner_id);
+
+      if (statusError) throw statusError;
+
+      setCycles((previousCycles) =>
+        previousCycles.map((item) =>
+          item.id === cycle.id
+            ? { ...item, status: nextStatus }
+            : item
+        )
+      );
+
+      setStatusConfirmCycle(null);
+    } catch (err) {
+      console.error("Status update error:", err);
+      alert(err.message || "Unable to change the cycle status.");
+    } finally {
+      setStatusChangingId(null);
+    }
+  };
+
+  const requestStatusChange = (cycle) => {
+    if (dontAskStatusAgain) {
+      changeCycleStatus(cycle);
+      return;
+    }
+
+    setStatusConfirmCycle(cycle);
+  };
+
+  const confirmStatusChange = () => {
+    if (statusConfirmCycle) {
+      changeCycleStatus(statusConfirmCycle);
     }
   };
 
@@ -574,6 +632,7 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
 
                 <div
                   className="owner-cycle-card"
+                    data-status={cycle.status}
                   key={cycle.id}
                 >
 
@@ -703,28 +762,43 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
                     
 
                     <div className="Owner-Edit-Delete">
-                    <button
-                      className="edit-cycle-btn"
-                      onClick={() => onEditCycle(cycle.id)}
-                    >
-                      ✏️ Edit Cycle
-                    </button>
 
-                    {/* DELETE */}
+                      {cycle.status !== "pending" && (
+                        <button
+                          className={
+                            cycle.status === "available"
+                              ? "change-status-btn make-unavailable"
+                              : "change-status-btn make-available"
+                          }
+                          onClick={() => requestStatusChange(cycle)}
+                          disabled={statusChangingId === cycle.id}
+                          type="button"
+                        >
+                          {statusChangingId === cycle.id
+                            ? "Updating..."
+                            : cycle.status === "available"
+                              ? "⏸ Make Unavailable"
+                              : "▶ Make Available"}
+                        </button>
+                      )}
 
-                    <button
-                      className="delete-cycle-btn"
-                      onClick={() =>
-                        handleDelete(cycle)
-                      }
-                      disabled={
-                        deletingId === cycle.id
-                      }
-                    >
-                      {deletingId === cycle.id
-                        ? "Deleting..."
-                        : "🗑 Delete Cycle"}
-                    </button>
+                      <button
+                        className="edit-cycle-btn"
+                        onClick={() => onEditCycle(cycle.id)}
+                        type="button"
+                      >
+                        ✏️ Edit
+                      </button>
+
+                      <button
+                        className="delete-cycle-btn"
+                        onClick={() => handleDelete(cycle)}
+                        disabled={deletingId === cycle.id}
+                        type="button"
+                      >
+                        {deletingId === cycle.id ? "Deleting..." : "🗑 Delete"}
+                      </button>
+
                     </div>
 
                   </div>
@@ -739,6 +813,84 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
 
       </main>
 
+
+      {/* =========================================
+          STATUS CONFIRMATION
+      ========================================= */}
+
+      {statusConfirmCycle && (
+        <div className="status-confirm-overlay">
+          <div
+            className="status-confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="status-confirm-title"
+          >
+            <div className="status-confirm-icon">
+              {statusConfirmCycle.status === "available" ? "⏸" : "▶"}
+            </div>
+
+            <h2 id="status-confirm-title">
+              Change cycle status?
+            </h2>
+
+            <p>
+              Do you want to make{" "}
+              <strong>
+                {statusConfirmCycle.brand || "this cycle"}
+              </strong>{" "}
+              {statusConfirmCycle.status === "available"
+                ? "unavailable"
+                : "available"}?
+            </p>
+
+            <label className="dont-ask-status">
+              <input
+                type="checkbox"
+                checked={dontAskStatusAgain}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setDontAskStatusAgain(checked);
+
+                  if (checked) {
+                    localStorage.setItem(
+                      "cycleStatusDontAskAgain",
+                      "true"
+                    );
+                  } else {
+                    localStorage.removeItem(
+                      "cycleStatusDontAskAgain"
+                    );
+                  }
+                }}
+              />
+              <span>Don't ask me again</span>
+            </label>
+
+            <div className="status-confirm-actions">
+              <button
+                type="button"
+                className="status-cancel-btn"
+                onClick={() => setStatusConfirmCycle(null)}
+                disabled={statusChangingId === statusConfirmCycle.id}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="status-confirm-btn"
+                onClick={confirmStatusChange}
+                disabled={statusChangingId === statusConfirmCycle.id}
+              >
+                {statusChangingId === statusConfirmCycle.id
+                  ? "Updating..."
+                  : "OK, Change Status"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =========================================
           FOOTER

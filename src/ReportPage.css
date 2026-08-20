@@ -12,10 +12,10 @@
   background:
     radial-gradient(
       circle at top,
-      rgba(0, 255, 150, 0.08),
+      #EAF2F8,
       transparent 45%
     ),
-    #02140d;
+    #F7F9FC;
 
   color: white;
 }
@@ -29,9 +29,9 @@
 
   border-radius: 24px;
 
-  background: rgba(4, 35, 25, 0.9);
+  background: #FFFFFF;
 
-  border: 1px solid rgba(0, 255, 150, 0.15);
+  border: 1px solid #E5E7EB;
 
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.4);
@@ -44,7 +44,7 @@
 
   background: transparent;
 
-  color: #8fb7a4;
+  color: #667085;
 
   font-size: 15px;
 
@@ -87,7 +87,7 @@
 .report-header p {
   margin-top: 10px;
 
-  color: #7fa694;
+  color: #667085;
 }
 
 .reported-cycle {
@@ -103,9 +103,9 @@
 
   border-radius: 15px;
 
-  background: rgba(0, 0, 0, 0.18);
+  background: #F7F9FC;
 
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid #E5E7EB;
 }
 
 .reported-cycle div {
@@ -119,7 +119,7 @@
 .reported-cycle span {
   font-size: 12px;
 
-  color: #6d9582;
+  color: #667085;
 
   text-transform: uppercase;
 }
@@ -127,7 +127,7 @@
 .reported-cycle strong {
   font-size: 15px;
 
-  color: #d9eee4;
+  color: #172027;
 }
 
 .report-field {
@@ -139,7 +139,7 @@
 
   margin-bottom: 10px;
 
-  color: #b9d4c6;
+  color: #344054;
 
   font-size: 14px;
 }
@@ -157,9 +157,9 @@
 
   border-radius: 14px;
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #D8E1E7;
 
-  background: rgba(0, 0, 0, 0.25);
+  background: #FFFFFF;
 
   color: white;
 
@@ -171,7 +171,7 @@
 }
 
 .report-field textarea:focus {
-  border-color: #31e98a;
+  border-color: #163A5F;
 
   box-shadow:
     0 0 0 3px rgba(49, 233, 138, 0.07);
@@ -182,7 +182,7 @@
 
   margin-top: 6px;
 
-  color: #587969;
+  color: #98A2B3;
 
   font-size: 12px;
 }
@@ -194,11 +194,11 @@
 
   border-radius: 10px;
 
-  background: rgba(255, 60, 60, 0.1);
+  background: #FEF3F2;
 
-  border: 1px solid rgba(255, 60, 60, 0.2);
+  border: 1px solid #F2C7C4;
 
-  color: #ff9999;
+  color: #D64545;
 
   font-size: 14px;
 }
@@ -214,9 +214,9 @@
 
   border-radius: 12px;
 
-  background: #28df80;
+  background: #163A5F;
 
-  color: #02140d;
+  color: #F7F9FC;
 
   font-size: 16px;
 
@@ -231,7 +231,7 @@
   transform: translateY(-1px);
 
   box-shadow:
-    0 8px 25px rgba(40, 223, 128, 0.18);
+    0 8px 25px rgba(22, 58, 95, 0.15);
 }
 
 .submit-report-btn:disabled {
@@ -245,7 +245,7 @@
 
   margin-top: 18px;
 
-  color: #628777;
+  color: #98A2B3;
 
   font-size: 12px;
 }
@@ -258,5 +258,140 @@
 
   .reported-cycle {
     grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   NITK CYCLE SHARING — FINAL REPORT PAGE THEME
+   Existing JSX class names and Supabase connections unchanged.
+========================================================= */
+
+.report-page {
+  --nitk-bg: #F7F9FC;
+  --nitk-white: #FFFFFF;
+  --nitk-navy: #163A5F;
+  --nitk-navy-dark: #0F2D4A;
+  --nitk-blue-soft: #EAF2F8;
+  --nitk-green: #2E8B70;
+  --nitk-text: #172027;
+  --nitk-secondary: #667085;
+  --nitk-muted: #98A2B3;
+  --nitk-border: #E5E7EB;
+}
+
+.report-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow:
+    0 18px 45px rgba(22, 58, 95, 0.07);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.report-back-btn {
+  color: #163A5F;
+}
+
+.report-back-btn:hover {
+  color: #0F2D4A;
+}
+
+.report-icon {
+  background: #FEF3F2;
+  border: 1px solid #F2C7C4;
+  color: #D64545;
+}
+
+.report-header h1 {
+  color: #163A5F;
+}
+
+.report-header p {
+  color: #667085;
+}
+
+.reported-cycle {
+  background: #F7F9FC;
+  border-color: #E5E7EB;
+}
+
+.reported-cycle span {
+  color: #667085;
+}
+
+.reported-cycle strong {
+  color: #172027;
+}
+
+.report-field label {
+  color: #344054;
+}
+
+.report-field textarea {
+  background: #FFFFFF;
+  border-color: #D8E1E7;
+  color: #172027;
+  box-shadow:
+    0 2px 8px rgba(22, 58, 95, 0.025);
+}
+
+.report-field textarea::placeholder {
+  color: #98A2B3;
+}
+
+.report-field textarea:focus {
+  border-color: #163A5F;
+  box-shadow:
+    0 0 0 3px rgba(22, 58, 95, 0.08);
+}
+
+.character-count {
+  color: #98A2B3;
+}
+
+.report-error {
+  background: #FEF3F2;
+  border-color: #F2C7C4;
+  color: #D64545;
+}
+
+.submit-report-btn {
+  background: #163A5F;
+  color: #FFFFFF;
+}
+
+.submit-report-btn:hover:not(:disabled) {
+  background: #0F2D4A;
+  box-shadow:
+    0 9px 24px rgba(22, 58, 95, 0.16);
+}
+
+.report-note {
+  color: #98A2B3;
+}
+
+@media (max-width: 600px) {
+  .report-page {
+    padding: 28px 14px;
+  }
+
+  .report-card {
+    padding: 25px 18px;
+    border-radius: 16px;
+    box-shadow:
+      0 12px 30px rgba(22, 58, 95, 0.06);
+  }
+
+  .report-header h1 {
+    font-size: 26px;
+  }
+
+  .report-field textarea {
+    min-height: 145px;
+    font-size: 14px;
+  }
+
+  .submit-report-btn {
+    min-height: 50px;
   }
 }

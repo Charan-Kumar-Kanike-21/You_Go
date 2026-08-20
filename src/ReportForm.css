@@ -24,12 +24,12 @@
   background:
     radial-gradient(
       circle at top left,
-      rgba(33, 91, 99, 0.35),
+      rgba(234, 242, 248, 0.95),
       transparent 35%
     ),
-    #061c17;
+    #F7F9FC;
 
-  color: #fff6de;
+  color: #172027;
 }
 
 
@@ -41,16 +41,16 @@
   width: 100%;
   max-width: 720px;
 
-  background: rgba(255, 246, 222, 0.06);
+  background: #FFFFFF;
 
-  border: 1px solid rgba(255, 246, 222, 0.12);
+  border: 1px solid #E5E7EB;
 
   border-radius: 24px;
 
   padding: 32px;
 
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.35);
+    0 20px 60px rgba(22, 58, 95, 0.07);
 
   backdrop-filter: blur(12px);
 }
@@ -79,7 +79,7 @@
 
   max-width: 560px;
 
-  color: rgba(255, 246, 222, 0.7);
+  color: #667085;
 
   line-height: 1.6;
 }
@@ -96,13 +96,13 @@
 
   padding: 10px 16px;
 
-  border: 1px solid rgba(255, 246, 222, 0.18);
+  border: 1px solid #D8E1E7;
 
   border-radius: 10px;
 
-  background: rgba(255, 246, 222, 0.06);
+  background: #FFFFFF;
 
-  color: #fff6de;
+  color: #172027;
 
   font-size: 14px;
 
@@ -113,7 +113,7 @@
 
 
 .report-back-btn:hover {
-  background: rgba(255, 246, 222, 0.12);
+  background: #E5E7EB;
 
   transform: translateX(-2px);
 }
@@ -135,7 +135,7 @@
 
   border-radius: 50%;
 
-  background: rgba(201, 124, 124, 0.16);
+  background: #FEF3F2;
 
   font-size: 28px;
 }
@@ -162,9 +162,9 @@
 
   border-radius: 14px;
 
-  background: rgba(255, 246, 222, 0.05);
+  background: #F7F9FC;
 
-  border: 1px solid rgba(255, 246, 222, 0.1);
+  border: 1px solid #E5E7EB;
 }
 
 
@@ -179,14 +179,14 @@
 
   letter-spacing: 0.08em;
 
-  color: rgba(255, 246, 222, 0.5);
+  color: #667085;
 }
 
 
 .cycle-info-item strong {
   font-size: 15px;
 
-  color: #fff6de;
+  color: #172027;
 }
 
 
@@ -219,7 +219,7 @@
 
   font-weight: 600;
 
-  color: #fff6de;
+  color: #172027;
 }
 
 
@@ -236,9 +236,9 @@
 
   border: 1px solid rgba(255, 246, 222, 0.15);
 
-  background: #0b2b24;
+  background: #FFFFFF;
 
-  color: #fff6de;
+  color: #172027;
 
   outline: none;
 
@@ -249,10 +249,10 @@
 
 
 .report-field select:focus {
-  border-color: #c97c7c;
+  border-color: #D64545;
 
   box-shadow:
-    0 0 0 3px rgba(201, 124, 124, 0.12);
+    0 0 0 3px #FEF3F2;
 }
 
 
@@ -273,9 +273,9 @@
 
   border: 1px solid rgba(255, 246, 222, 0.15);
 
-  background: #0b2b24;
+  background: #FFFFFF;
 
-  color: #fff6de;
+  color: #172027;
 
   outline: none;
 
@@ -288,15 +288,15 @@
 
 
 .report-field textarea::placeholder {
-  color: rgba(255, 246, 222, 0.4);
+  color: #98A2B3;
 }
 
 
 .report-field textarea:focus {
-  border-color: #c97c7c;
+  border-color: #D64545;
 
   box-shadow:
-    0 0 0 3px rgba(201, 124, 124, 0.12);
+    0 0 0 3px #FEF3F2;
 }
 
 
@@ -324,11 +324,11 @@
 
   border-radius: 10px;
 
-  background: rgba(201, 124, 124, 0.12);
+  background: #FEF3F2;
 
-  border: 1px solid rgba(201, 124, 124, 0.3);
+  border: 1px solid #F2C7C4;
 
-  color: #ffcaca;
+  color: #D64545;
 
   font-size: 14px;
 
@@ -349,7 +349,7 @@
 
   border-radius: 12px;
 
-  background: #c97c7c;
+  background: #163A5F;
 
   color: #fff;
 
@@ -367,7 +367,7 @@
   transform: translateY(-1px);
 
   box-shadow:
-    0 8px 25px rgba(201, 124, 124, 0.25);
+    0 8px 25px rgba(22, 58, 95, 0.16);
 }
 
 
@@ -387,7 +387,7 @@
 
   text-align: center;
 
-  color: rgba(255, 246, 222, 0.5);
+  color: #667085;
 
   font-size: 12px;
 
@@ -448,4 +448,186 @@
     grid-template-columns: 1fr;
   }
 
+}
+
+/* =========================================================
+   NITK CYCLE SHARING — REPORT FORM THEME
+   Existing JSX class names and Supabase connection unchanged.
+========================================================= */
+
+.report-page {
+  --nitk-bg: #F7F9FC;
+  --nitk-white: #FFFFFF;
+  --nitk-navy: #163A5F;
+  --nitk-navy-dark: #0F2D4A;
+  --nitk-blue-soft: #EAF2F8;
+  --nitk-green: #2E8B70;
+  --nitk-green-soft: #EAF5F1;
+  --nitk-text: #172027;
+  --nitk-secondary: #667085;
+  --nitk-muted: #98A2B3;
+  --nitk-border: #E5E7EB;
+  --nitk-danger: #D64545;
+}
+
+.report-page {
+  background:
+    radial-gradient(
+      circle at 92% 4%,
+      rgba(234, 242, 248, 0.95),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 5% 75%,
+      rgba(234, 245, 241, 0.72),
+      transparent 28%
+    ),
+    #F7F9FC;
+  color: #172027;
+}
+
+.report-card {
+  background: #FFFFFF;
+  border-color: #E5E7EB;
+  border-radius: 18px;
+  box-shadow:
+    0 18px 45px rgba(22, 58, 95, 0.07);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.report-header h1,
+.report-card > h2 {
+  color: #163A5F;
+}
+
+.report-header p,
+.report-card > p {
+  color: #667085;
+}
+
+.report-back-btn {
+  background: #FFFFFF;
+  border-color: #D8E1E7;
+  color: #163A5F;
+}
+
+.report-back-btn:hover {
+  background: #EAF2F8;
+  border-color: #C9D9E3;
+  color: #0F2D4A;
+  transform: translateX(-2px);
+}
+
+.report-icon {
+  background: #FEF3F2;
+  border-color: #F2C7C4;
+  color: #D64545;
+}
+
+.reported-cycle {
+  background: transparent;
+}
+
+.cycle-info-item {
+  background: #F7F9FC;
+  border-color: #E5E7EB;
+}
+
+.cycle-info-item span {
+  color: #667085;
+}
+
+.cycle-info-item strong {
+  color: #172027;
+}
+
+.report-field label {
+  color: #344054;
+}
+
+.report-field select,
+.report-field textarea {
+  background: #FFFFFF;
+  border-color: #D8E1E7;
+  color: #172027;
+  box-shadow:
+    0 2px 8px rgba(22, 58, 95, 0.025);
+}
+
+.report-field select:focus,
+.report-field textarea:focus {
+  border-color: #163A5F;
+  box-shadow:
+    0 0 0 3px rgba(22, 58, 95, 0.08);
+}
+
+.report-field select {
+  color: #172027;
+}
+
+.report-field select option {
+  background: #FFFFFF;
+  color: #172027;
+}
+
+.report-field textarea::placeholder {
+  color: #98A2B3;
+}
+
+.character-count {
+  color: #98A2B3;
+}
+
+.report-error {
+  background: #FEF3F2;
+  border-color: #F2C7C4;
+  color: #D64545;
+}
+
+.submit-report-btn {
+  background: #163A5F;
+  color: #FFFFFF;
+  border: 1px solid #163A5F;
+}
+
+.submit-report-btn:hover:not(:disabled) {
+  background: #0F2D4A;
+  border-color: #0F2D4A;
+  box-shadow:
+    0 9px 24px rgba(22, 58, 95, 0.16);
+}
+
+.report-note {
+  color: #98A2B3;
+}
+
+.report-empty-icon {
+  color: #D99A24;
+}
+
+@media (max-width: 600px) {
+  .report-page {
+    padding: 24px 12px;
+  }
+
+  .report-card {
+    padding: 22px 18px;
+    border-radius: 15px;
+    box-shadow:
+      0 12px 30px rgba(22, 58, 95, 0.06);
+  }
+
+  .report-header h1 {
+    font-size: 27px;
+  }
+
+  .report-field select,
+  .report-field textarea {
+    font-size: 14px;
+  }
+
+  .submit-report-btn {
+    min-height: 50px;
+  }
 }

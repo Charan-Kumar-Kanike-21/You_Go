@@ -2374,3 +2374,1115 @@ button:focus-visible {
       none;
   }
 }
+
+/* =========================================================
+   COMPACT CYCLE OWNER CARDS + STATUS CONTROL
+========================================================= */
+
+.owner-cycle-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  gap: 18px !important;
+}
+
+.owner-cycle-image {
+  height: 155px !important;
+}
+
+.owner-cycle-details {
+  padding: 14px !important;
+}
+
+.owner-cycle-title {
+  margin-bottom: 11px !important;
+}
+
+.owner-cycle-title h3 {
+  font-size: 18px !important;
+}
+
+.owner-cycle-info {
+  gap: 7px !important;
+  margin-bottom: 10px !important;
+}
+
+.owner-cycle-info div {
+  padding: 8px !important;
+}
+
+.owner-cycle-location {
+  padding: 8px 0 !important;
+  font-size: 11px !important;
+}
+
+.owner-cycle-pricing {
+  padding: 10px 0 !important;
+  gap: 7px !important;
+}
+
+.owner-cycle-pricing strong {
+  font-size: 16px !important;
+}
+
+.Owner-Edit-Delete {
+  gap: 7px !important;
+}
+
+.Owner-Edit-Delete button {
+  min-height: 37px !important;
+  padding: 8px 9px !important;
+  border-radius: 8px !important;
+  font-size: 10px !important;
+}
+
+.change-status-btn {
+  flex: 1.25 !important;
+  min-height: 37px !important;
+  padding: 8px 9px !important;
+  border-radius: 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+}
+
+.change-status-btn.make-unavailable {
+  border: 1px solid #D8C7A1 !important;
+  background: #FFF9EA !important;
+  color: #8A6818 !important;
+}
+
+.change-status-btn.make-available {
+  border: 1px solid #BFDCCD !important;
+  background: #EAF5F1 !important;
+  color: #26765F !important;
+}
+
+.change-status-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   STATUS CONFIRMATION
+========================================================= */
+
+.status-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background: rgba(15, 45, 74, .34);
+  backdrop-filter: blur(5px);
+}
+
+.status-confirm-dialog {
+  width: min(390px, 100%);
+  padding: 24px;
+
+  border: 1px solid #DCE7EF;
+  border-radius: 17px;
+
+  background: #FFF;
+  text-align: center;
+
+  box-shadow: 0 22px 55px rgba(22, 58, 95, .18);
+}
+
+.status-confirm-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+  background: #EAF2F8;
+  color: #163A5F;
+  font-size: 22px;
+}
+
+.status-confirm-dialog h2 {
+  margin: 0;
+  color: #163A5F;
+  font-size: 19px;
+}
+
+.status-confirm-dialog p {
+  margin: 9px 0 16px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.status-confirm-dialog p strong {
+  color: #172027;
+}
+
+.dont-ask-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin-bottom: 17px;
+
+  color: #667085;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.dont-ask-status input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #2E8B70;
+}
+
+.status-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 8px;
+}
+
+.status-cancel-btn,
+.status-confirm-btn {
+  min-height: 38px;
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status-cancel-btn {
+  border: 1px solid #D8E1E8;
+  background: #FFF;
+  color: #163A5F;
+}
+
+.status-confirm-btn {
+  border: 1px solid #163A5F;
+  background: #163A5F;
+  color: #FFF;
+}
+
+.status-cancel-btn:disabled,
+.status-confirm-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MOBILE OWNER CARD
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .owner-cycle-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .owner-cycle-card {
+    display: grid !important;
+
+    grid-template-columns: 126px minmax(0, 1fr) !important;
+    grid-template-rows: 100px !important;
+
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    border-radius: 9px !important;
+  }
+
+  .owner-cycle-image {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 126px !important;
+    height: 100px !important;
+
+    border-radius: 8px 0 0 8px !important;
+  }
+
+  .owner-cycle-details {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    height: 100px !important;
+
+    min-width: 0 !important;
+
+    padding: 7px 8px !important;
+
+    overflow: hidden !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  .owner-cycle-title {
+    margin: 0 !important;
+  }
+
+  .owner-cycle-title h3 {
+    font-size: 11px !important;
+  }
+
+  .owner-cycle-title p {
+    font-size: 7px !important;
+  }
+
+  .owner-cycle-info {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 4px !important;
+    margin: 0 !important;
+  }
+
+  .owner-cycle-info div {
+    padding: 4px 5px !important;
+  }
+
+  .owner-cycle-info span,
+  .owner-cycle-pricing span {
+    font-size: 5px !important;
+  }
+
+  .owner-cycle-info strong {
+    font-size: 6.5px !important;
+  }
+
+  .owner-cycle-location {
+    padding: 3px 0 !important;
+    font-size: 6px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-cycle-pricing {
+    padding: 3px 0 !important;
+  }
+
+  .owner-cycle-pricing strong {
+    font-size: 10px !important;
+  }
+
+  .Owner-Edit-Delete {
+    gap: 4px !important;
+  }
+
+  .Owner-Edit-Delete button {
+    min-height: 22px !important;
+    padding: 4px 5px !important;
+    font-size: 6px !important;
+    border-radius: 5px !important;
+  }
+
+  .change-status-btn {
+    flex: 1.35 !important;
+  }
+
+  .status-badge {
+    top: 6px !important;
+    left: 6px !important;
+    padding: 3px 6px !important;
+    font-size: 6px !important;
+  }
+
+  .status-confirm-dialog {
+    padding: 20px 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .status-confirm-dialog h2 {
+    font-size: 17px !important;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .owner-cycle-card {
+    grid-template-columns: 116px minmax(0, 1fr) !important;
+  }
+
+  .owner-cycle-image {
+    width: 116px !important;
+  }
+
+  .owner-cycle-details {
+    padding: 6px 7px !important;
+  }
+
+  .owner-cycle-title h3 {
+    font-size: 10px !important;
+  }
+
+  .owner-cycle-info strong {
+    font-size: 6px !important;
+  }
+
+  .owner-cycle-pricing strong {
+    font-size: 9px !important;
+  }
+
+  .Owner-Edit-Delete button {
+    font-size: 5.5px !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL MOBILE CYCLE CARD
+   Matches the compact Home Rental style
+   Desktop styles above remain unchanged.
+========================================================= */
+
+@media (max-width: 700px) {
+
+  /* One compact horizontal card */
+  .owner-cycle-grid {
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+
+  .owner-cycle-card {
+    display: grid !important;
+
+    grid-template-columns: 126px minmax(0, 1fr) !important;
+    grid-template-rows: 100px !important;
+
+    width: 100% !important;
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    overflow: hidden !important;
+
+    border-radius: 9px !important;
+    box-shadow: 0 2px 7px rgba(22, 58, 95, 0.05) !important;
+  }
+
+  /* ---------------------------------------------------------
+     IMAGE
+  --------------------------------------------------------- */
+
+  .owner-cycle-image {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 126px !important;
+    height: 100px !important;
+
+    min-width: 126px !important;
+    max-width: 126px !important;
+
+    border-radius: 8px 0 0 8px !important;
+  }
+
+  .owner-cycle-image img {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+  }
+
+  .no-cycle-image {
+    width: 100% !important;
+    height: 100% !important;
+
+    font-size: 36px !important;
+  }
+
+  /* Status stays inside image, like Home Rental */
+  .status-badge {
+    top: 6px !important;
+    left: 6px !important;
+
+    padding: 3px 6px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6px !important;
+    line-height: 8px !important;
+
+    z-index: 5 !important;
+  }
+
+  /* ---------------------------------------------------------
+     DETAILS
+  --------------------------------------------------------- */
+
+  .owner-cycle-details {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    height: 100px !important;
+
+    min-width: 0 !important;
+
+    padding: 7px 8px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+
+    overflow: hidden !important;
+  }
+
+  /* Cycle name + model */
+  .owner-cycle-title {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: block !important;
+  }
+
+  .owner-cycle-title h3 {
+    margin: 0 !important;
+
+    color: #163A5F !important;
+
+    font-size: 11px !important;
+    line-height: 13px !important;
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-cycle-title p {
+    margin: 1px 0 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 9px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Remove decorative bicycle from details */
+  .owner-cycle-title > span {
+    display: none !important;
+  }
+
+  /* ---------------------------------------------------------
+     TYPE + CONDITION
+     Convert large boxes into small chips.
+  --------------------------------------------------------- */
+
+  .owner-cycle-info {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .owner-cycle-info div {
+    width: auto !important;
+
+    min-width: 0 !important;
+
+    padding: 3px 6px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+
+    background: #F1F4F7 !important;
+
+    border: 0 !important;
+    border-radius: 5px !important;
+  }
+
+  .owner-cycle-info span {
+    display: none !important;
+  }
+
+  .owner-cycle-info strong {
+    display: block !important;
+
+    max-width: 85px !important;
+
+    color: #667085 !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+    font-weight: 600 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ---------------------------------------------------------
+     LOCATION
+  --------------------------------------------------------- */
+
+  .owner-cycle-location {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 2px 0 !important;
+
+    border: 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ---------------------------------------------------------
+     PRICE
+  --------------------------------------------------------- */
+
+  .owner-cycle-pricing {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: baseline !important;
+
+    gap: 10px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .owner-cycle-pricing div {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2px !important;
+
+    text-align: left !important;
+  }
+
+  .owner-cycle-pricing span {
+    display: inline !important;
+
+    margin: 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 5.5px !important;
+  }
+
+  .owner-cycle-pricing strong {
+    display: inline !important;
+
+    color: #172027 !important;
+
+    font-size: 9px !important;
+    line-height: 10px !important;
+    font-weight: 750 !important;
+  }
+
+  /* ---------------------------------------------------------
+     ACTION
+     Only Change Status is visible on mobile.
+  --------------------------------------------------------- */
+
+  .Owner-Edit-Delete {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    gap: 0 !important;
+  }
+
+  .Owner-Edit-Delete .edit-cycle-btn,
+  .Owner-Edit-Delete .delete-cycle-btn {
+    display: none !important;
+  }
+
+  .Owner-Edit-Delete .change-status-btn {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 23px !important;
+    height: 23px !important;
+
+    padding: 4px 8px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+  }
+
+  .Owner-Edit-Delete .change-status-btn.make-unavailable {
+    background: #163A5F !important;
+    border-color: #163A5F !important;
+    color: #FFFFFF !important;
+  }
+
+  .Owner-Edit-Delete .change-status-btn.make-available {
+    background: #EAF5F1 !important;
+    border-color: #BFDCCD !important;
+    color: #26765F !important;
+  }
+
+  /* ---------------------------------------------------------
+     Smaller phones
+  --------------------------------------------------------- */
+
+  @media (max-width: 400px) {
+
+    .owner-cycle-card {
+      grid-template-columns: 116px minmax(0, 1fr) !important;
+    }
+
+    .owner-cycle-image {
+      width: 116px !important;
+      min-width: 116px !important;
+      max-width: 116px !important;
+    }
+
+    .owner-cycle-details {
+      padding: 6px 7px !important;
+    }
+
+    .owner-cycle-title h3 {
+      font-size: 10px !important;
+    }
+
+    .owner-cycle-title p {
+      font-size: 6.5px !important;
+    }
+
+    .owner-cycle-info strong {
+      font-size: 6px !important;
+    }
+
+    .owner-cycle-location {
+      font-size: 6px !important;
+    }
+
+    .owner-cycle-pricing {
+      gap: 7px !important;
+    }
+
+    .owner-cycle-pricing strong {
+      font-size: 8.5px !important;
+    }
+
+    .owner-cycle-pricing span {
+      font-size: 5px !important;
+    }
+
+    .Owner-Edit-Delete .change-status-btn {
+      height: 22px !important;
+      min-height: 22px !important;
+
+      font-size: 6px !important;
+    }
+  }
+}
+
+
+
+/* =========================================================
+   FINAL MOBILE OWNER CARD — 3 ACTIONS IN ONE ROW
+   ---------------------------------------------------------
+   Keeps:
+   IMAGE | DETAILS
+   and fits Location + Price + all actions inside the
+   compact 100px card.
+
+   Pending:
+     Edit + Delete only
+   Available/Unavailable:
+     Change Status + Edit + Delete
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .owner-cycle-card {
+    grid-template-columns: 126px minmax(0, 1fr) !important;
+    grid-template-rows: 100px !important;
+
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+  }
+
+  .owner-cycle-image {
+    width: 126px !important;
+    min-width: 126px !important;
+    max-width: 126px !important;
+    height: 100px !important;
+  }
+
+  .owner-cycle-details {
+    width: 100% !important;
+    height: 100px !important;
+    min-width: 0 !important;
+
+    padding: 5px 7px !important;
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns: minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      14px
+      16px
+      12px
+      13px
+      22px !important;
+
+    row-gap: 2px !important;
+
+    align-content: start !important;
+
+    overflow: hidden !important;
+  }
+
+  /* Row 1 — name/model */
+  .owner-cycle-title {
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    height: 14px !important;
+
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  .owner-cycle-title > div {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .owner-cycle-title h3 {
+    margin: 0 !important;
+
+    font-size: 10px !important;
+    line-height: 11px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-cycle-title p {
+    margin: 0 !important;
+
+    font-size: 5.5px !important;
+    line-height: 6px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-cycle-title > span {
+    display: none !important;
+  }
+
+  /* Row 2 — type + condition */
+  .owner-cycle-info {
+    grid-row: 2 !important;
+
+    width: 100% !important;
+    height: 16px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .owner-cycle-info div {
+    width: auto !important;
+    min-width: 0 !important;
+
+    height: 15px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    padding: 2px 5px !important;
+
+    border-radius: 5px !important;
+    background: #F1F4F7 !important;
+  }
+
+  .owner-cycle-info span {
+    display: none !important;
+  }
+
+  .owner-cycle-info strong {
+    max-width: 55px !important;
+
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Row 3 — location is now guaranteed its own row */
+  .owner-cycle-location {
+    grid-row: 3 !important;
+
+    width: 100% !important;
+    height: 12px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Row 4 — pricing */
+  .owner-cycle-pricing {
+    grid-row: 4 !important;
+
+    width: 100% !important;
+    height: 13px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 9px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .owner-cycle-pricing div {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .owner-cycle-pricing span {
+    display: inline !important;
+
+    margin: 0 !important;
+
+    font-size: 4.8px !important;
+    line-height: 6px !important;
+  }
+
+  .owner-cycle-pricing strong {
+    font-size: 8px !important;
+    line-height: 9px !important;
+  }
+
+  /* Row 5 — all three actions in one line */
+  .Owner-Edit-Delete {
+    grid-row: 5 !important;
+
+    width: 100% !important;
+    height: 22px !important;
+
+    display: flex !important;
+    align-items: stretch !important;
+
+    gap: 3px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  .Owner-Edit-Delete button {
+    height: 22px !important;
+    min-height: 22px !important;
+
+    margin: 0 !important;
+    padding: 3px 4px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Status gets the largest share, but no longer consumes
+     the entire row. */
+  .Owner-Edit-Delete .change-status-btn {
+    display: flex !important;
+
+    flex: 1.65 1 0 !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Edit and Delete stay visible on mobile. */
+  .Owner-Edit-Delete .edit-cycle-btn,
+  .Owner-Edit-Delete .delete-cycle-btn {
+    display: flex !important;
+
+    flex: 0.8 1 0 !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Pending has no Change Status button because JSX already
+     does not render it. Edit + Delete automatically share
+     the available row. */
+  .owner-cycle-card[data-status="pending"]
+    .Owner-Edit-Delete .edit-cycle-btn,
+  .owner-cycle-card[data-status="pending"]
+    .Owner-Edit-Delete .delete-cycle-btn {
+    flex: 1 1 0 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     VERY SMALL PHONES
+  ------------------------------------------------------- */
+
+  @media (max-width: 400px) {
+
+    .owner-cycle-card {
+      grid-template-columns: 116px minmax(0, 1fr) !important;
+    }
+
+    .owner-cycle-image {
+      width: 116px !important;
+      min-width: 116px !important;
+      max-width: 116px !important;
+    }
+
+    .owner-cycle-details {
+      padding: 5px 6px !important;
+    }
+
+    .owner-cycle-title h3 {
+      font-size: 9px !important;
+    }
+
+    .owner-cycle-title p {
+      font-size: 5px !important;
+    }
+
+    .owner-cycle-info strong {
+      font-size: 5px !important;
+    }
+
+    .owner-cycle-location {
+      font-size: 5px !important;
+    }
+
+    .owner-cycle-pricing {
+      gap: 6px !important;
+    }
+
+    .owner-cycle-pricing strong {
+      font-size: 7.5px !important;
+    }
+
+    .owner-cycle-pricing span {
+      font-size: 4.5px !important;
+    }
+
+    .Owner-Edit-Delete {
+      gap: 2px !important;
+    }
+
+    .Owner-Edit-Delete button {
+      height: 21px !important;
+      min-height: 21px !important;
+
+      padding: 3px !important;
+
+      font-size: 5px !important;
+    }
+
+    .Owner-Edit-Delete .change-status-btn {
+      flex: 1.5 1 0 !important;
+    }
+
+    .Owner-Edit-Delete .edit-cycle-btn,
+    .Owner-Edit-Delete .delete-cycle-btn {
+      flex: 0.75 1 0 !important;
+    }
+  }
+}

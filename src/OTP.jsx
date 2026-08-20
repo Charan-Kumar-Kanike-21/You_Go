@@ -1,8 +1,7 @@
-
 import React, { useState, useRef } from "react";
 import "./OTP.css";
 
-function OTP({ onBookingId }) {
+function OTP({ onBookingId, onBackToNotifications }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -129,6 +128,20 @@ function OTP({ onBookingId }) {
     return (
       <div className="owner-otp-page">
 
+        <button
+          type="button"
+          className="otp-back-button"
+          onClick={() => {
+            if (typeof onBackToNotifications === "function") {
+              onBackToNotifications();
+            }
+          }}
+          aria-label="Back to notifications"
+        >
+          <span className="otp-back-arrow">←</span>
+          <span>Notifications</span>
+        </button>
+
         <div className="otp-success-card">
 
           <div className="success-icon">
@@ -170,6 +183,20 @@ function OTP({ onBookingId }) {
 
   return (
     <div className="owner-otp-page">
+
+      <button
+        type="button"
+        className="otp-back-button"
+        onClick={() => {
+          if (typeof onBackToNotifications === "function") {
+            onBackToNotifications();
+          }
+        }}
+        aria-label="Back to notifications"
+      >
+        <span className="otp-back-arrow">←</span>
+        <span>Notifications</span>
+      </button>
 
       <main className="otp-container">
 

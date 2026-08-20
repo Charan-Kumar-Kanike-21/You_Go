@@ -84,8 +84,33 @@ function NotificationBell({ onClick, className = "Bell-in-Owner" }) {
       title="Notifications"
       aria-label="Notifications"
     >
-      <span className="bell-icon">
-        🔔
+      <span className="notification-icon">
+        <span className="notification-spark spark-one"></span>
+        <span className="notification-spark spark-two"></span>
+        <span className="notification-spark spark-three"></span>
+
+        <svg
+          className="notification-svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M18 9.5C18 6.46 16.21 4 12 4C7.79 4 6 6.46 6 9.5V13L4.5 16H19.5L18 13V9.5Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+
+          <path
+            d="M10 19C10.45 19.62 11.15 20 12 20C12.85 20 13.55 19.62 14 19"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+        </svg>
       </span>
 
       {unreadCount > 0 && (

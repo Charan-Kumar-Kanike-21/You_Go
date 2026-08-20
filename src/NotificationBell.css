@@ -1,77 +1,7 @@
-.notification-bell {
-  position: relative;
-
-  width: 44px;
-  height: 44px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid rgba(66, 231, 122, 0.25);
-  border-radius: 50%;
-
-  background: rgba(5, 25, 18, 0.75);
-
-  color: white;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-
-  padding: 0;
-}
-
-.notification-bell:hover {
-  transform: translateY(-2px);
-
-  background: rgba(66, 231, 122, 0.12);
-
-  border-color: rgba(66, 231, 122, 0.65);
-}
-
-.bell-icon {
-  font-size: 20px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.notification-badge {
-  position: absolute;
-
-  top: -5px;
-  right: -5px;
-
-  min-width: 19px;
-  height: 19px;
-
-  padding: 0 5px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 999px;
-
-  background: #42e77a;
-
-  color: #062016;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  border: 2px solid #08051a;
-
-  box-sizing: border-box;
-}
 /* =========================================================
-   NOTIFICATION BELL
-   ========================================================= */
+   NITK CYCLE SHARING
+   GEN-Z NOTIFICATION BUTTON
+========================================================= */
 
 .notification-bell {
   position: relative;
@@ -85,116 +15,304 @@
 
   padding: 0;
 
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #E5E7EB;
 
-  background: transparent;
+  border-radius: 12px;
 
-  color: white;
+  background: #FFFFFF;
+
+  color: #163A5F;
 
   cursor: pointer;
 
   flex-shrink: 0;
 
+  -webkit-tap-highlight-color: transparent;
+
   transition:
     background 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-.notification-bell:hover {
-  background: rgba(66, 231, 122, 0.08);
-
-  transform: translateY(-1px);
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 
 /* =========================================================
-   BELL ICON
-   ========================================================= */
+   HOVER
+========================================================= */
 
-.bell-icon {
+.notification-bell:hover {
+  background: #EAF2F8;
+
+  border-color: #C8D9E5;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 15px
+    rgba(22, 58, 95, 0.08);
+}
+
+
+/* =========================================================
+   ACTIVE
+========================================================= */
+
+.notification-bell:active {
+  transform: scale(0.96);
+}
+
+
+/* =========================================================
+   NOTIFICATION ICON
+========================================================= */
+
+.notification-icon {
+  position: relative;
+
+  width: 24px;
+  height: 24px;
+
   display: flex;
 
   align-items: center;
   justify-content: center;
+}
 
-  font-size: 25px;
 
-  line-height: 1;
+/* =========================================================
+   SVG
+========================================================= */
+
+.notification-svg {
+  width: 22px;
+  height: 22px;
+
+  display: block;
+
+  color: #163A5F;
 
   transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.notification-bell:hover .notification-svg {
+  color: #0F2D4A;
+
+  transform:
+    rotate(-7deg)
+    scale(1.06);
+}
+
+
+/* =========================================================
+   GEN-Z SPARKS
+========================================================= */
+
+.notification-spark {
+  position: absolute;
+
+  display: block;
+
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: #2E8B70;
+
+  opacity: 0;
+
+  transform: scale(0);
+
+  transition:
+    opacity 0.2s ease,
     transform 0.2s ease;
 }
 
 
-.notification-bell:hover .bell-icon {
-  transform: scale(1.08);
+/* Top-right */
+
+.spark-one {
+  top: 1px;
+  right: 1px;
+}
+
+
+/* Left */
+
+.spark-two {
+  top: 7px;
+  left: 0;
+}
+
+
+/* Bottom-right */
+
+.spark-three {
+  right: 1px;
+  bottom: 2px;
+}
+
+
+/* Show sparks */
+
+.notification-bell:hover .notification-spark {
+  opacity: 1;
+
+  transform: scale(1);
 }
 
 
 /* =========================================================
-   OWNER PAGE BELL
-   ========================================================= */
+   UNREAD STATE
+========================================================= */
 
-.Bell-in-Owner {
-  width: 48px;
-  height: 48px;
+.notification-bell:has(
+  .notification-badge
+) .notification-svg {
+  color: #163A5F;
 }
 
 
-.Bell-in-Owner .bell-icon {
-  font-size: 30px;
+/* Small pulse around unread notification */
+
+.notification-bell:has(
+  .notification-badge
+)::after {
+  content: "";
+
+  position: absolute;
+
+  top: 5px;
+  right: 5px;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #2E8B70;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(46, 139, 112, 0.10);
+
+  animation:
+    notificationPulse 2s ease-in-out infinite;
 }
 
 
 /* =========================================================
-   NOTIFICATION BADGE
-   ========================================================= */
+   BADGE
+========================================================= */
 
 .notification-badge {
   position: absolute;
 
-  top: 2px;
-  right: 2px;
+  top: -5px;
+  right: -5px;
 
-  min-width: 17px;
-  height: 17px;
+  min-width: 18px;
+  height: 18px;
+
+  padding: 0 5px;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  padding: 0 4px;
-
   border-radius: 999px;
 
-  background: #42e77a;
+  background: #D64545;
 
-  color: #061a12;
+  color: #FFFFFF;
 
   font-size: 8px;
+
   font-weight: 800;
 
   line-height: 1;
 
-  border: 2px solid #051912;
+  border: 2px solid #FFFFFF;
+
+  box-shadow:
+    0 3px 8px
+    rgba(214, 69, 69, 0.20);
+
+  z-index: 3;
+}
+
+
+/* =========================================================
+   OWNER PAGE
+========================================================= */
+
+.Bell-in-Owner {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 13px;
+}
+
+
+.Bell-in-Owner .notification-icon {
+  width: 25px;
+  height: 25px;
+}
+
+
+.Bell-in-Owner .notification-svg {
+  width: 23px;
+  height: 23px;
+}
+
+
+/* =========================================================
+   NOTIFICATION PULSE
+========================================================= */
+
+@keyframes notificationPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.18);
+
+    opacity: 0.65;
+  }
 }
 
 
 /* =========================================================
    TABLET
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 768px) {
 
   .notification-bell {
     width: 40px;
     height: 40px;
+
+    border-radius: 11px;
   }
 
-  .bell-icon {
-    font-size: 23px;
+  .notification-icon {
+    width: 23px;
+    height: 23px;
+  }
+
+  .notification-svg {
+    width: 21px;
+    height: 21px;
   }
 
   .Bell-in-Owner {
@@ -202,73 +320,142 @@
     height: 44px;
   }
 
-  .Bell-in-Owner .bell-icon {
-    font-size: 27px;
+  .Bell-in-Owner .notification-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .Bell-in-Owner .notification-svg {
+    width: 22px;
+    height: 22px;
   }
 
   .notification-badge {
-    top: 1px;
-    right: 1px;
+    top: -4px;
+    right: -4px;
 
-    min-width: 16px;
-    height: 16px;
+    min-width: 17px;
+    height: 17px;
 
     font-size: 7px;
   }
-
 }
 
 
 /* =========================================================
    MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 480px) {
 
   .notification-bell {
     width: 38px;
     height: 38px;
+
+    border-radius: 10px;
   }
 
-  .bell-icon {
-    font-size: 21px;
+  .notification-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .notification-svg {
+    width: 20px;
+    height: 20px;
   }
 
   .Bell-in-Owner {
     width: 40px;
     height: 40px;
+
+    border-radius: 10px;
   }
 
-  .Bell-in-Owner .bell-icon {
-    font-size: 24px;
+  .Bell-in-Owner .notification-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .Bell-in-Owner .notification-svg {
+    width: 21px;
+    height: 21px;
   }
 
   .notification-badge {
-    top: 0;
-    right: 0;
+    top: -3px;
+    right: -3px;
 
-    min-width: 15px;
-    height: 15px;
+    min-width: 16px;
+    height: 16px;
+
+    padding: 0 4px;
 
     font-size: 7px;
   }
-
 }
 
 
 /* =========================================================
    VERY SMALL MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 360px) {
 
   .Bell-in-Owner {
     width: 36px;
     height: 36px;
+
+    border-radius: 9px;
   }
 
-  .Bell-in-Owner .bell-icon {
-    font-size: 22px;
+  .Bell-in-Owner .notification-icon {
+    width: 20px;
+    height: 20px;
   }
 
+  .Bell-in-Owner .notification-svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .notification-badge {
+    min-width: 15px;
+    height: 15px;
+
+    font-size: 6px;
+  }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.notification-bell:focus-visible {
+  outline:
+    3px solid
+    rgba(22, 58, 95, 0.14);
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .notification-bell,
+  .notification-svg,
+  .notification-spark {
+    transition: none;
+  }
+
+  .notification-bell:has(
+    .notification-badge
+  )::after {
+    animation: none;
+  }
 }

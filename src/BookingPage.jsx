@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./BookingPage.css";
 import { supabase } from "./supabase";
-import OwnerDetails from "./OwnerDetails";
 
-function BookingPage({ cycle, onBack, onOwnerDetails}) {
-  const [hours, setHours] = useState("");
-  const [days, setDays] = useState("");
+function BookingPage({ cycle, onBack, onOwnerDetails }) {
+  const [hours, setHours] = useState("0");
+  const [days, setDays] = useState("0");
+  const [booking, setBooking] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const [currentImage, setCurrentImage] = useState(0);
+
   const numericHours = Number(hours) || 0;
   const numericDays = Number(days) || 0;
 
@@ -14,11 +18,14 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
 
   const hourlyAmount = numericHours * pricePerHour;
   const dailyAmount = numericDays * pricePerDay;
-
   const totalPrice = hourlyAmount + dailyAmount;
-  const [owner, setOwner] = useState(null);
-  const [ownerLoading, setOwnerLoading] = useState(true);
-  const [booking, setBooking] = useState(false);
+
+  const images =
+    Array.isArray(cycle?.images) && cycle.images.length > 0
+      ? cycle.images
+      : cycle?.image
+        ? [cycle.image]
+        : [];
 
   const handleHoursChange = (e) => {
     let value = Number(e.target.value);
@@ -28,18 +35,14 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
       return;
     }
 
-    // Prevent negative hours
-    value = Math.max(0, value);
+    value = Math.max(0, Math.floor(value));
 
-    // Convert hours into days automatically
     if (value >= 24) {
       const additionalDays = Math.floor(value / 24);
       const remainingHours = value % 24;
-
       const currentDays = Number(days) || 0;
       const newDays = currentDays + additionalDays;
 
-      // Maximum rental duration = 7 days
       if (newDays > 7) {
         setDays("7");
         setHours("0");
@@ -48,13 +51,11 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
 
       setDays(String(newDays));
       setHours(String(remainingHours));
-
       return;
     }
 
-    setHours(String(value));
+    setHours(String(Math.min(value, 23)));
   };
-
 
   const handleDaysChange = (e) => {
     let value = Number(e.target.value);
@@ -64,83 +65,41 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
       return;
     }
 
-    // Prevent negative days
-    value = Math.max(0, value);
-
-    // Maximum = 7 days
-    if (value > 7) {
-      value = 7;
-    }
-
-    setDays(String(value));
+    value = Math.max(0, Math.floor(value));
+    setDays(String(Math.min(value, 7)));
   };
 
-  useEffect(() => {
-  const fetchOwnerDetails = async () => {
-    if (!cycle?.owner_id) {
-      setOwnerLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select(`
-          full_name,
-          phone,
-          avatar_url,
-          hostel
-        `)
-        .eq("id", cycle.owner_id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching owner:", error);
-        setOwner(null);
-      } else {
-        setOwner(data);
-      }
-    } catch (error) {
-      console.error("Owner fetch error:", error);
-      setOwner(null);
-    } finally {
-      setOwnerLoading(false);
-    }
+  const showMessage = (text, type = "error") => {
+    setMessage(text);
+    setMessageType(type);
   };
 
-  fetchOwnerDetails();
-  }, [cycle]);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
-  const [currentImage, setCurrentImage] = useState(0);
-
-  if (!cycle) {
-    return (
-      <div className="booking-page">
-        <div className="booking-error">
-          <h2>Cycle not found</h2>
-          <p>Please go back and select a cycle again.</p>
-
-          <button onClick={onBack}>
-            ← Back to Cycles
-          </button>
-        </div>
-      </div>
-    );
-  }
   const handleBooking = async () => {
     setMessage("");
     setMessageType("");
 
-    if (
-      hours === "" ||
-      days === ""
-    ) {
-      setMessage(
-        "Please enter the rental duration."
-      );
+    // Authentication must be checked before creating/sending any booking.
+    // Logged-in users may continue; logged-out users receive a clear login message.
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      setMessageType("error");
+      if (userError) throw userError;
+
+      if (!user) {
+        showMessage("You need to login to confirm your booking.");
+        return;
+      }
+    } catch (error) {
+      console.error("Authentication check error:", error);
+      showMessage("Please login before confirming your booking.");
+      return;
+    }
+
+    if (hours === "" || days === "") {
+      showMessage("Please enter the rental duration.");
       return;
     }
 
@@ -151,125 +110,53 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
       Number.isNaN(bookingHours) ||
       Number.isNaN(bookingDays) ||
       bookingHours < 0 ||
-      bookingDays < 0
+      bookingDays < 0 ||
+      bookingHours > 23 ||
+      bookingDays > 7
     ) {
-      setMessage(
-        "Please enter a valid rental duration."
-      );
-
-      setMessageType("error");
+      showMessage("Please enter a valid rental duration.");
       return;
     }
 
-    /*
-    * Hours must always be 0–23.
-    */
-    if (bookingHours > 23) {
-      setMessage(
-        "Hours must be between 0 and 23."
-      );
+    const totalRentalHours = bookingDays * 24 + bookingHours;
 
-      setMessageType("error");
-      return;
-    }
-
-    /*
-    * Days must always be 0–7.
-    */
-    if (bookingDays > 7) {
-      setMessage(
-        "Maximum rental duration is 7 days."
-      );
-
-      setMessageType("error");
-      return;
-    }
-
-    /*
-    * Calculate total rental duration.
-    */
-    const totalRentalHours =
-      bookingDays * 24 + bookingHours;
-
-    /*
-    * Cannot exceed 7 days.
-    */
     if (totalRentalHours > 168) {
-      setMessage(
-        "Maximum rental duration is 7 days."
-      );
-
-      setMessageType("error");
+      showMessage("Maximum rental duration is 7 days.");
       return;
     }
 
-    /*
-    * Cannot be zero.
-    */
     if (totalRentalHours === 0) {
-      setMessage(
-        "Rental duration cannot be zero."
-      );
-
-      setMessageType("error");
+      showMessage("Rental duration cannot be zero.");
       return;
     }
 
     try {
-
       setBooking(true);
 
       const {
         data: { user },
-        error: userError,
       } = await supabase.auth.getUser();
 
-      if (userError) {
-        throw userError;
-      }
-
-      if (!user) {
-        setMessage(
-          "Please login before booking a cycle."
-        );
-
-        setMessageType("error");
-        return;
-      }
-
       const bookingData = {
-
         cycle_id: cycle.id,
-
         student_id: user.id,
-
         hours: String(bookingHours),
-
         days: String(bookingDays),
-
         price_per_hour: pricePerHour,
-
         price_per_day: pricePerDay,
-
         hourly_amount: hourlyAmount,
-
         daily_amount: dailyAmount,
-
         total_price: totalPrice,
       };
 
       const response = await fetch(
-        "https://stem61.app.n8n.cloud/webhook/booking",
+        "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
-          body: JSON.stringify(
-            bookingData
-          ),
+          body: JSON.stringify(bookingData),
         }
       );
 
@@ -279,447 +166,317 @@ function BookingPage({ cycle, onBack, onOwnerDetails}) {
         );
       }
 
-      setMessage(
-        "Booking request sent successfully to the cycle owner."
+      showMessage(
+        "Booking request sent successfully to the cycle owner.",
+        "success"
       );
-
-      setMessageType("success");
-
     } catch (error) {
-
-      console.error(
-        "Booking error:",
-        error
-      );
-
-      setMessage(
-        "Unable to send booking request. Please try again."
-      );
-
-      setMessageType("error");
-
+      console.error("Booking error:", error);
+      showMessage("Unable to send booking request. Please try again.");
     } finally {
-
       setBooking(false);
-
     }
+  };
+
+  if (!cycle) {
+    return (
+      <div className="booking-page">
+        <div className="booking-error">
+          <div className="error-icon">!</div>
+          <h2>Cycle not found</h2>
+          <p>Please go back and select a cycle again.</p>
+          <button onClick={onBack}>← Back to Cycles</button>
+        </div>
+      </div>
+    );
+  }
+
+  const nextImage = () => {
+    if (images.length < 2) return;
+    setCurrentImage((prev) => (prev + 1) % images.length);
+  };
+
+  const previousImage = () => {
+    if (images.length < 2) return;
+    setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
   return (
     <div className="booking-page">
-
-      {/* NAVBAR */}
       <nav className="booking-navbar">
-
-        <div className="booking-logo">
-          <div className="booking-logo-icon">
-            🚲
-          </div>
-
-          <div>
-            <h2>NITK Cycle</h2>
-            <span>SHARING</span>
-          </div>
-        </div>
-
-        <button
-          className="booking-back-btn"
-          onClick={onBack}
-        >
-          ← Back
+        <button className="booking-brand" onClick={onBack} aria-label="Back">
+          <span className="brand-mark">🚲</span>
+          <span className="brand-copy">
+            <strong>NITK</strong>
+            <small>CYCLE SHARING</small>
+          </span>
         </button>
 
+        <div className="nav-context">
+          <span>BOOKING</span>
+          <i />
+          <strong>{cycle.brand || "Cycle"}</strong>
+        </div>
+
+        <button className="booking-back-btn" onClick={onBack}>
+          <span>←</span>
+          <span>Back</span>
+        </button>
       </nav>
 
-
-      {/* MAIN CONTENT */}
       <main className="booking-main">
-
-        <div className="booking-header">
-          <p>NITK CYCLE SHARING</p>
-          <h1>Cycle Details</h1>
-          <span>
-            Review the cycle details before sending your booking request.
-          </span>
-        </div>
-
-
-        {/* BOOKING CARD */}
-        <section className="booking-card">
-
-          {/* LEFT - IMAGE */}
-          <div className="booking-image-section ">
-
-        <div className="booking-main-image">
-
-        {cycle.images && cycle.images.length > 0 ? (
-
-        <>
-
-        <img
-            src={cycle.images[currentImage]}
-            alt={`${cycle.brand} ${currentImage + 1}`}
-        />
-
-        {/* LEFT ARROW */}
-        {cycle.images.length > 1 && (
-            <button
-            className="image-arrow image-arrow-left"
-            onClick={() =>
-                setCurrentImage(
-                currentImage === 0
-                    ? cycle.images.length - 1
-                    : currentImage - 1
-                )
-            }
-            >
-            ←
-            </button>
-        )}
-
-        {/* RIGHT ARROW */}
-        {cycle.images.length > 1 && (
-            <button
-            className="image-arrow image-arrow-right"
-            onClick={() =>
-                setCurrentImage(
-                currentImage === cycle.images.length - 1
-                    ? 0
-                    : currentImage + 1
-                )
-            }
-            >
-            →
-            </button>
-        )}
-
-        {/* IMAGE COUNTER */}
-        {cycle.images.length > 1 && (
-            <div className="image-counter">
-                {currentImage + 1} / {cycle.images.length}
-            </div>
-        )}
-
-        </>
-
-        ) : cycle.image ? (
-
-        <img
-        src={cycle.image}
-        alt={cycle.brand || "Cycle"}
-        />
-
-        ) : (
-
-        <div className="booking-image-placeholder">
-            🚲
-        </div>
-
-        )}
-
-        <span className="booking-available">
-        Available
-        </span>
-
-    </div>
-
+        <div className="booking-page-heading">
+          <div>
+            <span className="eyebrow">CYCLE BOOKING</span>
+            <h1>Book your ride</h1>
+            <p>Review the cycle, choose your duration, and confirm.</p>
           </div>
 
+          <div className="secure-note">
+            <span className="secure-dot" />
+            Campus verified
+          </div>
+        </div>
 
-          {/* RIGHT - DETAILS */}
-          <div className="booking-details">
+        <section className="booking-layout">
+          <article className="cycle-card">
+            <div className="cycle-visual">
+              {images.length > 0 ? (
+                <img
+                  src={images[currentImage]}
+                  alt={`${cycle.brand || "Cycle"} ${currentImage + 1}`}
+                />
+              ) : (
+                <div className="booking-image-placeholder">
+                  <span>🚲</span>
+                  <small>No cycle image</small>
+                </div>
+              )}
 
-            <div className="booking-title-row">
-              <div>
-                <p className="booking-small-label">
-                  CYCLE
-                </p>
+              <span className="availability-badge">
+                <span />
+                Available
+              </span>
 
-                <h2>
-                  {cycle.brand || "Cycle"}
-                </h2>
-              </div>
+              {images.length > 1 && (
+                <>
+                  <button
+                    className="image-arrow image-arrow-left"
+                    onClick={previousImage}
+                    aria-label="Previous image"
+                  >
+                    ‹
+                  </button>
 
-              <div className="booking-top-actions">
+                  <button
+                    className="image-arrow image-arrow-right"
+                    onClick={nextImage}
+                    aria-label="Next image"
+                  >
+                    ›
+                  </button>
+
+                  <div className="image-counter">
+                    {currentImage + 1} / {images.length}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="cycle-info">
+              <div className="cycle-title-row">
+                <div>
+                  <span className="section-kicker">CYCLE</span>
+                  <h2>{cycle.brand || "Cycle"}</h2>
+                </div>
 
                 {cycle.rating && (
-                  <div className="booking-rating">
-                    ★ {cycle.rating}
+                  <div className="rating-chip">
+                    <span>★</span>
+                    {cycle.rating}
                   </div>
                 )}
+              </div>
+
+              <div className="location-row">
+                <span className="location-icon">⌖</span>
+                <div>
+                  <small>Pickup location</small>
+                  <strong>
+                    {cycle.location || "Location not available"}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="cycle-spec-grid">
+                <div>
+                  <small>Brand</small>
+                  <strong>{cycle.brand || "Not specified"}</strong>
+                </div>
+                <div>
+                  <small>Model</small>
+                  <strong>{cycle.model || "Not specified"}</strong>
+                </div>
+                <div>
+                  <small>Type</small>
+                  <strong>{cycle.cycle_type || "Not specified"}</strong>
+                </div>
+                <div>
+                  <small>Condition</small>
+                  <strong>{cycle.condition || "Not specified"}</strong>
+                </div>
+              </div>
+
+              <div className="description-row">
+                <small>Description</small>
+                <p>
+                  {cycle.description ||
+                    "No additional description provided by the owner."}
+                </p>
+              </div>
+
+              <div className="cycle-bottom-row">
+                <div className="cycle-prices">
+                  <div>
+                    <small>Hourly</small>
+                    <strong>₹{pricePerHour.toFixed(0)}</strong>
+                    <span>/ hr</span>
+                  </div>
+                  <div>
+                    <small>Daily</small>
+                    <strong>₹{pricePerDay.toFixed(0)}</strong>
+                    <span>/ day</span>
+                  </div>
+                </div>
 
                 <button
                   className="owner-details-btn"
                   onClick={onOwnerDetails}
+                  type="button"
                 >
-                  👤 Owner Details
+                  <span>👤</span>
+                  Owner
                 </button>
-
               </div>
+            </div>
+          </article>
 
-          </div>
-
-
-            {/* LOCATION */}
-            <div className="booking-detail-item">
-
-              <span className="detail-icon">
-                📍
-              </span>
-
+          <aside className="booking-panel">
+            <div className="panel-heading">
               <div>
-                <label>Pickup Location</label>
-                <strong>
-                  {cycle.location || "Location not available"}
-                </strong>
+                <span className="section-kicker">RENTAL DURATION</span>
+                <h2>How long do you need it?</h2>
               </div>
-
+              <span className="max-duration">Max 7 days</span>
             </div>
 
-
-            {/* BRAND / MODEL */}
-            <div className="booking-detail-grid">
-
-              <div className="booking-detail-box">
-                <span>Brand</span>
-                <strong>
-                  {cycle.brand || "Not specified"}
-                </strong>
-              </div>
-
-              <div className="booking-detail-box">
-                <span>Model</span>
-                <strong>
-                  {cycle.model || "Not specified"}
-                </strong>
-              </div>
-
-            </div>
-
-
-            {/* TYPE / CONDITION */}
-            <div className="booking-detail-grid">
-
-              <div className="booking-detail-box">
-                <span>Cycle Type</span>
-                <strong>
-                  {cycle.cycle_type || "Not specified"}
-                </strong>
-              </div>
-
-              <div className="booking-detail-box">
-                <span>Condition</span>
-                <strong>
-                  {cycle.condition || "Not specified"}
-                </strong>
-              </div>
-
-            </div>
-
-
-            {/* DESCRIPTION */}
-            <div className="booking-description">
-
-              <span>Description</span>
-
-              <p>
-                {cycle.description ||
-                  "No additional description provided by the owner."}
-              </p>
-
-            </div>
-
-
-            {/* PRICING */}
-            <div className="booking-pricing">
-
-              <div>
-                <span>Per Hour</span>
-                <strong>
-                  ₹{cycle.price_per_hour ?? "--"}
-                </strong>
-              </div>
-
-              <div>
-                <span>Per Day</span>
-                <strong>
-                  ₹{cycle.price_per_day ?? "--"}
-                </strong>
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        {/* RENTAL DURATION */}
-        <section className="rental-duration-card">
-
-          <div className="duration-heading">
-            <div>
-              <p>RENTAL DURATION</p>
-              <h2>How long do you need the cycle?</h2>
-            </div>
-
-            <span>
-              Start time is automatically recorded.
-            </span>
-          </div>
-
-
-          <div className="duration-inputs">
-
-            <div className="duration-input-group">
-
-              <label>
-                Hours
+            <div className="duration-inputs">
+              <label className="duration-field">
+                <span>Days</span>
+                <div className="number-input">
+                  <input
+                    type="number"
+                    min="0"
+                    max="7"
+                    value={days}
+                    onChange={handleDaysChange}
+                    placeholder="0"
+                    inputMode="numeric"
+                  />
+                  <em>days</em>
+                </div>
               </label>
 
-              <input
-                type="number"
-                min="0"
-                max = "23"
-                value={hours}
-                onChange={handleHoursChange}
-                placeholder="0"
-              />
-
-              <span>
-                Enter number of hours
-              </span>
-
-            </div>
-
-
-            <div className="duration-input-group">
-
-              <label>
-                Days
+              <label className="duration-field">
+                <span>Hours</span>
+                <div className="number-input">
+                  <input
+                    type="number"
+                    min="0"
+                    max="23"
+                    value={hours}
+                    onChange={handleHoursChange}
+                    placeholder="0"
+                    inputMode="numeric"
+                  />
+                  <em>hrs</em>
+                </div>
               </label>
-
-              <input
-                type="number"
-                min="0"
-                max = "7"
-                value={days}
-                onChange={handleDaysChange}
-                placeholder="0"
-              />
-
-              <span>
-                Enter number of days
-              </span>
-
             </div>
 
-          </div>
-
-          {/* PRICE CALCULATION */}
-
-          <section className="booking-total-card">
-
-            <div className="total-price-header">
-              <div>
-                <p>RENTAL COST</p>
-                <h2>Total Price</h2>
-              </div>
-
-              <div className="total-price-value">
-                ₹{totalPrice.toFixed(2)}
-              </div>
+            <div className="duration-note">
+              <span>◷</span>
+              Start time is automatically recorded when the booking is created.
             </div>
 
-
-            <div className="price-breakdown">
-
-              <div className="price-breakdown-row">
-
-                <span>
-                  {numericDays} day
-                  {numericDays !== 1 ? "s" : ""}
-                  {" × "}
-                  ₹{pricePerDay.toFixed(2)}
+            <div className="price-card">
+              <div className="price-card-top">
+                <div>
+                  <span>ESTIMATED RENTAL COST</span>
+                  <strong>₹{totalPrice.toFixed(2)}</strong>
+                </div>
+                <span className="price-status">
+                  {numericDays || numericHours ? "Calculated" : "Enter duration"}
                 </span>
-
-                <strong>
-                  ₹{dailyAmount.toFixed(2)}
-                </strong>
-
               </div>
 
+              <div className="price-lines">
+                <div>
+                  <span>
+                    {numericDays} day{numericDays !== 1 ? "s" : ""} × ₹
+                    {pricePerDay.toFixed(2)}
+                  </span>
+                  <strong>₹{dailyAmount.toFixed(2)}</strong>
+                </div>
 
-              <div className="price-breakdown-row">
-
-                <span>
-                  {numericHours} hour
-                  {numericHours !== 1 ? "s" : ""}
-                  {" × "}
-                  ₹{pricePerHour.toFixed(2)}
-                </span>
-
-                <strong>
-                  ₹{hourlyAmount.toFixed(2)}
-                </strong>
-
+                <div>
+                  <span>
+                    {numericHours} hour{numericHours !== 1 ? "s" : ""} × ₹
+                    {pricePerHour.toFixed(2)}
+                  </span>
+                  <strong>₹{hourlyAmount.toFixed(2)}</strong>
+                </div>
               </div>
 
-
-              <div className="price-divider"></div>
-
-
-              <div className="price-breakdown-total">
-
+              <div className="price-total-row">
                 <span>Total</span>
-
-                <strong>
-                  ₹{totalPrice.toFixed(2)}
-                </strong>
-
+                <strong>₹{totalPrice.toFixed(2)}</strong>
               </div>
-
             </div>
 
-          </section>
+            {message && (
+              <div
+                className={`booking-message ${
+                  messageType === "success" ? "success" : "error"
+                }`}
+                role="alert"
+              >
+                <span>{messageType === "success" ? "✓" : "!"}</span>
+                {message}
+              </div>
+            )}
 
+            <button
+              className="book-cycle-btn"
+              onClick={handleBooking}
+              disabled={
+                booking || (numericHours === 0 && numericDays === 0)
+              }
+            >
+              <span>
+                {booking
+                  ? "Sending request..."
+                  : `Confirm booking · ₹${totalPrice.toFixed(2)}`}
+              </span>
+              {!booking && <b>→</b>}
+            </button>
+
+            <p className="booking-footnote">
+              By confirming, your request will be sent to the cycle owner.
+            </p>
+          </aside>
         </section>
-
-
-        {/* MESSAGE */}
-        {message && (
-          <div
-            className={
-              messageType === "success"
-                ? "booking-message success"
-                : "booking-message error"
-            }
-          >
-            {message}
-          </div>
-        )}
-
-
-        {/* BOOK BUTTON */}
-        <div className="booking-action">
-
-        <button
-          className="book-cycle-btn"
-          onClick={handleBooking}
-          disabled={
-            booking ||
-            (numericHours === 0 && numericDays === 0)
-          }
-        >
-          {booking
-            ? "Sending Request..."
-            : `Confirm Booking · ₹${totalPrice.toFixed(2)}`}
-        </button>
-
-        </div>
-
       </main>
-
     </div>
   );
 }

@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { supabase } from "./supabase";
 
 import Landing from "./Landing";
@@ -23,7 +28,7 @@ import TermsAndConditions from "./TermsAndConditions";
 import ResetPassword from "./ResetPassword";
 import "./App.css";
 
-function App() {
+function AppContent() {
   // ============================================================
 // PUSH NOTIFICATION HELPERS
 // ============================================================
@@ -238,8 +243,88 @@ const enablePushNotifications = async () => {
   // CURRENT PAGE
   // =========================================================
 
-  const [page, setPage] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  /*
+   * Each existing in-app page gets a real browser history entry.
+   *
+   * IMPORTANT:
+   * The existing page-state architecture is preserved.
+   * React Router is only added as the history layer.
+   */
+  const pagePaths = {
+    Landing: "/",
+    Login: "/login",
+    SignUp: "/signup",
+    ChoicePage: "/choice",
+    HomePageRental: "/rentals",
+    Listing: "/listing",
+    Profile: "/profile",
+    ForgotPassword: "/forgot-password",
+    BookingPage: "/booking",
+    CycleOwner: "/my-cycles",
+    OnGoingRents: "/ongoing-rentals",
+    ReportPage: "/report",
+    NotificationPage: "/notifications",
+    OTP: "/otp",
+    ReturnPage: "/return",
+    AdminDashboard: "/admin",
+    OwnerDetails: "/owner-details",
+    CycleVerification: "/cycle-verification",
+    TermsAndConditions: "/terms",
+    ResetPassword: "/reset-password",
+  };
+
+  const pathToPage = Object.entries(pagePaths).reduce(
+    (map, [pageName, path]) => {
+      map[path] = pageName;
+      return map;
+    },
+    {}
+  );
+
+  const [page, setPageState] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  /*
+   * Existing code throughout this file calls setPage(...).
+   * We keep that API unchanged, but now every page change also
+   * creates a browser history entry.
+   */
+  const setPage = (nextPage) => {
+    setPageState(nextPage);
+
+    const nextPath = pagePaths[nextPage];
+
+    if (!nextPath) {
+      return;
+    }
+
+    if (location.pathname !== nextPath) {
+      navigate(nextPath);
+    }
+  };
+
+  /*
+   * Handle Chrome back/forward buttons and Android/iOS browser
+   * gestures. React Router updates location, and this effect
+   * updates the existing page state without pushing another
+   * history entry.
+   */
+  useEffect(() => {
+    const previousPage = pathToPage[location.pathname];
+
+    if (!previousPage) {
+      return;
+    }
+
+    setPageState((currentPage) =>
+      currentPage === previousPage
+        ? currentPage
+        : previousPage
+    );
+  }, [location.pathname]);
 
   const [selectedCycleId, setSelectedCycleId] = useState(null);
 
@@ -1339,7 +1424,7 @@ useEffect(() => {
   // =========================================================
 
   const [notificationReturnPage, setNotificationReturnPage] =
-    useState("ChoicePage");
+    useState("HomePageRental");
 
   // =========================================================
   // ADMIN
@@ -1596,6 +1681,10 @@ useEffect(() => {
   const handleNotificationBack = () => {
     setPage(notificationReturnPage);
   };
+
+  const handleBackToNotificatios = () => {
+    setPage("NotificationPage");
+  }
 
   // =========================================================
   // LANDING → LOGIN
@@ -3169,6 +3258,7 @@ const handleNotificationAction = async (
       {page === "OTP" && (
         <OTP
           onBookingId = {bookingId}
+          onBackToNotifications={handleBackToNotificatios}
         />
       )}
 
@@ -3259,6 +3349,22 @@ const handleNotificationAction = async (
       ===================================================== */}
       <RentalBottomNav />
     </>
+  );
+}
+
+/*
+ * BrowserRouter supplies the browser history stack used by
+ * Chrome's back button, Android/iOS swipe-back gestures, and
+ * forward navigation.
+ *
+ * All existing Supabase/authentication/component connections
+ * remain inside AppContent unchanged.
+ */
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 

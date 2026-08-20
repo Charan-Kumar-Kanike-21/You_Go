@@ -1,21 +1,20 @@
-
 /* =========================================================
    OWNER OTP VERIFICATION PAGE
    NITK CYCLE SHARING
    ========================================================= */
 
 .owner-otp-page {
-  --bg-dark: #08051a;
-  --green-dark: #051912;
-  --green-bg: #0d2f21;
-  --green: #42e77a;
-  --green-light: #66e77a;
+  --bg-dark: #F7F9FC;
+  --green-dark: #FFFFFF;
+  --green-bg: #EAF2F8;
+  --green: #2E8B70;
+  --green-light: #2E8B70;
 
-  --text-primary: #f4f8f5;
-  --text-secondary: #81968a;
-  --text-muted: #61796b;
+  --text-primary: #17202A;
+  --text-secondary: #667085;
+  --text-muted: #667085;
 
-  --border: rgba(66, 231, 122, 0.20);
+  --border: #E5E7EB;
 
   min-height: 100vh;
   width: 100%;
@@ -38,12 +37,16 @@
 
   background:
     radial-gradient(
-      circle at 50% 35%,
-      rgba(45, 130, 72, 0.55) 0%,
-      rgba(28, 92, 53, 0.38) 22%,
-      rgba(13, 47, 33, 0.75) 45%,
-      rgba(6, 27, 20, 1) 75%
-    );
+      circle at 92% 5%,
+      rgba(234, 242, 248, 0.95),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 5% 80%,
+      rgba(234, 245, 241, 0.75),
+      transparent 28%
+    ),
+    #F7F9FC;
 
   background-color: var(--bg-dark);
 }
@@ -65,16 +68,16 @@
 
   border:
     1px solid
-    rgba(66, 231, 122, 0.20);
+    #E5E7EB;
 
   border-radius: 26px;
 
   background:
-    rgba(5, 25, 18, 0.82);
+    #FFFFFF;
 
   box-shadow:
     0 25px 70px
-    rgba(0, 0, 0, 0.35);
+    rgba(22, 58, 95, 0.08);
 
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -99,16 +102,16 @@
 
   border:
     1px solid
-    rgba(66, 231, 122, 0.20);
+    #E5E7EB;
 
   background:
-    rgba(66, 231, 122, 0.08);
+    #EAF2F8;
 
   font-size: 30px;
 
   box-shadow:
     0 0 30px
-    rgba(66, 231, 122, 0.08);
+    #EAF2F8;
 }
 
 
@@ -164,12 +167,12 @@
 
   border:
     1px solid
-    rgba(66, 231, 122, 0.13);
+    #DDE6EC;
 
   border-radius: 15px;
 
   background:
-    rgba(66, 231, 122, 0.035);
+    #F7F9FC;
 
   text-align: left;
 }
@@ -189,7 +192,7 @@
 .info-row + .info-row {
   border-top:
     1px solid
-    rgba(66, 231, 122, 0.08);
+    #EAF2F8;
 }
 
 .info-row span {
@@ -240,7 +243,7 @@
   outline: none;
 
   background:
-    rgba(2, 17, 11, 0.75);
+    #FFFFFF;
 
   color: var(--green-light);
 
@@ -261,13 +264,13 @@
     var(--green);
 
   background:
-    rgba(66, 231, 122, 0.06);
+    #F7F9FC;
 
   box-shadow:
     0 0 0 3px
-    rgba(66, 231, 122, 0.08),
+    #EAF2F8,
     0 0 20px
-    rgba(66, 231, 122, 0.08);
+    #EAF2F8;
 }
 
 
@@ -277,13 +280,13 @@
 
 .otp-input.otp-error {
   border-color:
-    rgba(255, 100, 100, 0.65);
+    #D64545;
 }
 
 .otp-error-message {
   margin: 10px 0;
 
-  color: #ff8585;
+  color: #D64545;
 
   font-size: 12px;
 }
@@ -308,7 +311,7 @@
     var(--green);
 
   color:
-    #062016;
+    #FFFFFF;
 
   font-size: 14px;
 
@@ -391,16 +394,16 @@
 
   border:
     1px solid
-    rgba(66, 231, 122, 0.28);
+    #C9E3D9;
 
   border-radius: 26px;
 
   background:
-    rgba(5, 25, 18, 0.85);
+    #FFFFFF;
 
   box-shadow:
     0 25px 70px
-    rgba(0, 0, 0, 0.35),
+    rgba(22, 58, 95, 0.08),
     0 0 50px
     rgba(66, 231, 122, 0.05);
 
@@ -421,7 +424,7 @@
   border-radius: 50%;
 
   background:
-    rgba(66, 231, 122, 0.12);
+    #EAF5F1;
 
   border:
     2px solid
@@ -436,7 +439,7 @@
 
   box-shadow:
     0 0 30px
-    rgba(66, 231, 122, 0.15);
+    #D8ECE4;
 }
 
 .otp-success-card h1 {
@@ -477,12 +480,12 @@
 
   border:
     1px solid
-    rgba(66, 231, 122, 0.20);
+    #E5E7EB;
 
   border-radius: 999px;
 
   background:
-    rgba(66, 231, 122, 0.07);
+    #EAF2F8;
 
   color:
     var(--green-light);
@@ -503,7 +506,7 @@
 
   box-shadow:
     0 0 9px
-    rgba(66, 231, 122, 0.6);
+    #2E8B70;
 }
 
 
@@ -524,7 +527,7 @@
     var(--green);
 
   color:
-    #062016;
+    #FFFFFF;
 
   font-size: 14px;
 
@@ -587,5 +590,295 @@
   .otp-input {
     width: 39px;
     height: 48px;
+  }
+}
+
+/* =========================================================
+   NITK CYCLE SHARING — FINAL OTP THEME
+   Existing JSX class names and connections are unchanged.
+========================================================= */
+
+.owner-otp-page {
+  --bg: #F7F9FC;
+  --white: #FFFFFF;
+  --navy: #163A5F;
+  --navy-dark: #0F2D4A;
+  --blue-soft: #EAF2F8;
+  --green: #2E8B70;
+  --green-soft: #EAF5F1;
+  --text: #17202A;
+  --secondary: #667085;
+  --muted: #98A2B3;
+  --border: #E5E7EB;
+}
+
+.otp-container,
+.otp-success-card {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid #E5E7EB;
+  box-shadow:
+    0 18px 45px rgba(22, 58, 95, 0.07);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.otp-icon {
+  background: #EAF2F8;
+  border-color: #D5E2EA;
+  color: #163A5F;
+  box-shadow: none;
+}
+
+.otp-eyebrow {
+  color: #2E8B70;
+}
+
+.otp-container h1,
+.otp-success-card h1 {
+  color: #163A5F;
+}
+
+.otp-description,
+.otp-success-card p {
+  color: #667085;
+}
+
+.booking-info {
+  background: #F7F9FC;
+  border-color: #E5E7EB;
+}
+
+.info-row + .info-row {
+  border-top-color: #E5E7EB;
+}
+
+.info-row span {
+  color: #667085;
+}
+
+.info-row strong {
+  color: #17202A;
+}
+
+.otp-input {
+  background: #FFFFFF;
+  border-color: #D7E1E8;
+  color: #163A5F;
+  box-shadow: 0 2px 8px rgba(22, 58, 95, 0.025);
+}
+
+.otp-input:focus {
+  border-color: #163A5F;
+  background: #F7F9FC;
+  box-shadow:
+    0 0 0 3px rgba(22, 58, 95, 0.08);
+}
+
+.otp-input.otp-error {
+  border-color: #D64545;
+}
+
+.otp-error-message {
+  color: #D64545;
+}
+
+.verify-button,
+.continue-button {
+  background: #163A5F;
+  color: #FFFFFF;
+  box-shadow: none;
+}
+
+.verify-button:hover,
+.continue-button:hover {
+  background: #0F2D4A;
+  box-shadow:
+    0 10px 24px rgba(22, 58, 95, 0.16);
+}
+
+.clear-button {
+  color: #667085;
+}
+
+.clear-button:hover {
+  color: #163A5F;
+}
+
+.security-note {
+  color: #98A2B3;
+}
+
+.success-icon {
+  background: #EAF5F1;
+  border-color: #2E8B70;
+  color: #2E8B70;
+  box-shadow: none;
+}
+
+.rental-status {
+  background: #EAF5F1;
+  border-color: #C9E3D9;
+  color: #2E8B70;
+}
+
+.status-dot {
+  background: #2E8B70;
+  box-shadow: none;
+}
+
+@media (max-width: 600px) {
+  .owner-otp-page {
+    padding: 18px 12px;
+  }
+
+  .otp-container,
+  .otp-success-card {
+    box-shadow:
+      0 12px 30px rgba(22, 58, 95, 0.06);
+  }
+
+  .otp-input {
+    background: #FFFFFF;
+  }
+}
+
+/* =========================================================
+   OTP BACK TO NOTIFICATIONS
+   ---------------------------------------------------------
+   Uses the same NITK Cycle Sharing theme.
+   The parent should pass:
+       onBackToNotifications={() => setPage("Notifications")}
+========================================================= */
+
+.owner-otp-page {
+  position: relative;
+}
+
+.otp-back-button {
+  position: absolute;
+
+  top: 24px;
+  right: 24px;
+  left: auto;
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 8px 12px;
+
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+
+  background: #FFFFFF;
+  color: #163A5F;
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-size: 10px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 3px 12px rgba(22, 58, 95, 0.06);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.otp-back-arrow {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.otp-back-button:hover {
+  background: #EAF2F8;
+  border-color: #C7D8E5;
+  color: #0F2D4A;
+
+  transform: translateX(-2px);
+
+  box-shadow:
+    0 6px 16px rgba(22, 58, 95, 0.09);
+}
+
+.otp-back-button:active {
+  transform: translateX(0);
+}
+
+@media (max-width: 600px) {
+  .otp-back-button {
+    top: 12px;
+    right: 12px;
+    left: auto;
+
+    padding: 7px 10px;
+
+    border-radius: 7px;
+
+    font-size: 9px;
+  }
+
+  .otp-back-arrow {
+    font-size: 14px;
+  }
+
+  .otp-container,
+  .otp-success-card {
+    margin-top: 34px;
+  }
+}
+
+@media (max-width: 380px) {
+  .otp-back-button {
+    top: 9px;
+    right: 9px;
+    left: auto;
+
+    padding: 6px 9px;
+
+    font-size: 8px;
+  }
+
+  .otp-container,
+  .otp-success-card {
+    margin-top: 30px;
+  }
+}
+
+
+/* =========================================================
+   FINAL OTP BACK BUTTON POSITION
+   RIGHT CORNER — DESKTOP + MOBILE
+========================================================= */
+
+.otp-back-button {
+  left: auto !important;
+  right: 24px !important;
+}
+
+@media (max-width: 600px) {
+  .otp-back-button {
+    left: auto !important;
+    right: 12px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .otp-back-button {
+    left: auto !important;
+    right: 9px !important;
   }
 }

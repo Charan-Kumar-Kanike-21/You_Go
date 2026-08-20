@@ -477,9 +477,9 @@ select {
 
 .cycle-card {
   width: 100%;
-  min-height: 152px;
+  min-height: 158px;
   display: grid;
-  grid-template-columns: 342px minmax(0, 1fr);
+  grid-template-columns: 300px minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 11px;
@@ -503,7 +503,7 @@ select {
 
 .cycle-image {
   width: 100%;
-  height: 150px !important;
+  height: 158px !important;
   position: relative;
   overflow: hidden;
   background: #f4f7fa;
@@ -574,7 +574,7 @@ select {
   min-width: 0;
   padding: 16px 18px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 95px 120px;
+  grid-template-columns: minmax(0, 1fr) 82px 112px;
   align-items: center;
   gap: 16px;
 }
@@ -755,7 +755,7 @@ select {
 ========================================================= */
 
 .rent-btn {
-  width: 120px;
+  width: 20px;
   min-height: 38px;
   justify-self: end;
   padding: 8px 15px;
@@ -1245,6 +1245,7 @@ select {
     align-items: stretch;
     justify-content: space-between;
     gap: 7px;
+    /* position: relative; */
   }
 
   .cycle-card-main {
@@ -1267,8 +1268,18 @@ select {
   }
 
   .cycle-price-line {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
     gap: 3px;
-    margin-top: 5px;
+    margin: 0;
+
+    z-index: 10;
   }
 
   .cycle-price-line strong {
@@ -2445,4 +2456,5544 @@ select {
   background: #f7f9fc;
   color: #667085;
   border: 1px solid #e5e7eb;
+}
+/* =========================================================
+   CYCLE CARD — BALANCED PROPORTIONS
+========================================================= */
+@media (min-width: 701px) {
+  .cycle-card {
+    grid-template-columns: 300px minmax(0, 1fr);
+    min-height: 158px;
+    align-items: stretch;
+  }
+  .cycle-image {
+    width: 300px;
+    height: 158px !important;
+    min-height: 158px;
+    border-radius: 10px 0 0 10px;
+  }
+  .cycle-image img {
+    width: 100%;
+    height: 100% !important;
+    object-fit: cover;
+    object-position: center;
+  }
+  .cycle-details {
+    min-height: 158px;
+    grid-template-columns: minmax(0, 1fr) 82px 112px;
+    gap: 14px;
+    padding: 15px 17px;
+  }
+  .cycle-title-row h2 { font-size: 15px; }
+  .cycle-price-line { margin-top: 6px; }
+  .cycle-location { margin-top: 7px; }
+  .owner-row { margin-top: 8px; }
+  .cycle-rating-block { align-self: center; }
+  .rent-btn {
+    width: 112px;
+    min-height: 36px;
+    align-self: center;
+  }
+}
+@media (min-width: 1051px) {
+  .cycle-card { grid-template-columns: 320px minmax(0, 1fr); }
+  .cycle-image { width: 320px; }
+}
+@media (max-width: 700px) {
+  .cycle-card { grid-template-columns: 122px minmax(0, 1fr); min-height: 154px; }
+  .cycle-image { width: 122px; height: 154px !important; min-height: 154px; }
+  .cycle-details { min-height: 154px; padding: 10px 10px 9px; }
+}
+@media (max-width: 390px) {
+  .cycle-card { grid-template-columns: 108px minmax(0, 1fr); }
+  .cycle-image { width: 108px; height: 150px !important; min-height: 150px; }
+  .cycle-details { min-height: 150px; }
+}
+@media (max-width: 350px) {
+  .cycle-card { grid-template-columns: 100px minmax(0, 1fr); }
+  .cycle-image { width: 100px; }
+}
+
+/* =========================================================
+   CYCLE LIST — 3-COLUMN COMPACT CARD LAYOUT
+   ---------------------------------------------------------
+   Based on the supplied NITK Cycle Sharing reference.
+   All existing cycle information and JSX connections are
+   preserved; only visual sizing/layout is changed.
+========================================================= */
+
+@media (min-width: 701px) {
+
+  .cycle-grid {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    align-items: stretch;
+  }
+
+  .cycle-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+      0 4px 15px rgba(22, 58, 95, 0.055) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: #cddae6 !important;
+    box-shadow:
+      0 9px 25px rgba(22, 58, 95, 0.09) !important;
+  }
+
+  /* -----------------------------------------
+     IMAGE
+     ----------------------------------------- */
+
+  .cycle-image {
+    width: 100% !important;
+    height: 175px !important;
+    min-height: 175px !important;
+
+    flex-shrink: 0 !important;
+
+    border-radius: 11px 11px 0 0 !important;
+
+    background: #f4f7fa !important;
+  }
+
+  .cycle-image img {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  .cycle-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* -----------------------------------------
+     AVAILABILITY + FAVOURITE
+     ----------------------------------------- */
+
+  .available-badge {
+    top: 10px !important;
+    left: 10px !important;
+
+    padding: 5px 8px !important;
+
+    border-radius: 6px !important;
+
+    font-size: 9px !important;
+  }
+
+  .favorite-btn {
+    top: 9px !important;
+    right: 9px !important;
+
+    width: 29px !important;
+    height: 29px !important;
+
+    background: rgba(255, 255, 255, 0.94) !important;
+  }
+
+  /* -----------------------------------------
+     DETAILS
+     ----------------------------------------- */
+
+  .cycle-details {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    padding: 13px 13px 12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    gap: 0 !important;
+  }
+
+  .cycle-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* -----------------------------------------
+     CYCLE NAME
+     ----------------------------------------- */
+
+  .cycle-title-row {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: block !important;
+  }
+
+  .cycle-title-row h2 {
+    margin: 0 !important;
+
+    color: var(--navy) !important;
+
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-model {
+    margin-top: 3px !important;
+
+    color: var(--muted) !important;
+
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* -----------------------------------------
+     PRICE
+     ----------------------------------------- */
+
+  .cycle-price-line {
+    margin-top: 7px !important;
+
+    display: flex !important;
+    align-items: baseline !important;
+
+    gap: 4px !important;
+  }
+
+  .cycle-price-line strong {
+    font-size: 12px !important;
+  }
+
+  .cycle-price-line span {
+    font-size: 8px !important;
+  }
+
+  .cycle-price-line i {
+    margin: 0 3px !important;
+  }
+
+  /* -----------------------------------------
+     CYCLE LOCATION
+     ----------------------------------------- */
+
+  .cycle-location {
+    margin-top: 7px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 4px !important;
+
+    font-size: 9px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .location-icon {
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
+  }
+
+  /* -----------------------------------------
+     OWNER NAME + OWNER LOCATION
+     ----------------------------------------- */
+
+  .owner-row {
+    margin-top: 8px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 7px !important;
+  }
+
+  .owner-avatar {
+    width: 27px !important;
+    height: 27px !important;
+
+    flex-shrink: 0 !important;
+
+    font-size: 9px !important;
+  }
+
+  .owner-details {
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 1px !important;
+  }
+
+  .owner-details strong {
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-details span {
+    font-size: 7px !important;
+    line-height: 1.2 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* -----------------------------------------
+     RATING
+     ----------------------------------------- */
+
+  .cycle-rating-block {
+    margin-top: 8px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 3px !important;
+  }
+
+  .rating-star {
+    font-size: 12px !important;
+  }
+
+  .cycle-rating-block strong {
+    font-size: 9px !important;
+  }
+
+  .rating-count {
+    font-size: 7px !important;
+  }
+
+  /* -----------------------------------------
+     VIEW DETAILS
+     ----------------------------------------- */
+
+  .rent-btn {
+    width: 100% !important;
+
+    min-height: 34px !important;
+
+    margin-top: 10px !important;
+
+    padding: 7px 10px !important;
+
+    border-radius: 6px !important;
+
+    font-size: 9px !important;
+  }
+}
+
+
+/* =========================================================
+   WIDER DESKTOP — KEEP CARDS COMPACT
+========================================================= */
+
+@media (min-width: 1100px) {
+
+  .cycle-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+  }
+
+  .cycle-image {
+    height: 185px !important;
+    min-height: 185px !important;
+  }
+
+  .cycle-title-row h2 {
+    font-size: 15px !important;
+  }
+
+  .cycle-price-line strong {
+    font-size: 13px !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   Two columns keeps the cards readable before mobile.
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 900px) {
+
+  .cycle-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 12px !important;
+  }
+
+  .cycle-image {
+    height: 155px !important;
+    min-height: 155px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   One compact card per row.
+   The 3-column desktop layout must not affect mobile.
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .cycle-grid {
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+
+    gap: 10px !important;
+  }
+
+  .cycle-card {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns:
+      122px minmax(0, 1fr) !important;
+
+    min-height: 154px !important;
+
+    flex-direction: initial !important;
+  }
+
+  .cycle-image {
+    width: 122px !important;
+    height: 154px !important;
+    min-height: 154px !important;
+
+    border-radius:
+      10px 0 0 10px !important;
+  }
+
+  .cycle-details {
+    min-height: 154px !important;
+  }
+}
+
+
+@media (max-width: 390px) {
+
+  .cycle-card {
+    grid-template-columns:
+      108px minmax(0, 1fr) !important;
+
+    min-height: 150px !important;
+  }
+
+  .cycle-image {
+    width: 108px !important;
+    height: 150px !important;
+    min-height: 150px !important;
+  }
+
+  .cycle-details {
+    min-height: 150px !important;
+  }
+}
+
+
+@media (max-width: 350px) {
+
+  .cycle-card {
+    grid-template-columns:
+      100px minmax(0, 1fr) !important;
+  }
+
+  .cycle-image {
+    width: 100px !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL REFERENCE-MATCHED CYCLE CARDS
+   ---------------------------------------------------------
+   Based on the supplied NITK Cycle Sharing reference.
+
+   DESKTOP
+   - Home/Top Cycles style
+   - Image ABOVE details
+   - Four cards across on wide desktop
+   - Compact details below image
+   - All existing cycle information preserved
+
+   MOBILE
+   - Browse-style compact horizontal card
+   - Image on LEFT
+   - Details on RIGHT
+   - No horizontal page scrolling
+   - All existing details preserved
+
+   IMPORTANT:
+   No JSX, data, Supabase, filtering or navigation is changed.
+========================================================= */
+
+
+/* =========================================================
+   DESKTOP — TOP CYCLES CARD
+   Reference: left side of supplied image
+========================================================= */
+
+@media (min-width: 1051px) {
+
+  .cycle-grid {
+    width: 100%;
+    display: grid !important;
+
+    /* Four cards like "Top Cycles Near You" */
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 12px !important;
+
+    align-items: stretch !important;
+  }
+
+  .cycle-card {
+    width: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #E5E7EB !important;
+    border-radius: 10px !important;
+
+    background: #FFFFFF !important;
+
+    box-shadow:
+      0 3px 12px rgba(22, 58, 95, 0.055) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-card:hover {
+    transform: translateY(-2px) !important;
+
+    border-color: #D4DFE8 !important;
+
+    box-shadow:
+      0 8px 20px rgba(22, 58, 95, 0.09) !important;
+  }
+
+
+  /* -------------------------------------------------------
+     IMAGE
+     ------------------------------------------------------- */
+
+  .cycle-image {
+    width: 100% !important;
+
+    height: 142px !important;
+    min-height: 142px !important;
+
+    flex: 0 0 142px !important;
+
+    position: relative !important;
+
+    overflow: hidden !important;
+
+    border-radius: 9px 9px 0 0 !important;
+
+    background: #F4F7FA !important;
+  }
+
+  .cycle-image img {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: block !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  .cycle-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #F7F9FC !important;
+
+    color: #163A5F !important;
+  }
+
+
+  /* -------------------------------------------------------
+     BADGES
+     ------------------------------------------------------- */
+
+  .available-badge {
+    top: 8px !important;
+    left: 8px !important;
+
+    padding: 4px 7px !important;
+
+    border-radius: 5px !important;
+
+    background: #EAF5F1 !important;
+    border: 1px solid #C9E3D9 !important;
+
+    color: #2E8B70 !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+  }
+
+  .favorite-btn {
+    top: 7px !important;
+    right: 7px !important;
+
+    width: 25px !important;
+    height: 25px !important;
+
+    border: 1px solid rgba(229, 231, 235, 0.9) !important;
+
+    background: rgba(255, 255, 255, 0.94) !important;
+
+    color: #667085 !important;
+
+    font-size: 16px !important;
+
+    box-shadow:
+      0 2px 7px rgba(22, 58, 95, 0.07) !important;
+  }
+
+  .favorite-btn:hover {
+    background: #FFFFFF !important;
+    color: #163A5F !important;
+  }
+
+
+  /* -------------------------------------------------------
+     DETAILS
+     Everything is BELOW the image, like the reference.
+     ------------------------------------------------------- */
+
+  .cycle-details {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 112px !important;
+
+    padding: 9px 10px 10px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+
+    gap: 0 !important;
+  }
+
+  .cycle-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-self: stretch !important;
+
+    justify-content: flex-start !important;
+  }
+
+
+  /* -------------------------------------------------------
+     TITLE
+     ------------------------------------------------------- */
+
+  .cycle-title-row {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    gap: 5px !important;
+  }
+
+  .cycle-name {
+    min-width: 0 !important;
+  }
+
+  .cycle-title-row h2 {
+    margin: 0 !important;
+
+    color: #172027 !important;
+
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-model {
+    display: block !important;
+
+    margin-top: 2px !important;
+
+    color: #98A2B3 !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* -------------------------------------------------------
+     PRICE
+     ------------------------------------------------------- */
+
+  .cycle-price-line {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: baseline !important;
+
+    gap: 3px !important;
+
+    margin-top: 5px !important;
+  }
+
+  .cycle-price-line strong {
+    color: #163A5F !important;
+
+    font-size: 10px !important;
+    line-height: 1 !important;
+
+    font-weight: 750 !important;
+  }
+
+  .cycle-price-line span {
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-price-line i {
+    margin: 0 2px !important;
+
+    color: #B8C1CA !important;
+
+    font-size: 8px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     LOCATION
+     ------------------------------------------------------- */
+
+  .cycle-location {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    margin: 5px 0 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 1.15 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .location-icon {
+    flex-shrink: 0 !important;
+
+    color: #163A5F !important;
+
+    font-size: 8px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     OWNER
+     ------------------------------------------------------- */
+
+  .owner-row {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    margin-top: 6px !important;
+  }
+
+  .owner-avatar {
+    width: 22px !important;
+    height: 22px !important;
+
+    flex: 0 0 22px !important;
+
+    font-size: 8px !important;
+
+    background: #163A5F !important;
+    color: #FFFFFF !important;
+  }
+
+  .owner-details {
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 1px !important;
+  }
+
+  .owner-details strong {
+    color: #172027 !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-details span {
+    color: #98A2B3 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* -------------------------------------------------------
+     RATING
+     ------------------------------------------------------- */
+
+  .cycle-rating-block {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 2px !important;
+
+    margin-top: 5px !important;
+
+    min-width: 0 !important;
+  }
+
+  .rating-star {
+    color: #D99A24 !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-rating-block strong {
+    color: #172027 !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+
+  .rating-count {
+    color: #98A2B3 !important;
+
+    font-size: 6px !important;
+    line-height: 1 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     VIEW DETAILS
+     ------------------------------------------------------- */
+
+  .rent-btn {
+    width: 100% !important;
+
+    height: 27px !important;
+    min-height: 27px !important;
+
+    margin-top: 7px !important;
+
+    padding: 5px 8px !important;
+
+    border: 1px solid #163A5F !important;
+    border-radius: 5px !important;
+
+    background: #163A5F !important;
+    color: #FFFFFF !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+
+    font-weight: 700 !important;
+  }
+
+  .rent-btn:hover {
+    background: #0F2D4A !important;
+    border-color: #0F2D4A !important;
+
+    box-shadow:
+      0 5px 12px rgba(22, 58, 95, 0.14) !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ---------------------------------------------------------
+   Two cards per row so the details don't become cramped.
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 1050px) {
+
+  .cycle-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 12px !important;
+  }
+
+  .cycle-card {
+    display: flex !important;
+    flex-direction: column !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .cycle-image {
+    width: 100% !important;
+    height: 145px !important;
+    min-height: 145px !important;
+  }
+
+  .cycle-details {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    padding: 10px !important;
+
+    gap: 0 !important;
+  }
+
+  .cycle-title-row h2 {
+    font-size: 13px !important;
+  }
+
+  .cycle-model {
+    font-size: 8px !important;
+  }
+
+  .cycle-price-line strong {
+    font-size: 12px !important;
+  }
+
+  .cycle-price-line span {
+    font-size: 8px !important;
+  }
+
+  .cycle-location {
+    font-size: 8px !important;
+  }
+
+  .owner-avatar {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .owner-details strong {
+    font-size: 8px !important;
+  }
+
+  .owner-details span {
+    font-size: 7px !important;
+  }
+
+  .cycle-rating-block strong {
+    font-size: 8px !important;
+  }
+
+  .rent-btn {
+    width: 100% !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+
+    margin-top: 7px !important;
+
+    font-size: 8px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ---------------------------------------------------------
+   Reference: middle/browse-cycle style.
+   Image LEFT + details RIGHT.
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .cycle-grid {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 10px !important;
+
+    overflow: visible !important;
+  }
+
+  .cycle-card {
+    width: 100% !important;
+
+    height: 154px !important;
+    min-height: 154px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      112px minmax(0, 1fr) !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #E5E7EB !important;
+    border-radius: 11px !important;
+
+    background: #FFFFFF !important;
+
+    box-shadow:
+      0 3px 12px rgba(22, 58, 95, 0.055) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-card:hover {
+    transform: none !important;
+
+    border-color: #E5E7EB !important;
+
+    box-shadow:
+      0 3px 12px rgba(22, 58, 95, 0.055) !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE IMAGE — LEFT SIDE
+     ------------------------------------------------------- */
+
+  .cycle-image {
+    width: 112px !important;
+    height: 100% !important;
+
+    min-height: 154px !important;
+
+    flex: none !important;
+
+    border-radius: 10px 0 0 10px !important;
+
+    overflow: hidden !important;
+
+    background: #F4F7FA !important;
+  }
+
+  .cycle-image img {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  .cycle-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE BADGES
+     ------------------------------------------------------- */
+
+  .available-badge {
+    top: 7px !important;
+    left: 7px !important;
+
+    padding: 4px 6px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+
+  .favorite-btn {
+    top: 7px !important;
+    right: 7px !important;
+
+    width: 25px !important;
+    height: 25px !important;
+
+    font-size: 16px !important;
+
+    background: rgba(255, 255, 255, 0.94) !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE DETAILS
+     ------------------------------------------------------- */
+
+  .cycle-details {
+    width: auto !important;
+    min-width: 0 !important;
+
+    height: 100% !important;
+
+    padding: 10px 10px 9px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+
+    gap: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    justify-content: flex-start !important;
+  }
+
+
+  /* -------------------------------------------------------
+     TITLE
+     ------------------------------------------------------- */
+
+  .cycle-title-row {
+    width: 100% !important;
+
+    display: block !important;
+  }
+
+  .cycle-title-row h2 {
+    margin: 0 !important;
+
+    color: #163A5F !important;
+
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-model {
+    margin-top: 2px !important;
+
+    color: #98A2B3 !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     PRICE
+     ------------------------------------------------------- */
+
+  .cycle-price-line {
+    margin-top: 6px !important;
+
+    display: flex !important;
+    align-items: baseline !important;
+
+    gap: 3px !important;
+  }
+
+  .cycle-price-line strong {
+    color: #172027 !important;
+
+    font-size: 11px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-price-line span {
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-price-line i {
+    margin: 0 3px !important;
+
+    font-size: 8px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     LOCATION
+     ------------------------------------------------------- */
+
+  .cycle-location {
+    width: 100% !important;
+
+    margin: 6px 0 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    color: #667085 !important;
+
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .location-icon {
+    color: #163A5F !important;
+
+    font-size: 9px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     OWNER
+     ------------------------------------------------------- */
+
+  .owner-row {
+    margin-top: 7px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 6px !important;
+  }
+
+  .owner-avatar {
+    width: 25px !important;
+    height: 25px !important;
+
+    flex: 0 0 25px !important;
+
+    font-size: 9px !important;
+  }
+
+  .owner-details {
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 1px !important;
+  }
+
+  .owner-details strong {
+    color: #172027 !important;
+
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .owner-details span {
+    color: #98A2B3 !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     RATING
+     ------------------------------------------------------- */
+
+  .cycle-rating-block {
+    width: 100% !important;
+
+    margin-top: 7px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 3px !important;
+  }
+
+  .rating-star {
+    color: #D99A24 !important;
+
+    font-size: 11px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-rating-block strong {
+    color: #172027 !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .rating-count {
+    color: #98A2B3 !important;
+
+    font-size: 7px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     VIEW DETAILS
+     ------------------------------------------------------- */
+
+  .rent-btn {
+    width: 100% !important;
+
+    height: 31px !important;
+    min-height: 31px !important;
+
+    margin-top: auto !important;
+
+    padding: 6px 8px !important;
+
+    border-radius: 5px !important;
+
+    background: #163A5F !important;
+    border-color: #163A5F !important;
+
+    color: #FFFFFF !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+  }
+
+  .rent-btn:hover {
+    background: #0F2D4A !important;
+    border-color: #0F2D4A !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 390px) {
+
+  .cycle-card {
+    height: 148px !important;
+    min-height: 148px !important;
+
+    grid-template-columns:
+      106px minmax(0, 1fr) !important;
+  }
+
+  .cycle-image {
+    width: 106px !important;
+    min-height: 148px !important;
+  }
+
+  .cycle-details {
+    padding: 9px 9px 8px !important;
+  }
+
+  .cycle-title-row h2 {
+    font-size: 12px !important;
+  }
+
+  .cycle-model {
+    font-size: 6.5px !important;
+  }
+
+  .cycle-price-line {
+    margin-top: 5px !important;
+  }
+
+  .cycle-price-line strong {
+    font-size: 10px !important;
+  }
+
+  .cycle-price-line span {
+    font-size: 6.5px !important;
+  }
+
+  .cycle-location {
+    margin-top: 5px !important;
+    font-size: 7px !important;
+  }
+
+  .owner-row {
+    margin-top: 6px !important;
+  }
+
+  .owner-avatar {
+    width: 23px !important;
+    height: 23px !important;
+    flex-basis: 23px !important;
+  }
+
+  .owner-details strong {
+    font-size: 7px !important;
+  }
+
+  .owner-details span {
+    font-size: 6.5px !important;
+  }
+
+  .cycle-rating-block {
+    margin-top: 6px !important;
+  }
+
+  .rating-star {
+    font-size: 10px !important;
+  }
+
+  .cycle-rating-block strong {
+    font-size: 8px !important;
+  }
+
+  .rating-count {
+    font-size: 6.5px !important;
+  }
+
+  .rent-btn {
+    height: 29px !important;
+    min-height: 29px !important;
+
+    font-size: 7.5px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 350px) {
+
+  .cycle-card {
+    height: 142px !important;
+    min-height: 142px !important;
+
+    grid-template-columns:
+      100px minmax(0, 1fr) !important;
+  }
+
+  .cycle-image {
+    width: 100px !important;
+    min-height: 142px !important;
+  }
+
+  .cycle-details {
+    padding: 8px !important;
+  }
+
+  .cycle-title-row h2 {
+    font-size: 11px !important;
+  }
+
+  .cycle-location {
+    font-size: 6.8px !important;
+  }
+
+  .owner-details strong {
+    font-size: 6.8px !important;
+  }
+
+  .owner-details span {
+    font-size: 6px !important;
+  }
+
+  .rent-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+
+    font-size: 7px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE SAFETY
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .home-page,
+  .cycle-grid,
+  .cycle-card,
+  .cycle-details {
+    max-width: 100% !important;
+  }
+
+  .cycle-grid {
+    overflow-x: hidden !important;
+  }
+
+  .cycle-card {
+    flex-shrink: 1 !important;
+  }
+}
+
+/* =========================================================
+   FINAL MOBILE REFERENCE OVERRIDE
+   ---------------------------------------------------------
+   IMPORTANT:
+   This block is intentionally LAST in the stylesheet.
+   The previous HomePageRental CSS contains several older
+   .cycle-card / .cycle-image / .cycle-details media-query
+   blocks. Those older rules are therefore overridden here.
+
+   Desktop/tablet styling remains controlled by the existing
+   stylesheet. These rules target MOBILE ONLY.
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+  /* =======================================================
+     CYCLE LIST
+  ======================================================= */
+
+  .cycle-grid {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 10px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+
+  /* =======================================================
+     CARD
+     Reference card is approximately 80–90px tall.
+  ======================================================= */
+
+  .cycle-grid .cycle-card {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    height: 86px !important;
+    min-height: 86px !important;
+    max-height: 86px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      123px minmax(0, 1fr) !important;
+
+    grid-template-rows: 1fr !important;
+
+    align-items: stretch !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #E5E7EB !important;
+    border-radius: 9px !important;
+
+    background: #FFFFFF !important;
+
+    box-shadow:
+      0 2px 9px rgba(22, 58, 95, 0.055) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-grid .cycle-card:hover {
+    transform: none !important;
+
+    border-color: #E5E7EB !important;
+
+    box-shadow:
+      0 2px 9px rgba(22, 58, 95, 0.055) !important;
+  }
+
+
+  /* =======================================================
+     IMAGE
+     Exact compact left-side proportions.
+  ======================================================= */
+
+  .cycle-grid .cycle-image {
+    position: relative !important;
+
+    width: 123px !important;
+    height: 84px !important;
+    min-width: 123px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+
+    align-self: center !important;
+
+    overflow: hidden !important;
+
+    border-radius: 8px 0 0 8px !important;
+
+    background: #F4F7FA !important;
+
+    flex: none !important;
+  }
+
+  .cycle-grid .cycle-image img {
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    object-fit: cover !important;
+
+    /*
+      The reference shows the whole bicycle with a
+      slightly wide crop rather than a zoomed image.
+    */
+    object-position: center center !important;
+  }
+
+  .cycle-grid .cycle-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #F7F9FC !important;
+
+    color: #163A5F !important;
+
+    font-size: 24px !important;
+  }
+
+
+  /* =======================================================
+     AVAILABILITY BADGE
+     Small green pill at image top-right.
+  ======================================================= */
+
+  .cycle-grid .available-badge {
+    position: absolute !important;
+
+    top: 7px !important;
+    right: 6px !important;
+    left: auto !important;
+
+    z-index: 4 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+
+    width: auto !important;
+
+    padding: 3px 6px !important;
+
+    border-radius: 5px !important;
+
+    background: #EAF5F1 !important;
+    border: 1px solid #C9E3D9 !important;
+
+    color: #2E8B70 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+  }
+
+
+  /* =======================================================
+     FAVOURITE BUTTON
+     Small circle in image.
+  ======================================================= */
+
+  .cycle-grid .favorite-btn {
+    position: absolute !important;
+
+    top: 6px !important;
+    right: 6px !important;
+
+    z-index: 5 !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    min-width: 22px !important;
+    min-height: 22px !important;
+
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    background: rgba(255,255,255,0.94) !important;
+    border: 1px solid #E5E7EB !important;
+
+    color: #667085 !important;
+
+    font-size: 14px !important;
+    line-height: 1 !important;
+
+    box-shadow:
+      0 2px 6px rgba(22, 58, 95, 0.08) !important;
+  }
+
+  /*
+    Availability badge and favourite overlap in the JSX.
+    Put the favourite slightly lower so both remain visible.
+  */
+  .cycle-grid .favorite-btn {
+    top: 34px !important;
+  }
+
+
+  /* =======================================================
+     DETAILS AREA
+  ======================================================= */
+
+  .cycle-grid .cycle-details {
+    box-sizing: border-box !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+
+    padding: 7px 8px 6px 10px !important;
+
+    display: grid !important;
+
+    /*
+      Main information | rating | button
+      The button is always pinned to the right.
+    */
+    grid-template-columns:
+      minmax(0, 1fr) 34px 67px !important;
+
+    grid-template-rows:
+      1fr !important;
+
+    column-gap: 5px !important;
+
+    align-items: center !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /* =======================================================
+     MAIN INFORMATION
+  ======================================================= */
+
+  .cycle-grid .cycle-card-main {
+    min-width: 0 !important;
+    width: 100% !important;
+
+    height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    justify-content: flex-start !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /* =======================================================
+     TITLE
+  ======================================================= */
+
+  .cycle-grid .cycle-title-row {
+    width: 100% !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #172027 !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.15 !important;
+
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* =======================================================
+     MODEL
+  ======================================================= */
+
+  .cycle-grid .cycle-model {
+    display: block !important;
+
+    margin: 2px 0 0 !important;
+    padding: 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* =======================================================
+     PRICE
+  ======================================================= */
+
+  .cycle-grid .cycle-price-line {
+    width: 100% !important;
+
+    margin: 4px 0 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: baseline !important;
+
+    gap: 2px !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    color: #172027 !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+
+    font-weight: 750 !important;
+  }
+
+  .cycle-grid .cycle-price-line span {
+    color: #667085 !important;
+
+    font-size: 6px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-price-line i {
+    margin: 0 2px !important;
+
+    color: #98A2B3 !important;
+
+    font-size: 6px !important;
+    font-style: normal !important;
+  }
+
+
+  /* =======================================================
+     LOCATION
+  ======================================================= */
+
+  .cycle-grid .cycle-location {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    margin: 4px 0 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 2px !important;
+
+    color: #667085 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .location-icon {
+    flex: 0 0 auto !important;
+
+    color: #163A5F !important;
+
+    font-size: 7px !important;
+  }
+
+
+  /* =======================================================
+     OWNER
+     Keep owner information present, but compact.
+  ======================================================= */
+
+  .cycle-grid .owner-row {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    margin: 4px 0 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .owner-avatar {
+    width: 14px !important;
+    height: 14px !important;
+
+    min-width: 14px !important;
+    min-height: 14px !important;
+
+    flex: 0 0 14px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    background: #163A5F !important;
+    color: #FFFFFF !important;
+
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .owner-details {
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .owner-details strong {
+    display: block !important;
+
+    max-width: 100% !important;
+
+    color: #172027 !important;
+
+    font-size: 6px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .owner-details span {
+    display: block !important;
+
+    max-width: 100% !important;
+
+    color: #98A2B3 !important;
+
+    font-size: 5.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* =======================================================
+     RATING
+     Fixed middle column.
+  ======================================================= */
+
+  .cycle-grid .cycle-rating-block {
+    width: 34px !important;
+    min-width: 34px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 1px !important;
+
+    align-self: end !important;
+
+    margin-bottom: 9px !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .rating-star {
+    color: #D99A24 !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-rating-block strong {
+    color: #172027 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .rating-count {
+    color: #98A2B3 !important;
+
+    font-size: 5.5px !important;
+    line-height: 1 !important;
+  }
+
+
+  /* =======================================================
+     VIEW DETAILS
+     EXACT RIGHT-SIDE POSITION
+  ======================================================= */
+
+  .cycle-grid .rent-btn {
+    width: 67px !important;
+    min-width: 67px !important;
+
+    height: 25px !important;
+    min-height: 25px !important;
+    max-height: 25px !important;
+
+    margin: 0 !important;
+
+    align-self: end !important;
+
+    margin-bottom: 7px !important;
+
+    padding: 5px 5px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border: 1px solid #163A5F !important;
+    border-radius: 4px !important;
+
+    background: #163A5F !important;
+    color: #FFFFFF !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .rent-btn:hover {
+    background: #0F2D4A !important;
+    border-color: #0F2D4A !important;
+
+    box-shadow: none !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   Keep the same visual proportions instead of letting
+   older rules enlarge the cards.
+========================================================= */
+
+@media screen and (max-width: 390px) {
+
+  .cycle-grid .cycle-card {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+
+    grid-template-columns:
+      116px minmax(0, 1fr) !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 116px !important;
+    min-width: 116px !important;
+
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+
+    padding:
+      6px 7px 5px 9px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) 32px 64px !important;
+
+    column-gap: 4px !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    font-size: 10px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    font-size: 8.5px !important;
+  }
+
+  .cycle-grid .cycle-location {
+    font-size: 6.2px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    width: 64px !important;
+    min-width: 64px !important;
+
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+
+    font-size: 6.2px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media screen and (max-width: 350px) {
+
+  .cycle-grid .cycle-card {
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+
+    grid-template-columns:
+      106px minmax(0, 1fr) !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 106px !important;
+    min-width: 106px !important;
+
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+
+    padding:
+      5px 6px 5px 8px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) 29px 60px !important;
+
+    column-gap: 3px !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    font-size: 9.5px !important;
+  }
+
+  .cycle-grid .cycle-model {
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    margin-top: 3px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    font-size: 8px !important;
+  }
+
+  .cycle-grid .cycle-location {
+    margin-top: 3px !important;
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .owner-row {
+    margin-top: 3px !important;
+  }
+
+  .cycle-grid .cycle-rating-block {
+    width: 29px !important;
+    min-width: 29px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    width: 60px !important;
+    min-width: 60px !important;
+
+    height: 23px !important;
+    min-height: 23px !important;
+    max-height: 23px !important;
+
+    font-size: 5.8px !important;
+  }
+}
+
+/* =========================================================
+   FINAL MOBILE PRICE POSITION
+   ---------------------------------------------------------
+   Matches the supplied Browse Cycles reference.
+
+   PRICE:
+   ₹20 /hr
+   ₹100 /day
+
+   Both prices are positioned on the RIGHT side of
+   the card while the cycle name/location stay on LEFT.
+
+   NO JSX CHANGE REQUIRED.
+========================================================= */
+
+@media (max-width: 700px) {
+
+  /* -----------------------------------------
+     DETAILS CONTAINER
+  ----------------------------------------- */
+
+  .cycle-details {
+    position: relative !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /* -----------------------------------------
+     TITLE AREA
+  ----------------------------------------- */
+
+  .cycle-title-row {
+    width: 100% !important;
+
+    display: block !important;
+
+    position: relative !important;
+  }
+
+  .cycle-name {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    padding-right: 68px !important;
+  }
+
+
+  /* -----------------------------------------
+     CYCLE NAME
+  ----------------------------------------- */
+
+  .cycle-title-row h2 {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* -----------------------------------------
+     MODEL
+  ----------------------------------------- */
+
+  .cycle-model {
+    width: 100% !important;
+
+    margin-top: 2px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* =====================================================
+     PRICE — RIGHT SIDE
+     ===================================================== */
+
+  .cycle-price-line {
+    position: absolute !important;
+
+    top: 9px !important;
+    right: 9px !important;
+
+    width: 55px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      auto auto !important;
+
+    grid-template-rows:
+      auto auto !important;
+
+    column-gap: 2px !important;
+    row-gap: 3px !important;
+
+    align-items: baseline !important;
+
+    justify-content: end !important;
+
+    white-space: nowrap !important;
+  }
+
+
+  /* -----------------------------------------
+     HOURLY PRICE
+     ₹20 /hr
+  ----------------------------------------- */
+
+  .cycle-price-line strong:nth-of-type(1) {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    color: #172027 !important;
+
+    font-size: 11px !important;
+    line-height: 1 !important;
+
+    font-weight: 750 !important;
+
+    text-align: right !important;
+  }
+
+  .cycle-price-line span:nth-of-type(1) {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+
+    text-align: left !important;
+  }
+
+
+  /* -----------------------------------------
+     REMOVE | BETWEEN PRICES
+  ----------------------------------------- */
+
+  .cycle-price-line i {
+    display: none !important;
+  }
+
+
+  /* -----------------------------------------
+     DAILY PRICE
+     ₹100 /day
+  ----------------------------------------- */
+
+  .cycle-price-line strong:nth-of-type(2) {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    color: #172027 !important;
+
+    font-size: 10px !important;
+    line-height: 1 !important;
+
+    font-weight: 750 !important;
+
+    text-align: right !important;
+  }
+
+  .cycle-price-line span:nth-of-type(2) {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+
+    text-align: left !important;
+  }
+
+
+  /* -----------------------------------------
+     LOCATION
+     Keep it below the cycle/model area.
+  ----------------------------------------- */
+
+  .cycle-location {
+    width: 100% !important;
+
+    margin-top: 6px !important;
+
+    padding-right: 60px !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 390px) {
+
+  .cycle-name {
+    padding-right: 62px !important;
+  }
+
+  .cycle-price-line {
+    top: 8px !important;
+    right: 8px !important;
+
+    width: 52px !important;
+  }
+
+  .cycle-price-line strong:nth-of-type(1) {
+    font-size: 10px !important;
+  }
+
+  .cycle-price-line strong:nth-of-type(2) {
+    font-size: 9px !important;
+  }
+
+  .cycle-price-line span {
+    font-size: 6.5px !important;
+  }
+
+  .cycle-location {
+    padding-right: 57px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 350px) {
+
+  .cycle-name {
+    padding-right: 57px !important;
+  }
+
+  .cycle-price-line {
+    top: 7px !important;
+    right: 7px !important;
+
+    width: 48px !important;
+
+    column-gap: 1px !important;
+    row-gap: 2px !important;
+  }
+
+  .cycle-price-line strong:nth-of-type(1) {
+    font-size: 9px !important;
+  }
+
+  .cycle-price-line strong:nth-of-type(2) {
+    font-size: 8px !important;
+  }
+
+  .cycle-price-line span {
+    font-size: 6px !important;
+  }
+
+  .cycle-location {
+    padding-right: 53px !important;
+  }
+}
+
+/* =========================================================
+   FINAL CYCLE CARD REFERENCE MATCH
+   ---------------------------------------------------------
+   Desktop  : LEFT side of supplied reference
+              - 4 cards per row
+              - image on top
+              - compact card
+              - details underneath
+   Mobile   : MIDDLE side of supplied reference
+              - image on left
+              - details on right
+              - compact horizontal card
+
+   IMPORTANT:
+   Only cycle-card presentation is overridden here.
+   Existing JSX, Supabase queries, filtering, sorting,
+   callbacks and navigation are untouched.
+========================================================= */
+
+
+/* =========================================================
+   DESKTOP — LEFT REFERENCE
+========================================================= */
+
+@media (min-width: 1051px) {
+
+  .cycle-grid {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    align-items: stretch !important;
+  }
+
+  .cycle-grid .cycle-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+
+    background: #ffffff !important;
+
+    box-shadow: 0 3px 12px rgba(22, 58, 95, 0.055) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-grid .cycle-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: #d4dfe8 !important;
+    box-shadow: 0 8px 20px rgba(22, 58, 95, 0.09) !important;
+  }
+
+  /* IMAGE */
+
+  .cycle-grid .cycle-image {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 150px !important;
+    min-height: 150px !important;
+    max-height: 150px !important;
+
+    flex: 0 0 150px !important;
+
+    overflow: hidden !important;
+    border-radius: 9px 9px 0 0 !important;
+
+    background: #f4f7fa !important;
+  }
+
+  .cycle-grid .cycle-image img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  /* AVAILABILITY */
+
+  .cycle-grid .available-badge,
+  .cycle-grid .availability-badge.other {
+    top: 8px !important;
+    left: 8px !important;
+
+    padding: 4px 7px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+  }
+
+  /* FAVOURITE */
+
+  .cycle-grid .favorite-btn {
+    top: 7px !important;
+    right: 7px !important;
+
+    width: 25px !important;
+    height: 25px !important;
+
+    border: 1px solid #e5e7eb !important;
+    background: rgba(255,255,255,.94) !important;
+
+    color: #667085 !important;
+    font-size: 15px !important;
+
+    box-shadow: 0 2px 7px rgba(22,58,95,.07) !important;
+  }
+
+  /* DETAILS */
+
+  .cycle-grid .cycle-details {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 126px !important;
+
+    padding: 10px 11px 11px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+
+    gap: 0 !important;
+  }
+
+  .cycle-grid .cycle-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* TITLE */
+
+  .cycle-grid .cycle-title-row {
+    width: 100% !important;
+    display: block !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    margin: 0 !important;
+
+    color: #172027 !important;
+
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .cycle-model {
+    display: block !important;
+
+    margin-top: 2px !important;
+
+    color: #98a2b3 !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* PRICE */
+
+  .cycle-grid .cycle-price-line {
+    display: flex !important;
+    align-items: baseline !important;
+
+    gap: 3px !important;
+    margin-top: 6px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    color: #163a5f !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    font-weight: 750 !important;
+  }
+
+  .cycle-grid .cycle-price-line span {
+    color: #667085 !important;
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-price-line i {
+    margin: 0 2px !important;
+    color: #b8c1ca !important;
+    font-size: 7px !important;
+  }
+
+  /* LOCATION */
+
+  .cycle-grid .cycle-location {
+    width: 100% !important;
+
+    margin: 6px 0 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    color: #667085 !important;
+
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .location-icon {
+    flex-shrink: 0 !important;
+    color: #163a5f !important;
+    font-size: 8px !important;
+  }
+
+  /* OWNER */
+
+  .cycle-grid .owner-row {
+    width: 100% !important;
+
+    margin-top: 7px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 5px !important;
+  }
+
+  .cycle-grid .owner-avatar {
+    width: 22px !important;
+    height: 22px !important;
+
+    min-width: 22px !important;
+    min-height: 22px !important;
+    flex: 0 0 22px !important;
+
+    font-size: 7px !important;
+  }
+
+  .cycle-grid .owner-details {
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1px !important;
+  }
+
+  .cycle-grid .owner-details strong {
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .owner-details span {
+    font-size: 6px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* RATING */
+
+  .cycle-grid .cycle-rating-block {
+    width: 100% !important;
+
+    margin-top: 6px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 2px !important;
+  }
+
+  .cycle-grid .rating-star {
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-rating-block strong {
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .rating-count {
+    font-size: 6px !important;
+    line-height: 1 !important;
+  }
+
+  /* BUTTON */
+
+  .cycle-grid .rent-btn {
+    width: 100% !important;
+
+    height: 28px !important;
+    min-height: 28px !important;
+
+    margin-top: 8px !important;
+
+    padding: 5px 8px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET — KEEP CARD STYLE BUT USE 2 COLUMNS
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 1050px) {
+
+  .cycle-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 13px !important;
+  }
+
+  .cycle-grid .cycle-card {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 100% !important;
+    height: 155px !important;
+    min-height: 155px !important;
+    flex: 0 0 155px !important;
+
+    border-radius: 9px 9px 0 0 !important;
+  }
+
+  .cycle-grid .cycle-details {
+    width: 100% !important;
+    min-height: 125px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    padding: 11px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    width: 100% !important;
+    min-height: 30px !important;
+    margin-top: 8px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE — MIDDLE REFERENCE
+   Image LEFT + details RIGHT
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .cycle-grid {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 10px !important;
+
+    overflow: visible !important;
+  }
+
+  .cycle-grid .cycle-card {
+    width: 100% !important;
+
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      124px minmax(0, 1fr) !important;
+
+    grid-template-rows: 1fr !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+
+    background: #ffffff !important;
+
+    box-shadow: 0 3px 12px rgba(22,58,95,.055) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-grid .cycle-card:hover {
+    transform: none !important;
+    border-color: #e5e7eb !important;
+    box-shadow: 0 3px 12px rgba(22,58,95,.055) !important;
+  }
+
+  /* IMAGE */
+
+  .cycle-grid .cycle-image {
+    position: relative !important;
+
+    width: 124px !important;
+    height: 90px !important;
+
+    min-width: 124px !important;
+    min-height: 90px !important;
+    max-height: 90px !important;
+
+    flex: none !important;
+
+    overflow: hidden !important;
+
+    border-radius: 9px 0 0 9px !important;
+
+    background: #f4f7fa !important;
+  }
+
+  .cycle-grid .cycle-image img {
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  /* AVAILABILITY — TOP RIGHT OF IMAGE */
+
+  .cycle-grid .available-badge,
+  .cycle-grid .availability-badge.other {
+    top: 6px !important;
+    right: 6px !important;
+    left: auto !important;
+
+    padding: 3px 6px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+  }
+
+  /* FAVOURITE — BELOW AVAILABILITY */
+
+  .cycle-grid .favorite-btn {
+    top: 30px !important;
+    right: 6px !important;
+
+    width: 21px !important;
+    height: 21px !important;
+
+    min-width: 21px !important;
+    min-height: 21px !important;
+
+    padding: 0 !important;
+
+    border: 1px solid #e5e7eb !important;
+    background: rgba(255,255,255,.94) !important;
+
+    font-size: 13px !important;
+  }
+
+  /* DETAILS */
+
+  .cycle-grid .cycle-details {
+    position: relative !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    height: 90px !important;
+    min-height: 90px !important;
+    max-height: 90px !important;
+
+    padding: 7px 8px 6px 10px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) 34px 67px !important;
+
+    grid-template-rows: 1fr !important;
+
+    column-gap: 5px !important;
+
+    align-items: center !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .cycle-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    justify-content: flex-start !important;
+
+    overflow: hidden !important;
+  }
+
+  /* TITLE */
+
+  .cycle-grid .cycle-title-row {
+    width: 100% !important;
+    display: block !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    color: #172027 !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.15 !important;
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .cycle-model {
+    display: block !important;
+
+    margin: 2px 0 0 !important;
+
+    color: #667085 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* PRICE — RIGHT SIDE OF DETAILS */
+
+  .cycle-grid .cycle-price-line {
+    position: absolute !important;
+
+    top: 7px !important;
+    right: 8px !important;
+
+    width: 58px !important;
+
+    margin: 0 !important;
+
+    display: grid !important;
+
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+
+    column-gap: 2px !important;
+    row-gap: 3px !important;
+
+    justify-content: end !important;
+    align-items: baseline !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .cycle-price-line i {
+    display: none !important;
+  }
+
+  .cycle-grid .cycle-price-line strong:nth-of-type(1) {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    color: #172027 !important;
+
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-price-line span:nth-of-type(1) {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    color: #667085 !important;
+
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong:nth-of-type(2) {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    color: #172027 !important;
+
+    font-size: 8.5px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-price-line span:nth-of-type(2) {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    color: #667085 !important;
+
+    font-size: 6px !important;
+  }
+
+  /* Reserve space so title/model do not collide with prices */
+
+  .cycle-grid .cycle-name {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-right: 67px !important;
+  }
+
+  /* LOCATION */
+
+  .cycle-grid .cycle-location {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 5px 0 0 !important;
+    padding-right: 62px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 2px !important;
+
+    color: #667085 !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .location-icon {
+    flex: 0 0 auto !important;
+    color: #163a5f !important;
+    font-size: 7px !important;
+  }
+
+  /* OWNER */
+
+  .cycle-grid .owner-row {
+    width: 100% !important;
+
+    margin: 4px 0 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .owner-avatar {
+    width: 15px !important;
+    height: 15px !important;
+
+    min-width: 15px !important;
+    min-height: 15px !important;
+    flex: 0 0 15px !important;
+
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .owner-details {
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .owner-details strong {
+    display: block !important;
+
+    font-size: 6px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .owner-details span {
+    display: block !important;
+
+    font-size: 5.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* RATING — MIDDLE COLUMN */
+
+  .cycle-grid .cycle-rating-block {
+    width: 34px !important;
+    min-width: 34px !important;
+
+    margin: 0 0 7px !important;
+
+    align-self: end !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 1px !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .rating-star {
+    font-size: 8px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .cycle-rating-block strong {
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+  }
+
+  .cycle-grid .rating-count {
+    font-size: 5.5px !important;
+    line-height: 1 !important;
+  }
+
+  /* VIEW DETAILS — RIGHT */
+
+  .cycle-grid .rent-btn {
+    width: 67px !important;
+    min-width: 67px !important;
+
+    height: 25px !important;
+    min-height: 25px !important;
+    max-height: 25px !important;
+
+    margin: 0 0 6px !important;
+
+    align-self: end !important;
+
+    padding: 5px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 390px) {
+
+  .cycle-grid .cycle-card {
+    height: 90px !important;
+    min-height: 90px !important;
+    max-height: 90px !important;
+
+    grid-template-columns:
+      116px minmax(0, 1fr) !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 116px !important;
+    min-width: 116px !important;
+
+    height: 88px !important;
+    min-height: 88px !important;
+    max-height: 88px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 88px !important;
+    min-height: 88px !important;
+    max-height: 88px !important;
+
+    padding: 6px 7px 5px 9px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) 32px 64px !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    font-size: 10px !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    width: 54px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong:nth-of-type(1) {
+    font-size: 9px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong:nth-of-type(2) {
+    font-size: 8px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    width: 64px !important;
+    min-width: 64px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 350px) {
+
+  .cycle-grid .cycle-card {
+    height: 86px !important;
+    min-height: 86px !important;
+    max-height: 86px !important;
+
+    grid-template-columns:
+      106px minmax(0, 1fr) !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 106px !important;
+    min-width: 106px !important;
+
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+
+    padding: 5px 6px 5px 8px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) 29px 60px !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    width: 49px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong:nth-of-type(1) {
+    font-size: 8.5px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong:nth-of-type(2) {
+    font-size: 7.5px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    width: 60px !important;
+    min-width: 60px !important;
+
+    height: 23px !important;
+    min-height: 23px !important;
+    max-height: 23px !important;
+
+    font-size: 5.8px !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL MOBILE REFERENCE MATCH — VERSION 2
+   ---------------------------------------------------------
+   Mobile target:
+   Match the supplied "Firefox Rapid" reference card.
+
+   Layout:
+   - Card is a compact horizontal rectangle
+   - Image is LEFT and substantially larger than the
+     previous version
+   - Details are RIGHT
+   - Cycle name is readable
+   - Price is on the upper-right
+   - Location/rating/badges remain visible
+   - View Details button is at lower-right
+   - Favourite stays on the image
+   - Available badge is at the upper-right of the card
+
+   This block is intentionally LAST so it overrides all
+   previous mobile cycle-card rules.
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+  /* -------------------------------------------------------
+     LIST
+  ------------------------------------------------------- */
+
+  .cycle-grid {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 10px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+
+  /* -------------------------------------------------------
+     CARD
+     Similar proportions to the supplied second image.
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-card {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      126px minmax(0, 1fr) !important;
+
+    grid-template-rows: 100px !important;
+
+    align-items: stretch !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #E5E7EB !important;
+    border-radius: 9px !important;
+
+    background: #FFFFFF !important;
+
+    box-shadow:
+      0 2px 10px rgba(22, 58, 95, 0.06) !important;
+
+    transform: none !important;
+  }
+
+  .cycle-grid .cycle-card:hover {
+    transform: none !important;
+
+    border-color: #E5E7EB !important;
+
+    box-shadow:
+      0 2px 10px rgba(22, 58, 95, 0.06) !important;
+  }
+
+
+  /* -------------------------------------------------------
+     IMAGE — LEFT
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-image {
+    position: relative !important;
+
+    width: 126px !important;
+    min-width: 126px !important;
+
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    border-radius: 8px 0 0 8px !important;
+
+    background: #F4F7FA !important;
+  }
+
+  .cycle-grid .cycle-image img {
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 100% !important;
+    min-height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  .cycle-grid .cycle-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+
+  /* -------------------------------------------------------
+     FAVOURITE BUTTON — ON IMAGE
+  ------------------------------------------------------- */
+
+  .cycle-grid .favorite-btn {
+    position: absolute !important;
+
+    top: 6px !important;
+    right: 6px !important;
+
+    left: auto !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    min-width: 22px !important;
+    min-height: 22px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    background: rgba(255,255,255,.94) !important;
+
+    z-index: 30 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     AVAILABLE BADGE
+     Place it on the RIGHT side like the reference.
+  ------------------------------------------------------- */
+
+  .cycle-grid .available-badge,
+  .cycle-grid .availability-badge.other {
+    position: absolute !important;
+
+    top: 7px !important;
+    right: 8px !important;
+    left: auto !important;
+
+    width: auto !important;
+
+    padding: 3px 7px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+    font-weight: 700 !important;
+
+    z-index: 25 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     DETAILS — RIGHT
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-details {
+    position: relative !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    height: 100px !important;
+
+    min-width: 0 !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    padding: 9px 9px 8px 10px !important;
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    display: block !important;
+  }
+
+
+  /* -------------------------------------------------------
+     TITLE
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-title-row {
+    position: relative !important;
+
+    width: 100% !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .cycle-grid .cycle-name {
+    display: block !important;
+
+    width: calc(100% - 70px) !important;
+    max-width: calc(100% - 70px) !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 10.5px !important;
+    line-height: 13px !important;
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MODEL
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-model {
+    display: block !important;
+
+    width: calc(100% - 70px) !important;
+    max-width: calc(100% - 70px) !important;
+
+    margin: 2px 0 0 !important;
+    padding: 0 !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+
+  /* -------------------------------------------------------
+     PRICE — UPPER RIGHT
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-price-line {
+    position: absolute !important;
+
+    top: 9px !important;
+    right: 8px !important;
+
+    width: 58px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+
+    gap: 2px !important;
+
+    text-align: right !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 9px !important;
+    line-height: 10px !important;
+    font-weight: 700 !important;
+  }
+
+  .cycle-grid .cycle-price-line span {
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 6px !important;
+    line-height: 7px !important;
+  }
+
+  .cycle-grid .cycle-price-line i {
+    display: none !important;
+  }
+
+
+  /* -------------------------------------------------------
+     LOCATION
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-location {
+    width: calc(100% - 68px) !important;
+    max-width: calc(100% - 68px) !important;
+
+    margin: 6px 0 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .location-icon {
+    flex: 0 0 auto !important;
+
+    font-size: 7px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     OWNER
+     Keep compact but readable.
+  ------------------------------------------------------- */
+
+  .cycle-grid .owner-row {
+    display: flex !important;
+    align-items: center !important;
+
+    margin: 5px 0 0 !important;
+    padding: 0 !important;
+
+    max-width: calc(100% - 70px) !important;
+  }
+
+  .cycle-grid .owner-avatar {
+    width: 18px !important;
+    height: 18px !important;
+
+    min-width: 18px !important;
+    min-height: 18px !important;
+  }
+
+  .cycle-grid .owner-details strong {
+    font-size: 6px !important;
+    line-height: 7px !important;
+  }
+
+  .cycle-grid .owner-details span {
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     RATING
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-rating-block {
+    position: absolute !important;
+
+    left: 10px !important;
+    bottom: 8px !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 2px !important;
+  }
+
+  .cycle-grid .rating-star {
+    font-size: 9px !important;
+    line-height: 9px !important;
+  }
+
+  .cycle-grid .cycle-rating-block strong {
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+  }
+
+  .cycle-grid .rating-count {
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     CONDITION / TYPE BADGES
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-condition,
+  .cycle-grid .condition-badge,
+  .cycle-grid .cycle-type {
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+
+    padding: 2px 5px !important;
+
+    white-space: nowrap !important;
+  }
+
+
+  /* -------------------------------------------------------
+     VIEW DETAILS — LOWER RIGHT
+  ------------------------------------------------------- */
+
+  .cycle-grid .rent-btn {
+    position: absolute !important;
+
+    right: 8px !important;
+    bottom: 8px !important;
+
+    width: 66px !important;
+    min-width: 66px !important;
+
+    height: 27px !important;
+    min-height: 27px !important;
+    max-height: 27px !important;
+
+    margin: 0 !important;
+    padding: 5px 7px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6px !important;
+    line-height: 1 !important;
+
+    z-index: 20 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     HIDE NON-REFERENCE OWNER ROW IF IT COLLIDES
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-details > .owner-row {
+    max-width: calc(100% - 78px) !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE — <= 390px
+========================================================= */
+
+@media screen and (max-width: 390px) {
+
+  .cycle-grid .cycle-card {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+
+    grid-template-columns:
+      116px minmax(0, 1fr) !important;
+
+    grid-template-rows: 96px !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 116px !important;
+    min-width: 116px !important;
+
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+
+    padding: 8px 8px 7px 9px !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    font-size: 10px !important;
+    line-height: 12px !important;
+  }
+
+  .cycle-grid .cycle-model {
+    font-size: 6px !important;
+    line-height: 7px !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    top: 8px !important;
+    right: 7px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    font-size: 8.5px !important;
+  }
+
+  .cycle-grid .cycle-location {
+    margin-top: 5px !important;
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    right: 7px !important;
+    bottom: 7px !important;
+
+    width: 63px !important;
+    min-width: 63px !important;
+
+    height: 25px !important;
+    min-height: 25px !important;
+    max-height: 25px !important;
+
+    font-size: 5.8px !important;
+  }
+
+  .cycle-grid .cycle-rating-block {
+    left: 9px !important;
+    bottom: 7px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE — <= 350px
+========================================================= */
+
+@media screen and (max-width: 350px) {
+
+  .cycle-grid .cycle-card {
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+
+    grid-template-columns:
+      108px minmax(0, 1fr) !important;
+
+    grid-template-rows: 92px !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 108px !important;
+    min-width: 108px !important;
+
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+
+    padding: 7px 7px 6px 8px !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    font-size: 9.5px !important;
+    line-height: 11px !important;
+  }
+
+  .cycle-grid .cycle-model {
+    font-size: 5.7px !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    top: 7px !important;
+    right: 6px !important;
+
+    width: 51px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    font-size: 8px !important;
+  }
+
+  .cycle-grid .cycle-price-line span {
+    font-size: 5.5px !important;
+  }
+
+  .cycle-grid .cycle-location {
+    margin-top: 4px !important;
+    font-size: 5.7px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    right: 6px !important;
+    bottom: 6px !important;
+
+    width: 59px !important;
+    min-width: 59px !important;
+
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+
+    font-size: 5.4px !important;
+  }
+
+  .cycle-grid .cycle-rating-block {
+    left: 8px !important;
+    bottom: 6px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE CYCLE CARD
+   Only affects mobile - existing desktop layout untouched
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+  /* -------------------------------------------------------
+     CARD
+  ------------------------------------------------------- */
+
+  .cycle-card {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr) 78px;
+    gap: 10px;
+
+    width: 100%;
+    min-height: 105px;
+
+    padding: 10px;
+
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+
+  /* -------------------------------------------------------
+     CYCLE IMAGE
+  ------------------------------------------------------- */
+
+  .cycle-image {
+    grid-column: 1;
+    grid-row: 1 / 5;
+
+    width: 115px;
+    height: 95px;
+
+    border-radius: 8px;
+    overflow: hidden;
+
+    position: relative;
+  }
+
+  .cycle-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    display: block;
+  }
+
+
+  /* -------------------------------------------------------
+     AVAILABILITY
+     Stays INSIDE the image box
+  ------------------------------------------------------- */
+
+  .cycle-image .available-badge,
+  .cycle-image .availability-badge {
+    position: absolute;
+
+    top: 6px;
+    left: 6px;
+
+    z-index: 5;
+
+    padding: 3px 7px;
+
+    font-size: 8px;
+    line-height: 1;
+
+    border-radius: 10px;
+
+    white-space: nowrap;
+  }
+
+
+  /* -------------------------------------------------------
+     REMOVE FAVORITE ICON
+  ------------------------------------------------------- */
+
+  .cycle-image .favorite-btn {
+    display: none !important;
+  }
+
+
+  /* -------------------------------------------------------
+     REMOVE THE OLD CARD LAYOUT
+     Allows the individual information pieces to be
+     positioned independently.
+  ------------------------------------------------------- */
+
+  .cycle-details {
+    display: contents;
+  }
+
+  .cycle-card-main {
+    display: contents;
+  }
+
+
+  /* -------------------------------------------------------
+     CYCLE NAME
+     Position: second column, first row
+  ------------------------------------------------------- */
+
+  .cycle-title-row {
+    display: contents;
+  }
+
+  .cycle-name {
+    display: contents;
+  }
+
+  .cycle-name h2 {
+    grid-column: 2;
+    grid-row: 1;
+
+    align-self: start;
+
+    margin: 1px 0 0;
+
+    min-width: 0;
+
+    font-size: 13px;
+    line-height: 17px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+
+  /* Model is not part of the requested mobile order */
+
+  .cycle-model {
+    display: none;
+  }
+
+
+  /* -------------------------------------------------------
+     LOCATION
+  ------------------------------------------------------- */
+
+  .cycle-location {
+    grid-column: 2;
+    grid-row: 2;
+
+    margin: 0;
+
+    min-width: 0;
+
+    font-size: 9px;
+    line-height: 13px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cycle-location .location-icon {
+    font-size: 9px;
+    margin-right: 2px;
+  }
+
+
+  /* -------------------------------------------------------
+     RATING
+  ------------------------------------------------------- */
+
+  .cycle-rating-block {
+    grid-column: 2;
+    grid-row: 3;
+
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    margin: 0;
+
+    font-size: 9px;
+    line-height: 13px;
+  }
+
+  .cycle-rating-block .rating-star {
+    font-size: 10px;
+    margin-right: 2px;
+  }
+
+  .cycle-rating-block strong {
+    font-size: 9px;
+  }
+
+  .cycle-rating-block .rating-count {
+    font-size: 8px;
+    margin-left: 2px;
+  }
+
+
+  /* -------------------------------------------------------
+     OWNER
+  ------------------------------------------------------- */
+
+  .owner-row {
+    grid-column: 2;
+    grid-row: 4;
+
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    margin: 0;
+  }
+
+  .owner-avatar {
+    width: 18px;
+    height: 18px;
+
+    min-width: 18px;
+
+    font-size: 8px;
+  }
+
+  .owner-details {
+    min-width: 0;
+
+    margin-left: 5px;
+  }
+
+  .owner-details strong {
+    display: block;
+
+    max-width: 100%;
+
+    font-size: 9px;
+    line-height: 12px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .owner-details > span {
+    display: none;
+  }
+
+
+  /* -------------------------------------------------------
+     PRICE
+     RIGHT SIDE
+  ------------------------------------------------------- */
+
+  .cycle-price-line {
+    grid-column: 3;
+    grid-row: 1 / 3;
+
+    align-self: start;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 0;
+
+    margin: 0;
+
+    white-space: nowrap;
+  }
+
+  .cycle-price-line strong {
+    font-size: 11px;
+    line-height: 15px;
+  }
+
+  .cycle-price-line span {
+    font-size: 8px;
+    line-height: 10px;
+  }
+
+  .cycle-price-line i {
+    display: none;
+  }
+
+
+  /* -------------------------------------------------------
+     VIEW DETAILS
+     RIGHT SIDE / BOTTOM
+  ------------------------------------------------------- */
+
+  .rent-btn {
+    grid-column: 3;
+    grid-row: 4;
+
+    align-self: end;
+    justify-self: stretch;
+
+    width: 100%;
+
+    min-height: 24px;
+
+    padding: 5px 4px;
+
+    border-radius: 6px;
+
+    font-size: 8px;
+    line-height: 10px;
+
+    white-space: nowrap;
+  }
+
+
+  /* -------------------------------------------------------
+     CYCLE GRID
+  ------------------------------------------------------- */
+
+  .cycle-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+
+  /* -------------------------------------------------------
+     PREVENT LONG TEXT FROM BREAKING THE CARD
+  ------------------------------------------------------- */
+
+  .cycle-details,
+  .cycle-card-main,
+  .cycle-title-row,
+  .cycle-name {
+    min-width: 0;
+  }
+
+}
+
+
+/* =========================================================
+   FINAL MOBILE CARD — GEAR + CLEAN AVAILABILITY
+   ---------------------------------------------------------
+   MOBILE ONLY.
+   Existing desktop/tablet CSS remains untouched.
+
+   Mobile information order:
+     1. Cycle name
+     2. Location
+     3. Rating
+     4. Gear type
+     5. Owner name
+
+   Right side:
+     Price/hour
+     Price/day
+     View Details
+
+   Image:
+     Availability badge inside image
+     Favourite hidden
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+  .cycle-grid .cycle-card {
+    position: relative !important;
+
+    display: grid !important;
+    grid-template-columns: 122px minmax(0, 1fr) !important;
+    grid-template-rows: 100px !important;
+
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    overflow: hidden !important;
+  }
+
+  /* ---------------- IMAGE ---------------- */
+
+  .cycle-grid .cycle-image {
+    position: relative !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 122px !important;
+    min-width: 122px !important;
+
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    overflow: hidden !important;
+    border-radius: 8px 0 0 8px !important;
+  }
+
+  .cycle-grid .cycle-image img {
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  /* ---------------- AVAILABILITY ----------------
+     Keep it INSIDE the image and make unavailable
+     compact instead of the large white overlay.
+  -------------------------------------------------- */
+
+  .cycle-grid .available-badge,
+  .cycle-grid .availability-badge {
+    position: absolute !important;
+
+    top: 6px !important;
+    right: 6px !important;
+    left: auto !important;
+
+    z-index: 30 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+    max-width: calc(100% - 12px) !important;
+
+    min-height: 0 !important;
+
+    padding: 3px 6px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6px !important;
+    line-height: 8px !important;
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  .cycle-grid .available-badge {
+    background: #DFF7E8 !important;
+    color: #16834A !important;
+    border: 1px solid #B8E8C9 !important;
+  }
+
+  .cycle-grid .availability-badge.other {
+    background: #F2F4F7 !important;
+    color: #667085 !important;
+    border: 1px solid #D0D5DD !important;
+  }
+
+  /* ---------------- FAVOURITE ---------------- */
+
+  .cycle-grid .favorite-btn {
+    display: none !important;
+  }
+
+  /* ---------------- DETAILS ---------------- */
+
+  .cycle-grid .cycle-details {
+    position: relative !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+
+    min-width: 0 !important;
+
+    padding: 7px 8px !important;
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    display: grid !important;
+
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 19px 18px 18px 18px 1fr !important;
+
+    align-items: center !important;
+  }
+
+  /* Let individual JSX elements occupy the required rows. */
+  .cycle-grid .cycle-card-main {
+    display: contents !important;
+  }
+
+  /* ---------------- 1. NAME ---------------- */
+
+  .cycle-grid .cycle-title-row {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .cycle-grid .cycle-name {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding: 0 64px 0 0 !important;
+    margin: 0 !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 10px !important;
+    line-height: 12px !important;
+    font-weight: 750 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .cycle-model {
+    display: none !important;
+  }
+
+  /* ---------------- 2. LOCATION ---------------- */
+
+  .cycle-grid .cycle-location {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 62px 0 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 3px !important;
+
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .location-icon {
+    flex: 0 0 auto !important;
+    font-size: 7px !important;
+  }
+
+  /* ---------------- 3. RATING ---------------- */
+
+  .cycle-grid .cycle-rating-block {
+    position: static !important;
+
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+
+    width: fit-content !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 2px !important;
+
+    white-space: nowrap !important;
+  }
+
+  .cycle-grid .rating-star {
+    font-size: 8px !important;
+    line-height: 8px !important;
+  }
+
+  .cycle-grid .cycle-rating-block strong {
+    font-size: 6.5px !important;
+    line-height: 8px !important;
+  }
+
+  .cycle-grid .rating-count {
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+  }
+
+  /* ---------------- 4. GEAR TYPE ---------------- */
+
+  .cycle-grid .cycle-gear-badge {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+
+    justify-self: start !important;
+    align-self: center !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: fit-content !important;
+    max-width: 85px !important;
+
+    min-height: 14px !important;
+
+    margin: 0 !important;
+    padding: 2px 5px !important;
+
+    border-radius: 4px !important;
+
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+    font-weight: 600 !important;
+
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  .cycle-grid .cycle-gear-badge.geared {
+    background: #EEF4F8 !important;
+    color: #163A5F !important;
+    border: 1px solid #D8E4EC !important;
+  }
+
+  .cycle-grid .cycle-gear-badge.non-geared {
+    background: #F4F5F6 !important;
+    color: #667085 !important;
+    border: 1px solid #E2E4E7 !important;
+  }
+
+  /* ---------------- 5. OWNER ---------------- */
+
+  .cycle-grid .owner-row {
+    grid-column: 1 !important;
+    grid-row: 5 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 4px !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .owner-avatar {
+    width: 17px !important;
+    height: 17px !important;
+
+    min-width: 17px !important;
+    min-height: 17px !important;
+
+    flex: 0 0 17px !important;
+
+    font-size: 6px !important;
+  }
+
+  .cycle-grid .owner-details {
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    overflow: hidden !important;
+  }
+
+  .cycle-grid .owner-details strong {
+    display: block !important;
+
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 6px !important;
+    line-height: 8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .cycle-grid .owner-details > span {
+    display: none !important;
+  }
+
+  /* ---------------- PRICE ---------------- */
+
+  .cycle-grid .cycle-price-line {
+    position: absolute !important;
+
+    top: 7px !important;
+    right: 8px !important;
+
+    width: 55px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: grid !important;
+
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+
+    justify-content: end !important;
+    align-items: baseline !important;
+
+    column-gap: 2px !important;
+    row-gap: 1px !important;
+
+    text-align: right !important;
+
+    white-space: nowrap !important;
+    z-index: 20 !important;
+  }
+
+  .cycle-grid .cycle-price-line i {
+    display: none !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 8px !important;
+    line-height: 9px !important;
+  }
+
+  .cycle-grid .cycle-price-line span {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 5.5px !important;
+    line-height: 7px !important;
+  }
+
+  /* ---------------- VIEW DETAILS ---------------- */
+
+  .cycle-grid .rent-btn {
+    position: absolute !important;
+
+    right: 8px !important;
+    bottom: 7px !important;
+
+    width: 64px !important;
+    min-width: 64px !important;
+
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+
+    margin: 0 !important;
+    padding: 5px 6px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 6px !important;
+    line-height: 1 !important;
+
+    z-index: 20 !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media screen and (max-width: 390px) {
+
+  .cycle-grid .cycle-card {
+    grid-template-columns: 116px minmax(0, 1fr) !important;
+
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 116px !important;
+    min-width: 116px !important;
+
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+
+    padding: 6px 7px !important;
+
+    grid-template-rows: 18px 17px 17px 17px 1fr !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    top: 6px !important;
+    right: 7px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    right: 7px !important;
+    bottom: 6px !important;
+
+    width: 62px !important;
+    min-width: 62px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media screen and (max-width: 350px) {
+
+  .cycle-grid .cycle-card {
+    grid-template-columns: 106px minmax(0, 1fr) !important;
+
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+  }
+
+  .cycle-grid .cycle-image {
+    width: 106px !important;
+    min-width: 106px !important;
+
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 92px !important;
+    min-height: 92px !important;
+    max-height: 92px !important;
+
+    padding: 5px 6px !important;
+
+    grid-template-rows: 17px 16px 16px 16px 1fr !important;
+  }
+
+  .cycle-grid .cycle-gear-badge {
+    font-size: 5px !important;
+    min-height: 13px !important;
+    padding: 2px 4px !important;
+  }
+
+  .cycle-grid .cycle-price-line {
+    top: 5px !important;
+    right: 6px !important;
+
+    width: 50px !important;
+  }
+
+  .cycle-grid .cycle-price-line strong {
+    font-size: 7.5px !important;
+  }
+
+  .cycle-grid .cycle-price-line span {
+    font-size: 5px !important;
+  }
+
+  .cycle-grid .rent-btn {
+    right: 6px !important;
+    bottom: 5px !important;
+
+    width: 58px !important;
+    min-width: 58px !important;
+
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+
+    font-size: 5.5px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE PRICE POSITION — FINAL ALIGNMENT
+   ---------------------------------------------------------
+   Move the price block slightly toward the middle so it
+   visually aligns above the View Details button instead of
+   sitting against the extreme right edge.
+   ========================================================= */
+
+@media screen and (max-width: 700px) {
+  .cycle-grid .cycle-price-line {
+    right: 18px !important;
+    width: 62px !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+}
+
+@media screen and (max-width: 390px) {
+  .cycle-grid .cycle-price-line {
+    right: 16px !important;
+    width: 58px !important;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .cycle-grid .cycle-price-line {
+    right: 14px !important;
+    width: 54px !important;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP FINAL POLISH
+   ---------------------------------------------------------
+   Desktop/tablet only. Mobile rules below 700px remain
+   exactly as previously configured.
+
+   1. All desktop filter blocks have equal width.
+   2. Location select is centered inside its block.
+   3. Gear badge is compact.
+   4. Favourite icon is removed from cycle cards.
+========================================================= */
+
+@media screen and (min-width: 1051px) {
+
+  /* -------------------------------------------------------
+     EQUAL FILTER BLOCK WIDTHS
+  ------------------------------------------------------- */
+
+  .filter-controls {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr)) !important;
+
+    gap: 14px !important;
+
+    align-items: stretch !important;
+  }
+
+  .filter-control {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    box-sizing: border-box !important;
+
+    min-height: 170px !important;
+  }
+
+  /* -------------------------------------------------------
+     LOCATION FILTER
+     Keep the label at the top but vertically center the
+     actual location selector within the remaining space.
+  ------------------------------------------------------- */
+
+  .filter-control:nth-child(4) {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+  }
+
+  .filter-control:nth-child(4) label {
+    width: 100% !important;
+
+    margin-bottom: 18px !important;
+
+    text-align: center !important;
+  }
+
+  .filter-control:nth-child(4) select {
+    width: 100% !important;
+
+    margin-top: 16px !important;
+    margin-bottom: auto !important;
+
+    text-align: left !important;
+  }
+
+  /* -------------------------------------------------------
+     GEAR TYPE FILTER
+     Keep its options aligned cleanly in the middle area.
+  ------------------------------------------------------- */
+
+  .filter-control:nth-child(5) {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+  }
+
+  .filter-control:nth-child(5) label {
+    width: 100% !important;
+
+    text-align: center !important;
+
+    margin-bottom: 18px !important;
+  }
+
+  .filter-control:nth-child(5) .gear-options {
+    width: 100% !important;
+
+    justify-content: flex-start !important;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP CYCLE CARD POLISH
+========================================================= */
+
+@media screen and (min-width: 701px) {
+
+  /* Remove favourite icon from desktop/tablet cards too. */
+  .cycle-grid .favorite-btn {
+    display: none !important;
+  }
+
+  /* -------------------------------------------------------
+     COMPACT GEAR / NON-GEAR BADGE
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-gear-badge {
+    display: inline-flex !important;
+
+    width: fit-content !important;
+    max-width: max-content !important;
+
+    min-height: 20px !important;
+
+    align-self: flex-start !important;
+
+    margin: 5px 0 0 !important;
+
+    padding: 3px 7px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 8px !important;
+    line-height: 10px !important;
+
+    font-weight: 650 !important;
+
+    white-space: nowrap !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .cycle-grid .cycle-gear-badge.geared {
+    background: #EEF4F8 !important;
+    color: #163A5F !important;
+
+    border: 1px solid #D8E4EC !important;
+  }
+
+  .cycle-grid .cycle-gear-badge.non-geared {
+    background: #F4F5F6 !important;
+    color: #667085 !important;
+
+    border: 1px solid #E2E4E7 !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET FILTERS — EQUAL WIDTHS
+   Keeps the desktop filter appearance balanced before the
+   mobile breakpoint.
+========================================================= */
+
+@media screen and (min-width: 701px) and (max-width: 1050px) {
+
+  .filter-controls {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 12px !important;
+  }
+
+  .filter-control {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .cycle-grid .favorite-btn {
+    display: none !important;
+  }
+
+  .cycle-grid .cycle-gear-badge {
+    display: inline-flex !important;
+
+    width: fit-content !important;
+    max-width: max-content !important;
+
+    min-height: 18px !important;
+
+    margin-top: 4px !important;
+
+    padding: 3px 6px !important;
+
+    border-radius: 5px !important;
+
+    font-size: 7px !important;
+    line-height: 9px !important;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP CYCLE CARD — CENTERED DETAILS
+   ---------------------------------------------------------
+   Desktop/tablet only.
+   Mobile card layout remains unchanged.
+
+   - Center all card details
+   - Hide owner location
+   - Keep image / availability / existing connections
+   - Keep View Details full-width
+========================================================= */
+
+@media screen and (min-width: 701px) {
+
+  /* -------------------------------------------------------
+     CARD DETAILS
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-details {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+
+    width: 100% !important;
+
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /* -------------------------------------------------------
+     CYCLE NAME
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-title-row {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    text-align: center !important;
+  }
+
+  .cycle-grid .cycle-name {
+    width: 100% !important;
+
+    text-align: center !important;
+  }
+
+  .cycle-grid .cycle-title-row h2 {
+    width: 100% !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    text-align: center !important;
+  }
+
+  .cycle-grid .cycle-model {
+    width: 100% !important;
+
+    text-align: center !important;
+  }
+
+  /* -------------------------------------------------------
+     PRICE
+     Center horizontally beneath the cycle name
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-price-line {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: baseline !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* -------------------------------------------------------
+     LOCATION
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-location {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cycle-grid .location-icon {
+    flex: 0 0 auto !important;
+  }
+
+  /* -------------------------------------------------------
+     RATING
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-rating-block {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* -------------------------------------------------------
+     GEAR TYPE
+  ------------------------------------------------------- */
+
+  .cycle-grid .cycle-gear-badge {
+    align-self: center !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    text-align: center !important;
+  }
+
+  /* -------------------------------------------------------
+     OWNER
+  ------------------------------------------------------- */
+
+  .cycle-grid .owner-row {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cycle-grid .owner-details {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    text-align: center !important;
+  }
+
+  .cycle-grid .owner-details strong {
+    text-align: center !important;
+  }
+
+  /* Remove owner location completely */
+  .cycle-grid .owner-details > span {
+    display: none !important;
+  }
+
+  /* -------------------------------------------------------
+     VIEW DETAILS
+  ------------------------------------------------------- */
+
+  .cycle-grid .rent-btn {
+    align-self: stretch !important;
+
+    width: 100% !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    text-align: center !important;
+  }
 }

@@ -19,7 +19,7 @@ import "./CycleVerification.css";
 */
 
 const VERIFICATION_WEBHOOK =
-  "https://stem61.app.n8n.cloud/webhook/cycle-listing-verification";
+  "https://ugo-cyclesharing.app.n8n.cloud/webhook/cycle-listing-verification";
 
 function CycleVerification({ cycleId: propCycleId, onBack }) {
   const [cycleId, setCycleId] = useState(propCycleId || null);

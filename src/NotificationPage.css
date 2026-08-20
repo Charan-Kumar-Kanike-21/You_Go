@@ -37,19 +37,19 @@
 }
 
 .notification-page {
-  --bg-dark: #08051a;
-  --panel: #051912;
-  --panel-light: #0b241a;
+  --bg-dark: #f7f9fc;
+  --panel: #ffffff;
+  --panel-light: #f7f9fc;
 
-  --green: #42e77a;
-  --green-light: #66e77a;
-  --green-soft: rgba(66, 231, 122, 0.08);
+  --green: #2e8b70;
+  --green-light: #2e8b70;
+  --green-soft: rgba(46, 139, 112, 0.08);
 
-  --text-primary: #f4f8f5;
-  --text-secondary: #9aada2;
-  --text-muted: #61796b;
+  --text-primary: #163a5f;
+  --text-secondary: #667085;
+  --text-muted: #98a2b3;
 
-  --border: rgba(66, 231, 122, 0.14);
+  --border: #e5e7eb;
 
   min-height: 100vh;
   width: 100%;
@@ -64,18 +64,7 @@
     Helvetica,
     sans-serif;
 
-  background:
-    radial-gradient(
-      circle at 70% 0%,
-      rgba(45, 130, 72, 0.35),
-      transparent 38%
-    ),
-    linear-gradient(
-      135deg,
-      #08051a 0%,
-      #061a12 48%,
-      #071d15 100%
-    );
+  background: #f7f9fc;
 
   overflow-x: hidden;
 
@@ -642,13 +631,7 @@
   color:
     var(--text-secondary);
 
-  background:
-    linear-gradient(
-      135deg,
-      #08051a 0%,
-      #061a12 48%,
-      #071d15 100%
-    );
+  background: #f7f9fc;
 
   font-size: 12px;
 }
@@ -1061,3 +1044,333 @@
   }
 }
 
+
+
+/* =========================================================
+   FINAL NITK CYCLE SHARING THEME + HEADER LAYOUT
+   ========================================================= */
+
+.notification-page {
+  --bg-dark: #f7f9fc;
+  --panel: #ffffff;
+  --panel-light: #f7f9fc;
+  --green: #2e8b70;
+  --green-light: #2e8b70;
+  --green-soft: rgba(46, 139, 112, 0.08);
+  --text-primary: #163a5f;
+  --text-secondary: #667085;
+  --text-muted: #98a2b3;
+  --border: #e5e7eb;
+
+  min-height: 100vh;
+  background: #f7f9fc !important;
+  color: #17202a;
+}
+
+/* Main content */
+.notification-container {
+  position: relative;
+  width: min(1120px, 94%);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 42px 0 60px;
+}
+
+/* =========================================================
+   BACK BUTTON — RIGHT CORNER
+   ========================================================= */
+
+.notification-back-button {
+  position: fixed !important;
+  top: 22px !important;
+  right: 24px !important;
+  left: auto !important;
+  z-index: 100 !important;
+
+  margin: 0 !important;
+  padding: 8px 13px !important;
+
+  border: 1px solid #cfd8e3 !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+  color: #163a5f !important;
+
+  box-shadow: 0 3px 12px rgba(22, 58, 95, 0.06);
+}
+
+.notification-back-button:hover {
+  background: #eaf2f8 !important;
+  border-color: #9bb4ca !important;
+  color: #163a5f !important;
+}
+
+/* =========================================================
+   HEADER — CENTER OF PAGE
+   ========================================================= */
+
+.notification-header {
+  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 0 0 30px !important;
+}
+
+.notification-header-left {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-eyebrow {
+  margin-bottom: 7px !important;
+  color: #2e8b70 !important;
+  font-size: 9px !important;
+  letter-spacing: 2px !important;
+  font-weight: 750 !important;
+}
+
+.notification-header h1 {
+  margin: 0 !important;
+  color: #163a5f !important;
+  font-size: 30px !important;
+  line-height: 1.1 !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.6px !important;
+}
+
+.notification-header p {
+  max-width: 580px !important;
+  margin: 8px auto 0 !important;
+  color: #667085 !important;
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+}
+
+/* =========================================================
+   CARDS — LIGHT NITK STYLE
+   ========================================================= */
+
+.notification-card {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 11px !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(22, 58, 95, 0.045) !important;
+  backdrop-filter: none !important;
+}
+
+.notification-card:hover {
+  background: #ffffff !important;
+  border-color: #cddae6 !important;
+  box-shadow: 0 8px 22px rgba(22, 58, 95, 0.08) !important;
+}
+
+.notification-card.notification-unread {
+  border-color: #b9d9cc !important;
+  background: #fbfefd !important;
+}
+
+.notification-card.notification-unread::before {
+  top: 13px !important;
+  bottom: 13px !important;
+  height: auto !important;
+  width: 3px !important;
+  background: #2e8b70 !important;
+}
+
+/* Icon */
+.notification-icon {
+  border: 1px solid #d6e9e1 !important;
+  border-radius: 10px !important;
+  background: #e8f6f0 !important;
+  color: #2e8b70 !important;
+  box-shadow: none !important;
+}
+
+/* Text */
+.notification-title-row h3 {
+  color: #163a5f !important;
+}
+
+.notification-message {
+  color: #667085 !important;
+}
+
+.notification-time {
+  color: #98a2b3 !important;
+}
+
+/* JSX uses this class for unread notifications */
+.unread-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #2e8b70;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.notification-action-button {
+  border: 1px solid #c7ded5 !important;
+  border-radius: 7px !important;
+  background: #e8f6f0 !important;
+  color: #246f5a !important;
+}
+
+.notification-action-button:hover {
+  background: #dff1e9 !important;
+  border-color: #9fcbb9 !important;
+  color: #163a5f !important;
+}
+
+.accept-button {
+  background: #2e8b70 !important;
+  border-color: #2e8b70 !important;
+  color: #ffffff !important;
+}
+
+.accept-button:hover {
+  background: #246f5a !important;
+  border-color: #246f5a !important;
+}
+
+.reject-button {
+  background: #ffffff !important;
+  border-color: #d64545 !important;
+  color: #b83232 !important;
+}
+
+.reject-button:hover {
+  background: #fff4f4 !important;
+  border-color: #b83232 !important;
+  color: #922626 !important;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+   ========================================================= */
+
+.notification-empty {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(22, 58, 95, 0.04);
+}
+
+.notification-empty-icon {
+  border: 1px solid #d6e9e1 !important;
+  border-radius: 15px !important;
+  background: #e8f6f0 !important;
+  box-shadow: none !important;
+}
+
+.notification-empty h2 {
+  color: #163a5f !important;
+}
+
+.notification-empty p {
+  color: #667085 !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .notification-container {
+    width: calc(100% - 24px);
+    padding: 22px 0 40px;
+  }
+
+  .notification-back-button {
+    position: absolute !important;
+    top: 12px !important;
+    right: 0 !important;
+    left: auto !important;
+    padding: 7px 10px !important;
+    font-size: 9px !important;
+  }
+
+  .notification-header {
+    padding-top: 48px !important;
+    margin-bottom: 22px !important;
+  }
+
+  .notification-header-left {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .notification-header h1 {
+    font-size: 24px !important;
+  }
+
+  .notification-header p {
+    max-width: 330px !important;
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .notification-container {
+    width: calc(100% - 20px);
+    padding-top: 18px;
+  }
+
+  .notification-back-button {
+    top: 9px !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  .notification-header {
+    padding-top: 44px !important;
+  }
+
+  .notification-header h1 {
+    font-size: 22px !important;
+  }
+}
+
+@media (hover: none) {
+  .notification-card:hover {
+    transform: none !important;
+    background: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(22, 58, 95, 0.045) !important;
+  }
+}
+
+/* =========================================================
+   FINAL BACK BUTTON POSITION
+   ---------------------------------------------------------
+   Back button is intentionally kept at the RIGHT corner
+   on desktop, tablet and mobile.
+========================================================= */
+
+.notification-back-button {
+  left: auto !important;
+  right: 24px !important;
+}
+
+@media (max-width: 700px) {
+  .notification-back-button {
+    left: auto !important;
+    right: 0 !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .notification-back-button {
+    left: auto !important;
+    right: 0 !important;
+  }
+}
