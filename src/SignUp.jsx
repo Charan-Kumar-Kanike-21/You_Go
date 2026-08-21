@@ -92,6 +92,11 @@ function SignUp({ onBackToLogin, onTermsClick }) {
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: formData.password,
+        options: {
+          data: {
+            phone: mobile,
+          },
+        },
       });
 
       console.log("Supabase Auth Response:", data);

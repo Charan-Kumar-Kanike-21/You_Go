@@ -13,6 +13,7 @@ function CycleOwner({ onListCycle, onNotifications, onEditCycle, onProfile, hand
   const [deletingId, setDeletingId] = useState(null);
   const [statusChangingId, setStatusChangingId] = useState(null);
   const [statusConfirmCycle, setStatusConfirmCycle] = useState(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [dontAskStatusAgain, setDontAskStatusAgain] = useState(
     localStorage.getItem("cycleStatusDontAskAgain") === "true"
   );
@@ -538,6 +539,18 @@ const ownerName =
   "Cycle Owner";
 
   // =========================================
+  // LIST CYCLE AUTH CHECK
+  // =========================================
+
+  const handleListCycleClick = () => {
+    if (isLoggedIn) {
+      onListCycle();
+    } else {
+      setShowLoginPrompt(true);
+    }
+  };
+
+  // =========================================
   // RENDER
   // =========================================
 
@@ -638,10 +651,11 @@ const ownerName =
 
         {/* LIST CYCLE */}
 
-        <button
-          className="owner-action-card list-action"
-          onClick={onListCycle}
-        >
+          <button
+            className="owner-action-card list-action"
+            onClick={handleListCycleClick}
+            type="button"
+          >
 
           <div className="action-icon">
             ➕
@@ -797,7 +811,8 @@ const ownerName =
 
               <button
                 className="empty-list-btn"
-                onClick={onListCycle}
+                onClick={handleListCycleClick}
+                type="button"
               >
                 + List My First Cycle
               </button>
@@ -1079,6 +1094,57 @@ const ownerName =
           </div>
         </div>
       )}
+
+      {/* =========================================
+              LOGIN REQUIRED POPUP
+          ========================================= */}
+
+          {showLoginPrompt && (
+            <div className="owner-login-overlay">
+              <div
+                className="owner-login-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="owner-login-title"
+              >
+                <div className="owner-login-icon">
+                  🔐
+                </div>
+
+                <h2 id="owner-login-title">
+                  Login Required
+                </h2>
+
+                <p>
+                  Please login or sign up to list your cycle
+                  on the NITK Cycle Sharing platform.
+                </p>
+
+                <div className="owner-login-actions">
+
+                  <button
+                    type="button"
+                    className="owner-login-cancel"
+                    onClick={() => setShowLoginPrompt(false)}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    className="owner-login-confirm"
+                    onClick={() => {
+                      setShowLoginPrompt(false);
+                      handleBackToLogin();
+                    }}
+                  >
+                    Login / Sign Up →
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          )}
 
       {/* =========================================
           FOOTER

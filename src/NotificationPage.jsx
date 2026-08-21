@@ -36,10 +36,159 @@ function NotificationPage({ onAction, onBack }) {
   // The parent/backend action connection remains unchanged.
   const [rentalDecisions, setRentalDecisions] = useState({});
   const [processingRentalId, setProcessingRentalId] = useState(null);
+  const [otpRegeneratedIds, setOtpRegeneratedIds] = useState({});
   // Notifications selected with the checkboxes.
   const [selectedNotificationIds, setSelectedNotificationIds] = useState([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
-  const [selectionMode, setSelectionMode] = useState(false);
+
+  // One shared clock drives all notification countdowns.
+  // The backend-provided expiry_time remains the source of truth.
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  const getNotificationExpiry = (notification) => {
+    const actionData = notification?.action_data || {};
+
+    /*
+     * IMPORTANT:
+     * expiry_time from the backend is the source of truth.
+     *
+     * Do NOT compare it with created_at here.
+     *
+     * A regenerated OTP has a NEW expiry_time while the notification
+     * may still have the OLD created_at. Comparing the two would make
+     * the regenerated OTP expire immediately.
+     */
+    const backendExpiry =
+      actionData.expiry_time ||
+      actionData.expiryTime ||
+      actionData.otp_expires_at ||
+      actionData.otp_expires_at_timestamp ||
+      actionData.expires_at ||
+      actionData.timestampz;
+
+    if (backendExpiry) {
+      const expiryTimestamp =
+        new Date(backendExpiry).getTime();
+
+      if (Number.isFinite(expiryTimestamp)) {
+        return expiryTimestamp;
+      }
+    }
+
+    /*
+     * Only use created_at as a fallback when the backend did not
+     * provide an expiry timestamp at all.
+     */
+    const createdTimestamp =
+      new Date(notification?.created_at).getTime();
+
+    return Number.isFinite(createdTimestamp)
+      ? createdTimestamp + 15 * 60 * 1000
+      : null;
+  };
+
+  const getRemainingSeconds = (notification) => {
+    const expiryTimestamp =
+      getNotificationExpiry(notification);
+
+    if (!expiryTimestamp) return null;
+
+    return Math.max(
+      0,
+      Math.ceil(
+        (expiryTimestamp - currentTime) / 1000
+      )
+    );
+  };
+
+  const isNotificationExpired = (notification) => {
+    const remaining =
+      getRemainingSeconds(notification);
+
+    return remaining !== null && remaining <= 0;
+  };
+
+  const formatRemainingTime = (seconds) => {
+    if (seconds === null) return null;
+
+    const safeSeconds = Math.max(0, seconds);
+    const minutes = Math.floor(safeSeconds / 60);
+    const remainingSeconds = safeSeconds % 60;
+
+    return `${String(minutes).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
+  };
+
+  const isOtpNotification = (notification) => {
+    const actionType =
+      String(notification?.action_type || "")
+        .trim()
+        .toLowerCase();
+
+    const title =
+      String(notification?.title || "")
+        .trim()
+        .toLowerCase();
+
+    const message =
+      String(notification?.message || "")
+        .trim()
+        .toLowerCase();
+
+    return (
+      actionType === "enter_rental_otp" ||
+      actionType === "otp_verification" ||
+      actionType === "rental_otp" ||
+      actionType === "rental_otp_generated" ||
+      actionType === "pickup_otp_generated" ||
+      actionType === "regenerate_rental_otp" ||
+      title.includes("rental otp") ||
+      title.includes("otp generated") ||
+      message.includes("pickup otp") ||
+      message.includes("session otp")
+    );
+  };
+
+  const isOwnerOtpNotification = (notification) => {
+    if (!isOtpNotification(notification)) {
+      return false;
+    }
+
+    const actionData =
+      notification?.action_data || {};
+
+    // Prefer an explicit recipient role when supplied by the backend.
+    const role = String(
+      actionData.role ||
+      actionData.recipient_role ||
+      actionData.user_role ||
+      ""
+    ).trim().toLowerCase();
+
+    if (role === "owner") return true;
+    if (role === "user" || role === "renter") return false;
+
+    // Prefer explicit owner_id when supplied.
+    if (actionData.owner_id) {
+      return (
+        String(actionData.owner_id) ===
+        String(notification?.user_id)
+      );
+    }
+
+    // Existing owner OTP notifications use enter_rental_OTP.
+    return (
+      String(notification?.action_type || "")
+        .trim()
+        .toLowerCase() ===
+      "enter_rental_otp"
+    );
+  };
+
+  const isRentalRequestNotification = (notification) =>
+    notification?.action_type ===
+    "rental_request_received";
 
   const getRentalCycleId = (notification) => {
     const data = notification?.action_data || {};
@@ -55,29 +204,50 @@ function NotificationPage({ onAction, onBack }) {
     );
   };
 
+  /*
+   * Rental decision is persisted inside notifications.action_data.
+   *
+   * We keep rentalDecisions as a local cache for the current page,
+   * but action_data is the source of truth so the decision survives
+   * a refresh/reload of the notification page.
+   */
+  const getPersistedRentalDecision = (notification) => {
+    const actionData = notification?.action_data;
+
+    if (!actionData || typeof actionData !== "object") {
+      return null;
+    }
+
+    const decision =
+      actionData.rental_decision ||
+      actionData.rentalDecision ||
+      null;
+
+    return decision === "accepted" || decision === "rejected"
+      ? decision
+      : null;
+  };
+
   const getRentalDecision = (notification) =>
-    rentalDecisions[notification?.id] || null;
+    rentalDecisions[notification?.id] ||
+    getPersistedRentalDecision(notification) ||
+    null;
 
   const hasAcceptedRentalForCycle = (notification) => {
     const cycleId = getRentalCycleId(notification);
 
     if (!cycleId) return false;
 
-    return Object.entries(rentalDecisions).some(
-      ([notificationId, decision]) => {
-        if (decision !== "accepted") return false;
-
-        const acceptedNotification = notifications.find(
-          (item) => String(item.id) === String(notificationId)
-        );
-
-        return (
-          acceptedNotification &&
-          String(getRentalCycleId(acceptedNotification)) ===
-            String(cycleId)
-        );
+    return notifications.some((item) => {
+      if (String(item.id) === String(notification.id)) {
+        return false;
       }
-    );
+
+      return (
+        getRentalDecision(item) === "accepted" &&
+        String(getRentalCycleId(item)) === String(cycleId)
+      );
+    });
   };
 
   const markNotificationAsRead = async (notificationId) => {
@@ -134,10 +304,55 @@ function NotificationPage({ onAction, onBack }) {
       // Preserve the existing parent/backend connection.
       await onAction(action, notification);
 
+      /*
+       * Persist the owner's choice in the notification itself.
+       * This is what makes Accepted/Rejected survive a page refresh.
+       *
+       * We merge the existing action_data so no existing backend
+       * connection/data is overwritten.
+       */
+      const existingActionData =
+        notification?.action_data &&
+        typeof notification.action_data === "object"
+          ? notification.action_data
+          : {};
+
+      const updatedActionData = {
+        ...existingActionData,
+        rental_decision: decision,
+      };
+
+      const { data: updatedNotification, error: decisionUpdateError } =
+        await supabase
+          .from("notifications")
+          .update({
+            action_data: updatedActionData,
+          })
+          .eq("id", notification.id)
+          .eq("user_id", notification.user_id)
+          .select("*")
+          .single();
+
+      if (decisionUpdateError) {
+        throw decisionUpdateError;
+      }
+
       setRentalDecisions((previous) => ({
         ...previous,
         [notification.id]: decision,
       }));
+
+      setNotifications((previousNotifications) =>
+        previousNotifications.map((item) =>
+          item.id === notification.id
+            ? {
+                ...item,
+                ...(updatedNotification || {}),
+                action_data: updatedActionData,
+              }
+            : item
+        )
+      );
 
       if (!notification.is_read) {
         await markNotificationAsRead(notification.id);
@@ -148,6 +363,155 @@ function NotificationPage({ onAction, onBack }) {
       setProcessingRentalId(null);
     }
   };
+
+  /*
+  |--------------------------------------------------------------------------
+  | COUNTDOWN CLOCK
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | REGENERATE OTP
+  |--------------------------------------------------------------------------
+  |
+  | The backend remains responsible for generating/sending the new OTP
+  | and returning/updating the new expiry_time. We only send the existing
+  | notification + booking context through the established onAction path.
+  |--------------------------------------------------------------------------
+  */
+
+  const handleRegenerateOtp = async (notification) => {
+    if (!notification?.id || processingRentalId) return;
+
+    try {
+      setProcessingRentalId(notification.id);
+      setError(null);
+
+      if (typeof onAction !== "function") {
+        throw new Error(
+          "Notification action handler is not provided."
+        );
+      }
+
+      /*
+       * App.jsx calls the regeneration webhook and RETURNS its
+       * backend response to us.
+       */
+      const backendResult = await onAction(
+        "regenerate_rental_otp",
+        notification
+      );
+
+      if (backendResult === false) {
+        throw new Error(
+          "OTP regeneration was not completed by the backend."
+        );
+      }
+
+      /*
+       * Extract the NEW expiry timestamp returned by the backend.
+       */
+      const returnedActionData =
+        backendResult?.action_data &&
+        typeof backendResult.action_data === "object"
+          ? backendResult.action_data
+          : {};
+
+      const backendExpiry =
+        returnedActionData.expiry_time ||
+        returnedActionData.expiryTime ||
+        returnedActionData.otp_expires_at ||
+        returnedActionData.otp_expires_at_timestamp ||
+        returnedActionData.expires_at ||
+        returnedActionData.timestampz ||
+        backendResult?.expiry_time ||
+        backendResult?.expiryTime ||
+        backendResult?.otp_expires_at;
+
+      /*
+       * If the backend returned an expiry timestamp, use it.
+       *
+       * If it did not return one, temporarily start a 15-minute
+       * client countdown. Realtime/fetch will replace it with the
+       * actual backend expiry as soon as the notification is updated.
+       */
+      const nextExpiry =
+        backendExpiry ||
+        new Date(
+          Date.now() + 15 * 60 * 1000
+        ).toISOString();
+
+      /*
+       * IMPORTANT:
+       * The old notification was expired. We immediately convert the
+       * owner card back into the active OTP state by replacing its
+       * expiry_time.
+       */
+      setOtpRegeneratedIds((previous) => ({
+        ...previous,
+        [notification.id]: true,
+      }));
+
+      setNotifications((previous) =>
+        previous.map((item) =>
+          item.id === notification.id
+            ? {
+                ...item,
+                is_read: false,
+                message:
+                  "OTP regenerated successfully. Enter the new OTP sent to the renter.",
+                action_type:
+                  item.action_type || "enter_rental_otp",
+                action_data: {
+                  ...(item.action_data || {}),
+                  ...returnedActionData,
+                  expiry_time: nextExpiry,
+                },
+              }
+            : item
+        )
+      );
+
+      /*
+       * Give the backend a moment to finish creating/updating the
+       * notification rows before fetching them.
+       *
+       * Realtime will also refresh the page as soon as Supabase emits
+       * the INSERT/UPDATE event.
+       */
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, 1200)
+      );
+
+      await fetchNotifications();
+
+    } catch (err) {
+      console.error(
+        "OTP regeneration failed:",
+        err
+      );
+
+      setError(
+        err.message ||
+        "Unable to regenerate OTP."
+      );
+    } finally {
+      setProcessingRentalId(null);
+    }
+  };
+
 
   /*
   |--------------------------------------------------------------------------
@@ -225,6 +589,25 @@ function NotificationPage({ onAction, onBack }) {
 
 
       /*
+       * Restore rental decisions from the database.
+       *
+       * The owner may have selected Accept/Reject before leaving
+       * the page. Because the choice is stored in action_data,
+       * rebuild the local decision cache after every fetch.
+       */
+      const persistedRentalDecisions = {};
+
+      fetchedNotifications.forEach((notification) => {
+        const decision = getPersistedRentalDecision(notification);
+
+        if (decision) {
+          persistedRentalDecisions[notification.id] = decision;
+        }
+      });
+
+      setRentalDecisions(persistedRentalDecisions);
+
+      /*
        * Store fetched notifications as-is.
        * Read/unread status is controlled by the user now.
        */
@@ -266,6 +649,66 @@ function NotificationPage({ onAction, onBack }) {
 
   /*
   |--------------------------------------------------------------------------
+  | REALTIME NOTIFICATION UPDATES
+  |--------------------------------------------------------------------------
+  |
+  | Refresh the current user's notifications whenever the backend
+  | creates or updates an OTP notification. This lets the renter see
+  | the newly generated session OTP and fresh 15-minute expiry without
+  | manually refreshing the page.
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    let channel = null;
+
+    const subscribeToNotifications = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) return;
+
+      channel = supabase
+        .channel(`notification-page-${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log(
+              "Notification realtime update:",
+              payload
+            );
+
+            fetchNotifications();
+          }
+        )
+        .subscribe((status) => {
+          console.log(
+            "Notification realtime status:",
+            status
+          );
+        });
+    };
+
+    subscribeToNotifications();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, []);
+
+
+  /*
+  |--------------------------------------------------------------------------
   | NOTIFICATION SELECTION / BULK ACTIONS
   |--------------------------------------------------------------------------
   */
@@ -276,6 +719,79 @@ function NotificationPage({ onAction, onBack }) {
         ? previous.filter((id) => id !== notificationId)
         : [...previous, notificationId]
     );
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    if (bulkProcessing || notifications.length === 0) return;
+
+    setBulkProcessing(true);
+
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+      if (!user) throw new Error("User is not logged in.");
+
+      const { error: updateError } = await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("user_id", user.id)
+        .eq("is_read", false);
+
+      if (updateError) throw updateError;
+
+      setNotifications((previous) =>
+        previous.map((notification) => ({
+          ...notification,
+          is_read: true,
+        }))
+      );
+    } catch (err) {
+      console.error("Error marking all notifications as read:", err);
+      setError(err.message || "Unable to mark all notifications as read.");
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const clearAllNotifications = async () => {
+    if (bulkProcessing || notifications.length === 0) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to clear all notifications?"
+    );
+
+    if (!confirmed) return;
+
+    setBulkProcessing(true);
+
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+      if (!user) throw new Error("User is not logged in.");
+
+      const { error: deleteError } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (deleteError) throw deleteError;
+
+      setNotifications([]);
+      setSelectedNotificationIds([]);
+    } catch (err) {
+      console.error("Error clearing all notifications:", err);
+      setError(err.message || "Unable to clear all notifications.");
+    } finally {
+      setBulkProcessing(false);
+    }
   };
 
   const markSelectedNotificationsAsRead = async () => {
@@ -301,7 +817,6 @@ function NotificationPage({ onAction, onBack }) {
         )
       );
       setSelectedNotificationIds([]);
-      setSelectionMode(false);
     } catch (err) {
       console.error("Error marking selected notifications as read:", err);
       setError(err.message || "Unable to mark selected notifications as read.");
@@ -329,7 +844,6 @@ function NotificationPage({ onAction, onBack }) {
         previous.filter((notification) => !selected.has(notification.id))
       );
       setSelectedNotificationIds([]);
-      setSelectionMode(false);
     } catch (err) {
       console.error("Error deleting selected notifications:", err);
       setError(err.message || "Unable to delete selected notifications.");
@@ -349,6 +863,7 @@ function NotificationPage({ onAction, onBack }) {
         : notifications.map((notification) => notification.id)
     );
   };
+
 
   /*
   |--------------------------------------------------------------------------
@@ -614,89 +1129,70 @@ function NotificationPage({ onAction, onBack }) {
             CONTENT
         ====================================================== */}
 
-        <section className={`notification-content ${selectionMode ? "notification-selection-mode" : ""}`}>
+        <section className="notification-content">
 
           {notifications.length > 0 && (
-            <div className="notification-toolbar">
-              <div className="notification-toolbar-left">
-                {selectionMode ? (
-                  <>
-                    <label className="notification-select-all">
-                      <input
-                        type="checkbox"
-                        checked={allNotificationsSelected}
-                        onChange={toggleSelectAllNotifications}
-                        disabled={bulkProcessing}
-                      />
-                      <span>Select all</span>
-                    </label>
+            <>
+              <div className="notification-toolbar">
+                <div className="notification-toolbar-left">
+                  <label className="notification-select-all custom-notification-checkbox select-all-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={allNotificationsSelected}
+                      onChange={toggleSelectAllNotifications}
+                      disabled={bulkProcessing}
+                    />
+                    <span className="notification-checkbox-box" aria-hidden="true"></span>
+                    <span className="select-all-label">Select all</span>
+                  </label>
 
-                    <span className="notification-count">
-                      {selectedNotificationIds.length > 0
-                        ? `${selectedNotificationIds.length} selected`
-                        : `${notifications.length} notifications`}
-                    </span>
-                  </>
-                ) : (
                   <span className="notification-count">
-                    {notifications.length} notification{notifications.length === 1 ? "" : "s"}
+                    {selectedNotificationIds.length > 0
+                      ? `${selectedNotificationIds.length} selected`
+                      : `${notifications.length} notification${notifications.length === 1 ? "" : "s"}`}
                   </span>
-                )}
+                </div>
+
+                <div className="notification-toolbar-actions">
+                  <button
+                    type="button"
+                    className="notification-toolbar-button read-all-button"
+                    onClick={markAllNotificationsAsRead}
+                    disabled={bulkProcessing}
+                  >
+                    ✓ Mark all as read
+                  </button>
+
+                  <button
+                    type="button"
+                    className="notification-toolbar-button clear-all-button"
+                    onClick={clearAllNotifications}
+                    disabled={bulkProcessing}
+                  >
+                    🗑 Clear all notifications
+                  </button>
+                </div>
               </div>
 
-              <div className="notification-toolbar-actions">
-                {!selectionMode ? (
-                  <>
-                    <button
-                      type="button"
-                      className="notification-icon-action mark-read-icon-button"
-                      onClick={() => {
-                        setSelectionMode(true);
-                        setSelectedNotificationIds([]);
-                      }}
-                      disabled={bulkProcessing}
-                      aria-label="Select notifications to mark as read"
-                      title="Mark notifications as read"
-                    >
-                      ✓
-                    </button>
+              {selectedNotificationIds.length > 0 && (
+                <div className="notification-selection-bar">
+                  <span>{selectedNotificationIds.length} selected</span>
 
+                  <div className="notification-selection-actions">
                     <button
                       type="button"
-                      className="notification-icon-action delete-icon-button"
-                      onClick={() => {
-                        setSelectionMode(true);
-                        setSelectedNotificationIds([]);
-                      }}
-                      disabled={bulkProcessing}
-                      aria-label="Select notifications to delete"
-                      title="Delete notifications"
-                    >
-                      🗑
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="notification-toolbar-button selected-mark-read-button"
+                      className="selected-mark-read-button"
                       onClick={markSelectedNotificationsAsRead}
-                      disabled={
-                        bulkProcessing ||
-                        selectedNotificationIds.length === 0
-                      }
+                      disabled={bulkProcessing}
                     >
                       ✓ Mark as read
                     </button>
 
                     <button
                       type="button"
-                      className="notification-toolbar-button selected-delete-button"
+                      className="selected-delete-button"
                       onClick={deleteSelectedNotifications}
-                      disabled={
-                        bulkProcessing ||
-                        selectedNotificationIds.length === 0
-                      }
+                      disabled={bulkProcessing}
                     >
                       🗑 Delete
                     </button>
@@ -704,20 +1200,16 @@ function NotificationPage({ onAction, onBack }) {
                     <button
                       type="button"
                       className="notification-cancel-selection"
-                      onClick={() => {
-                        setSelectedNotificationIds([]);
-                        setSelectionMode(false);
-                      }}
+                      onClick={() => setSelectedNotificationIds([])}
                       disabled={bulkProcessing}
                     >
                       Cancel
                     </button>
-                  </>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
-
 
           {/* ===================================================
               NO NOTIFICATIONS
@@ -804,33 +1296,31 @@ function NotificationPage({ onAction, onBack }) {
                     >
 
 
-                      {selectionMode && (
-                        <label
-                          className="notification-item-checkbox"
-                          aria-label={`Select ${notification.title || "notification"}`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedNotificationIds.includes(
+                      <label
+                        className="notification-item-checkbox custom-notification-checkbox"
+                        aria-label={`Select ${notification.title || "notification"}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedNotificationIds.includes(
+                            notification.id
+                          )}
+                          onChange={() =>
+                            toggleNotificationSelection(
                               notification.id
-                            )}
-                            onChange={() =>
-                              toggleNotificationSelection(
-                                notification.id
-                              )
-                            }
-                            disabled={bulkProcessing}
-                          />
-                          <span />
-                        </label>
-                      )}
+                            )
+                          }
+                          disabled={bulkProcessing}
+                        />
+                        <span />
+                      </label>
 
                       {/* =======================================
                           NOTIFICATION ICON
                       ======================================== */}
 
                       <div className="notification-icon">
-                        🔔
+                        <span className="notification-bell-icon" aria-hidden="true">♧</span>
                       </div>
 
 
@@ -890,7 +1380,7 @@ function NotificationPage({ onAction, onBack }) {
                           ACTION BUTTONS
                       ======================================= */}
 
-                      {notification.action_type === "rental_request_received" ? (
+                      {isRentalRequestNotification(notification) ? (
 
                         <div className="rental-request-actions">
 
@@ -906,6 +1396,16 @@ function NotificationPage({ onAction, onBack }) {
                             const isProcessing =
                               processingRentalId ===
                               notification.id;
+
+                            const remainingSeconds =
+                              getRemainingSeconds(
+                                notification
+                              );
+
+                            const expired =
+                              isNotificationExpired(
+                                notification
+                              );
 
                             if (decision === "accepted") {
                               return (
@@ -925,55 +1425,192 @@ function NotificationPage({ onAction, onBack }) {
                               );
                             }
 
-                            return (
-                              <>
-                                {/* ACCEPT */}
-                                <button
-                                  type="button"
-                                  className="notification-action-button accept-button"
-                                  disabled={
-                                    isProcessing ||
-                                    anotherAccepted
-                                  }
-                                  onClick={() =>
-                                    handleRentalDecision(
-                                      notification,
-                                      "accepted"
-                                    )
-                                  }
-                                  title={
-                                    anotherAccepted
-                                      ? "Another rental request for this cycle has already been accepted."
-                                      : "Accept this rental request"
-                                  }
-                                >
-                                  {isProcessing ? (
-                                    <span className="rental-action-spinner" />
-                                  ) : (
-                                    <>
-                                      Accept
-                                      <span>✓</span>
-                                    </>
-                                  )}
-                                </button>
+                            if (expired) {
+                              return (
+                                <div className="rental-decision expired-decision">
+                                  <span>⌛</span>
+                                  Expired
+                                </div>
+                              );
+                            }
 
-                                {/* REJECT */}
-                                <button
-                                  type="button"
-                                  className="notification-action-button reject-button"
-                                  disabled={isProcessing}
-                                  onClick={() =>
-                                    handleRentalDecision(
-                                      notification,
-                                      "rejected"
-                                    )
-                                  }
-                                  title="Reject this rental request"
-                                >
-                                  Reject
-                                  <span>✕</span>
-                                </button>
-                              </>
+                            return (
+                              <div className="rental-request-action-stack">
+                                {remainingSeconds !== null && (
+                                  <div
+                                    className={`notification-countdown ${
+                                      remainingSeconds <= 60
+                                        ? "notification-countdown-warning"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span>⏱</span>
+                                    Expires in{" "}
+                                    <strong>
+                                      {formatRemainingTime(
+                                        remainingSeconds
+                                      )}
+                                    </strong>
+                                  </div>
+                                )}
+
+                                <div className="rental-request-action-buttons">
+                                  {/* ACCEPT */}
+                                  <button
+                                    type="button"
+                                    className="notification-action-button accept-button"
+                                    disabled={
+                                      isProcessing ||
+                                      anotherAccepted
+                                    }
+                                    onClick={() =>
+                                      handleRentalDecision(
+                                        notification,
+                                        "accepted"
+                                      )
+                                    }
+                                    title={
+                                      anotherAccepted
+                                        ? "Another rental request for this cycle has already been accepted."
+                                        : "Accept this rental request"
+                                    }
+                                  >
+                                    {isProcessing ? (
+                                      <span className="rental-action-spinner" />
+                                    ) : (
+                                      <>
+                                        Accept
+                                        <span>✓</span>
+                                      </>
+                                    )}
+                                  </button>
+
+                                  {/* REJECT */}
+                                  <button
+                                    type="button"
+                                    className="notification-action-button reject-button"
+                                    disabled={isProcessing}
+                                    onClick={() =>
+                                      handleRentalDecision(
+                                        notification,
+                                        "rejected"
+                                      )
+                                    }
+                                    title="Reject this rental request"
+                                  >
+                                    Reject
+                                    <span>✕</span>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                        </div>
+
+                      ) : isOtpNotification(notification) ? (
+
+                        <div className="otp-notification-actions">
+
+                          {(() => {
+                            const remainingSeconds =
+                              getRemainingSeconds(
+                                notification
+                              );
+
+                            const expired =
+                              isNotificationExpired(
+                                notification
+                              );
+
+                            const ownerOtp =
+                              isOwnerOtpNotification(
+                                notification
+                              );
+
+                            const isProcessing =
+                              processingRentalId ===
+                              notification.id;
+
+                            if (expired) {
+                              return (
+                                <div className="otp-expired-block">
+                                  <div className="otp-expired-status">
+                                    <span>⌛</span>
+                                    OTP Expired
+                                  </div>
+
+                                  {ownerOtp && (
+                                    <button
+                                      type="button"
+                                      className="notification-action-button regenerate-otp-button"
+                                      disabled={isProcessing}
+                                      onClick={() =>
+                                        handleRegenerateOtp(
+                                          notification
+                                        )
+                                      }
+                                    >
+                                      {isProcessing ? (
+                                        <span className="rental-action-spinner" />
+                                      ) : (
+                                        <>
+                                          Regenerate OTP
+                                          <span>↻</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div className="otp-active-block">
+                                {otpRegeneratedIds[notification.id] && (
+                                  <div className="otp-regenerated-status">
+                                    <span>✓</span>
+                                    OTP Regenerated
+                                  </div>
+                                )}
+
+                                {remainingSeconds !== null && (
+                                  <div
+                                    className={`notification-countdown otp-countdown ${
+                                      remainingSeconds <= 60
+                                        ? "notification-countdown-warning"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span>⏱</span>
+                                    Expires in{" "}
+                                    <strong>
+                                      {formatRemainingTime(
+                                        remainingSeconds
+                                      )}
+                                    </strong>
+                                  </div>
+                                )}
+
+                                {ownerOtp && (
+                                  <button
+                                    type="button"
+                                    className="notification-action-button"
+                                    disabled={isProcessing}
+                                    onClick={() => {
+                                      if (onAction) {
+                                        onAction(
+                                          notification.action_type,
+                                          notification
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    Enter OTP
+                                    <span>→</span>
+                                  </button>
+                                )}
+                              </div>
                             );
                           })()}
 

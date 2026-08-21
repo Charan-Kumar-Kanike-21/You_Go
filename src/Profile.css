@@ -128,11 +128,46 @@ html,body,#root{width:100%;min-height:100%;margin:0;padding:0}
 .password-value{letter-spacing:3px;color:var(--navy-soft)}
 .password-note{color:var(--muted-soft);font-size:10px;line-height:1.4}
 
-.profile-actions{width:100%;display:flex;gap:10px;margin-top:23px}
-.edit-profile-btn,.save-profile-btn{
- min-height:47px;flex:1;padding:0 18px;border:1px solid var(--navy);border-radius:10px;
- background:var(--navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
- box-shadow:0 6px 15px rgba(22,58,95,.13);transition:.18s ease;
+.profile-actions {
+  width: 100%;
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.profile-actions button {
+  min-width: 0;
+  min-height: 52px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.booking-history-profile-btn {
+  border: 1px solid #164d78;
+  background: linear-gradient(135deg, #123e65, #0d3152);
+  color: #f4fbff;
+  box-shadow: 0 7px 18px rgba(4, 29, 49, 0.28);
+}
+
+.booking-history-profile-btn:hover {
+  background: linear-gradient(135deg, #174d7c, #124064);
+  border-color: #2d78ad;
+  box-shadow: 0 9px 22px rgba(4, 29, 49, 0.35);
 }
 .edit-profile-btn:hover,.save-profile-btn:hover{background:var(--navy-dark);border-color:var(--navy-dark);transform:translateY(-1px);box-shadow:0 9px 20px rgba(15,45,74,.18)}
 .edit-profile-btn:active,.save-profile-btn:active{transform:translateY(0)}

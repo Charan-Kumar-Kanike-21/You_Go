@@ -1,5 +1,5 @@
 import React from "react";
-import "./ChoicePage.css";
+// import "./ChoicePage.css";
 
 function ChoicePage({ onRentalChoice, onProfileChoice, onCycleOwner, onActiveRentals, isAdmin, onBackToAdmin }) {
   return (

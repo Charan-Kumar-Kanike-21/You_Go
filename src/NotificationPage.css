@@ -1458,41 +1458,173 @@
 
 
 /* =========================================================
-   NOTIFICATION MANAGEMENT TOOLBAR
+   15-MINUTE RENTAL / OTP COUNTDOWN
 ========================================================= */
 
+.rental-request-action-stack,
+.otp-active-block,
+.otp-expired-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.rental-request-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.notification-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid #dfe7e3;
+  border-radius: 6px;
+  background: #f6faf8;
+  color: #466157;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.notification-countdown strong {
+  color: #163a5f;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3px;
+}
+
+.notification-countdown-warning {
+  border-color: #f0d4a0;
+  background: #fff8ea;
+  color: #9a671b;
+}
+
+.notification-countdown-warning strong {
+  color: #b06d08;
+}
+
+.expired-decision,
+.otp-expired-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 1px solid #e3d7d7;
+  border-radius: 6px;
+  background: #faf7f7;
+  color: #8a5b5b;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.otp-regenerated-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid #d2eadf;
+  border-radius: 6px;
+  background: #f3faf6;
+  color: #2e8c62;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.otp-notification-actions {
+  min-width: 145px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.otp-active-block {
+  width: 100%;
+}
+
+.otp-expired-block {
+  width: 100%;
+}
+
+.regenerate-otp-button {
+  border-color: #163a5f !important;
+}
+
+@media screen and (max-width: 700px) {
+  .rental-request-action-stack,
+  .otp-active-block,
+  .otp-expired-block {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .rental-request-action-buttons {
+    justify-content: flex-end;
+  }
+
+  .notification-countdown {
+    align-self: flex-end;
+    padding: 4px 6px;
+    font-size: 8px;
+  }
+
+  .expired-decision,
+  .otp-expired-status {
+    padding: 5px 7px;
+    font-size: 8px;
+  }
+
+  .otp-regenerated-status {
+    align-self: flex-end;
+    padding: 4px 6px;
+    font-size: 7px;
+  }
+
+  .otp-notification-actions {
+    min-width: 105px;
+  }
+}
+
+/* =========================================================
+   NOTIFICATION MANAGEMENT TOOLBAR
+   NITK LIGHT THEME
+   ========================================================= */
+
 .notification-toolbar {
+  width: 100%;
+  min-height: 64px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  gap: 16px;
+  border: 1px solid #dfe7ee;
+  border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 3px 12px rgba(22, 58, 95, 0.035);
+  box-shadow: 0 3px 12px rgba(22, 58, 95, 0.05);
 }
 
 .notification-toolbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
-.notification-select-all,
-.notification-checkbox {
+.notification-select-all {
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
-}
-
-.notification-select-all {
-  gap: 7px;
+  gap: 8px;
+  margin: 0;
   color: #163a5f;
-  font-size: 10px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
   white-space: nowrap;
 }
 
@@ -1501,13 +1633,13 @@
   width: 15px;
   height: 15px;
   margin: 0;
-  accent-color: #2e8b70;
+  accent-color: #163a5f;
   cursor: pointer;
 }
 
 .notification-count {
   color: #98a2b3;
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -1515,630 +1647,698 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 7px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .notification-toolbar-button {
-  min-height: 31px;
-  padding: 7px 11px;
-  border: 1px solid #cfd8e3;
+  min-height: 34px;
+  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #d7e1e9;
   border-radius: 7px;
   background: #ffffff;
   color: #163a5f;
   font-family: inherit;
-  font-size: 9px;
-  font-weight: 650;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  transition: background 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease, transform 0.18s ease;
 }
 
 .notification-toolbar-button:hover:not(:disabled) {
   background: #f4f8fb;
-  border-color: #9bb4ca;
+  border-color: #b8cad8;
   transform: translateY(-1px);
 }
 
+.notification-toolbar-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .read-all-button {
-  border-color: #c7ded5;
-  background: #e8f6f0;
-  color: #246f5a;
+  background: #eef7f3;
+  border-color: #c9e3d8;
+  color: #23765c;
+}
+
+.read-all-button:hover:not(:disabled) {
+  background: #e4f3ed;
+  border-color: #abd3c2;
+  color: #1c644e;
 }
 
 .clear-all-button {
-  border-color: #f0caca;
-  background: #fff4f4;
-  color: #b83232;
+  background: #ffffff;
+  border-color: #e1caca;
+  color: #b13b3b;
 }
 
 .clear-all-button:hover:not(:disabled) {
-  background: #fff0f0;
-  border-color: #d64545;
-}
-
-.notification-toolbar-button:disabled,
-.selected-mark-read-button:disabled,
-.selected-delete-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-  transform: none;
+  background: #fff7f7;
+  border-color: #dba9a9;
+  color: #992f2f;
 }
 
 /* =========================================================
-   SELECTED NOTIFICATIONS ACTION BAR
-========================================================= */
+   SELECTED-NOTIFICATION ACTION BAR
+   ========================================================= */
 
 .notification-selection-bar {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 12px;
+  padding: 9px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
-  padding: 8px 11px;
-  border: 1px solid #c7ded5;
-  border-radius: 9px;
-  background: #f4faf7;
-  color: #246f5a;
-  font-size: 9px;
+  border: 1px solid #cddde8;
+  border-radius: 10px;
+  background: #f8fbfd;
+  box-shadow: 0 2px 8px rgba(22, 58, 95, 0.035);
+}
+
+.notification-selection-bar > span {
+  color: #163a5f;
+  font-size: 11px;
   font-weight: 650;
+  white-space: nowrap;
 }
 
 .notification-selection-actions {
   display: flex;
   align-items: center;
   gap: 7px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .selected-mark-read-button,
-.selected-delete-button {
-  min-height: 30px;
+.selected-delete-button,
+.notification-cancel-selection {
+  min-height: 32px;
+  padding: 6px 11px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   border-radius: 7px;
   font-family: inherit;
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease, transform 0.18s ease;
 }
 
 .selected-mark-read-button {
-  padding: 6px 10px;
-  border: 1px solid #c7ded5;
-  background: #e8f6f0;
-  color: #246f5a;
-}
-
-.selected-delete-button {
-  width: 30px;
-  padding: 6px;
-  border: 1px solid #f0caca;
-  background: #fff4f4;
-  color: #b83232;
-  font-size: 13px;
+  border: 1px solid #c9e3d8;
+  background: #eef7f3;
+  color: #23765c;
 }
 
 .selected-mark-read-button:hover:not(:disabled) {
-  background: #dff1e9;
-}
-
-.selected-delete-button:hover:not(:disabled) {
-  background: #ffeaea;
-  border-color: #d64545;
-}
-
-/* =========================================================
-   CHECKBOX ON EACH NOTIFICATION
-========================================================= */
-
-.notification-checkbox {
-  flex: 0 0 17px;
-  width: 17px;
-  padding-top: 4px;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.notification-checkbox input {
-  width: 15px;
-  height: 15px;
-}
-
-/* Selected card */
-.notification-card.notification-selected {
-  border-color: #9fcbb9 !important;
-  background: #f7fcfa !important;
-  box-shadow: 0 5px 18px rgba(46, 139, 112, 0.08) !important;
-}
-
-/* =========================================================
-   READ / UNREAD VISUAL DIFFERENCE
-========================================================= */
-
-.notification-card.notification-unread {
-  border-color: #b9d9cc !important;
-  background: #fbfefd !important;
-}
-
-.notification-card.notification-unread::before {
-  content: "";
-  position: absolute;
-  top: 13px;
-  bottom: 13px;
-  left: 0;
-  width: 3px;
-  border-radius: 0 4px 4px 0;
-  background: #2e8b70;
-}
-
-.notification-card.notification-read {
-  border-color: #e5e7eb !important;
-  background: #ffffff !important;
-  opacity: .88;
-}
-
-.notification-card.notification-read .notification-title-row h3 {
-  font-weight: 600;
-  color: #4f6072 !important;
-}
-
-.notification-card.notification-read .notification-message {
-  color: #7c8794 !important;
-}
-
-.notification-card.notification-read .notification-icon {
-  background: #f1f4f6 !important;
-  border-color: #e1e6eb !important;
-  color: #8b98a5 !important;
-}
-
-.notification-card.notification-read .unread-dot {
-  display: none;
-}
-
-/* Keep selected cards fully visible even if they are read. */
-.notification-card.notification-selected.notification-read {
-  opacity: 1;
-}
-
-/* =========================================================
-   MOBILE NOTIFICATION MANAGEMENT
-========================================================= */
-
-@media (max-width: 700px) {
-  .notification-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 9px;
-    padding: 10px;
-  }
-
-  .notification-toolbar-left {
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .notification-toolbar-actions {
-    width: 100%;
-    justify-content: stretch;
-  }
-
-  .notification-toolbar-button {
-    flex: 1;
-    min-width: 0;
-    font-size: 8px;
-  }
-
-  .notification-selection-bar {
-    align-items: center;
-    padding: 8px 9px;
-  }
-
-  .notification-checkbox {
-    flex-basis: 16px;
-    width: 16px;
-  }
-
-  .notification-card {
-    gap: 10px;
-  }
-}
-
-@media (max-width: 400px) {
-  .notification-toolbar-button {
-    padding: 7px 8px;
-    font-size: 7.5px;
-  }
-
-  .notification-count {
-    font-size: 8px;
-  }
-
-  .notification-selection-bar {
-    font-size: 8px;
-  }
-
-  .selected-mark-read-button {
-    font-size: 8px;
-    padding: 6px 8px;
-  }
-
-  .selected-delete-button {
-    width: 28px;
-    font-size: 12px;
-  }
-}
-
-
-/* =========================================================
-   ICON-DRIVEN NOTIFICATION SELECTION
-   Initial: Mark-read + Delete icons.
-   After either icon: checkboxes + Select all + bulk actions.
-========================================================= */
-
-.notification-toolbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.notification-icon-action {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #d9e1e8;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #163a5f;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.notification-icon-action:hover:not(:disabled) {
-  border-color: #163a5f;
-  background: #f4f8fb;
+  background: #e2f2eb;
+  border-color: #a9d2c0;
   transform: translateY(-1px);
 }
 
-.notification-icon-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.mark-read-icon-button {
-  color: #2f7f5b;
-}
-
-.mark-read-icon-button:hover:not(:disabled) {
-  border-color: #71a98d;
-  background: #f3faf6;
-}
-
-.delete-icon-button {
-  color: #b63b3b;
-}
-
-.delete-icon-button:hover:not(:disabled) {
-  border-color: #d56a6a;
-  background: #fff7f7;
-}
-
-.notification-select-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #163a5f;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  user-select: none;
-}
-
-.notification-select-all input {
-  width: 15px;
-  height: 15px;
-  margin: 0;
-  accent-color: #163a5f;
-  cursor: pointer;
-}
-
-.notification-item-checkbox {
-  flex: 0 0 28px;
-  width: 28px;
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: center;
-  cursor: pointer;
-}
-
-.notification-item-checkbox input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.notification-item-checkbox span {
-  width: 16px;
-  height: 16px;
-  display: block;
-  border: 1.5px solid #aebbc7;
-  border-radius: 4px;
-  background: #ffffff;
-  transition: all 0.16s ease;
-}
-
-.notification-item-checkbox input:checked + span {
-  border-color: #163a5f;
-  background: #163a5f;
-  box-shadow: inset 0 0 0 3px #ffffff;
-}
-
-.notification-card.notification-selected {
-  border-color: #7e9ab2;
-  box-shadow: 0 0 0 2px rgba(22, 58, 95, 0.08);
-}
-
-.notification-cancel-selection {
-  min-height: 32px;
-  padding: 7px 10px;
-  border: 1px solid #d9e1e8;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #667482;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.notification-cancel-selection:hover:not(:disabled) {
-  background: #f6f8fa;
-}
-
-.notification-cancel-selection:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.notification-toolbar-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media screen and (max-width: 700px) {
-  .notification-toolbar-actions {
-    gap: 5px;
-  }
-
-  .notification-icon-action {
-    width: 32px;
-    height: 32px;
-    border-radius: 7px;
-    font-size: 14px;
-  }
-
-  .notification-select-all {
-    font-size: 9px;
-    gap: 5px;
-  }
-
-  .notification-select-all input {
-    width: 14px;
-    height: 14px;
-  }
-
-  .notification-count {
-    font-size: 8px;
-  }
-
-  .notification-toolbar-button {
-    min-height: 30px;
-    padding: 6px 8px;
-    font-size: 8px;
-  }
-
-  .notification-cancel-selection {
-    min-height: 30px;
-    padding: 6px 8px;
-    font-size: 8px;
-  }
-
-  .notification-item-checkbox {
-    flex-basis: 23px;
-    width: 23px;
-  }
-
-  .notification-item-checkbox span {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-  }
-}
-
-
-/* =========================================================
-   FINAL NOTIFICATION MANAGEMENT UI
-   - Green line on every notification card
-   - Keep the existing selection block color
-   - Improved delete button styling
-   ========================================================= */
-
-/* Green line should appear on EVERY notification */
-.notification-card {
-  overflow: hidden;
-}
-
-.notification-card::before {
-  content: "";
-  position: absolute;
-  top: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  width: 3px !important;
-  height: auto !important;
-  border-radius: 0 !important;
-  background: #2e8b70 !important;
-}
-
-/* Keep the line green for both unread and read notifications */
-.notification-card.notification-unread::before,
-.notification-card.notification-read::before {
-  top: 0 !important;
-  bottom: 0 !important;
-  height: auto !important;
-  width: 3px !important;
-  background: #2e8b70 !important;
-}
-
-/* =========================================================
-   SELECTION TOOLBAR
-   Keep the soft green block from the current design
-   ========================================================= */
-
-.notification-toolbar {
-  border: 1px solid #d9e9e2 !important;
-  background: #f1f8f5 !important;
-  border-radius: 11px !important;
-}
-
-/* =========================================================
-   DELETE BUTTON — BULK ACTION
-   Red outlined rectangular button like the reference image
-   ========================================================= */
-
 .selected-delete-button {
-  width: auto !important;
-  min-width: 112px !important;
-  min-height: 34px !important;
-
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-
-  padding: 7px 16px !important;
-
-  border: 1px solid #d64545 !important;
-  border-radius: 8px !important;
-
-  background: #ffffff !important;
-  color: #c23b3b !important;
-
-  font-family: inherit !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-
-  cursor: pointer !important;
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s ease !important;
+  border: 1px solid #e1caca;
+  background: #ffffff;
+  color: #b13b3b;
 }
 
 .selected-delete-button:hover:not(:disabled) {
-  background: #fff4f4 !important;
-  border-color: #b83232 !important;
-  color: #a82f2f !important;
-  transform: translateY(-1px) !important;
+  background: #fff5f5;
+  border-color: #dba9a9;
+  transform: translateY(-1px);
 }
 
-.selected-delete-button:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-  transform: none !important;
+.notification-cancel-selection {
+  border: 1px solid #d7e1e9;
+  background: #ffffff;
+  color: #667085;
 }
 
-/* If the JSX uses an icon inside the delete button */
-.selected-delete-button span,
-.selected-delete-button svg {
-  flex-shrink: 0;
+.notification-cancel-selection:hover:not(:disabled) {
+  background: #f4f7fa;
+  border-color: #bdccd8;
+  color: #163a5f;
 }
 
-/* =========================================================
-   INITIAL DELETE ICON BUTTON
-   ========================================================= */
-
-.delete-icon-button {
-  width: 36px !important;
-  height: 36px !important;
-
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  border: 1px solid #e3aaaa !important;
-  border-radius: 8px !important;
-
-  background: #ffffff !important;
-  color: #c23b3b !important;
-
-  font-size: 16px !important;
-  font-weight: 700 !important;
-
-  cursor: pointer !important;
-
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s ease !important;
-}
-
-.delete-icon-button:hover:not(:disabled) {
-  background: #fff4f4 !important;
-  border-color: #d64545 !important;
-  color: #b83232 !important;
-  transform: translateY(-1px) !important;
+.selected-mark-read-button:disabled,
+.selected-delete-button:disabled,
+.notification-cancel-selection:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 /* =========================================================
    MOBILE
    ========================================================= */
 
-@media (max-width: 700px) {
-  .notification-card::before,
-  .notification-card.notification-unread::before,
-  .notification-card.notification-read::before {
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 3px !important;
-    height: auto !important;
+@media screen and (max-width: 700px) {
+  .notification-toolbar {
+    min-height: auto;
+    padding: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
-  .selected-delete-button {
-    min-width: 92px !important;
-    min-height: 31px !important;
-    padding: 6px 11px !important;
-    gap: 6px !important;
+  .notification-toolbar-left {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .notification-toolbar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .notification-toolbar-button {
+    width: 100%;
+    min-height: 36px;
+    font-size: 10px;
+  }
+
+  .notification-selection-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 9px 10px;
+  }
+
+  .notification-selection-bar > span {
+    text-align: center;
+  }
+
+  .notification-selection-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.7fr;
+  }
+
+  .selected-mark-read-button,
+  .selected-delete-button,
+  .notification-cancel-selection {
+    width: 100%;
+    min-height: 34px;
+    padding: 6px 7px;
+    font-size: 9px;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .notification-toolbar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-selection-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-toolbar-left {
+    align-items: flex-start;
+  }
+
+  .notification-count {
+    text-align: right;
+  }
+}
+
+/* =========================================================
+   RENTAL ACCEPT / REJECT ACTIONS
+   ========================================================= */
+
+.rental-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+  flex-shrink: 0;
+}
+
+.rental-action-buttons button {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 18px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+/* ACCEPT */
+
+.rental-action-buttons .accept-btn {
+  background: #2f8f75;
+  color: #ffffff;
+  border: 1px solid #2f8f75;
+}
+
+.rental-action-buttons .accept-btn:hover {
+  background: #267a64;
+  border-color: #267a64;
+}
+
+/* REJECT */
+
+.rental-action-buttons .reject-btn {
+  background: #ffffff;
+  color: #c65f5f;
+  border: 1px solid #d98b8b;
+}
+
+.rental-action-buttons .reject-btn:hover {
+  background: #fff5f5;
+  border-color: #c65f5f;
+}
+
+/* Prevent buttons from overflowing the notification card */
+
+.notification-card .rental-action-buttons {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .rental-action-buttons {
+    max-width: 100%;
+    gap: 6px;
+  }
+
+  .rental-action-buttons button {
+    height: 40px;
+    padding: 0 10px;
+    font-size: 11px;
+    border-radius: 7px;
+  }
+
+}
+
+
+/* =========================================================
+   FINAL FIX — RENTAL REQUEST ACCEPT / REJECT BUTTONS
+   IMPORTANT: JSX uses .rental-request-actions,
+   .notification-action-button, .accept-button and
+   .reject-button. Do not use .rental-action-buttons.
+   ========================================================= */
+
+/* Keep the two rental decision buttons inside the card */
+.notification-card .rental-request-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 280px !important;
+  flex: 0 0 280px !important;
+
+  margin-top: 3px !important;
+}
+
+/* Override the old width:100% rule */
+.notification-card .rental-request-actions .notification-action-button {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+
+  height: 42px !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 8px !important;
+
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Accept */
+.notification-card .rental-request-actions .accept-button {
+  background: #2e8b70 !important;
+  border: 1px solid #2e8b70 !important;
+  color: #ffffff !important;
+}
+
+.notification-card .rental-request-actions .accept-button:hover:not(:disabled) {
+  background: #246f5a !important;
+  border-color: #246f5a !important;
+}
+
+/* Reject */
+.notification-card .rental-request-actions .reject-button {
+  background: #ffffff !important;
+  border: 1px solid #d64545 !important;
+  color: #b83232 !important;
+}
+
+.notification-card .rental-request-actions .reject-button:hover:not(:disabled) {
+  background: #fff4f4 !important;
+  border-color: #b83232 !important;
+}
+
+/* Disabled state */
+.notification-card .rental-request-actions .notification-action-button:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* =========================================================
+   RENTAL REQUEST + COUNTDOWN STACK
+   If the JSX wraps the buttons/countdown in this container,
+   keep the whole group inside the notification card.
+   ========================================================= */
+
+.notification-card .rental-request-action-stack {
+  min-width: 0 !important;
+  max-width: 280px !important;
+  flex: 0 1 280px !important;
+  align-items: stretch !important;
+}
+
+.notification-card .rental-request-action-stack .rental-request-actions {
+  width: 100% !important;
+  max-width: none !important;
+  flex: none !important;
+}
+
+/* =========================================================
+   ACCEPTED / REJECTED STATES
+   ========================================================= */
+
+.notification-card .rental-decision {
+  min-width: 92px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .notification-card .rental-request-actions,
+  .notification-card .rental-request-action-stack {
+    max-width: 230px !important;
+    flex-basis: 230px !important;
+  }
+
+  .notification-card .rental-request-actions .notification-action-button {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 10px !important;
     font-size: 9px !important;
   }
+}
 
-  .delete-icon-button {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 7px !important;
-    font-size: 14px !important;
+@media (max-width: 700px) {
+  .notification-card .rental-request-action-stack {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    align-items: stretch !important;
+  }
+
+  .notification-card .rental-request-actions {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+  }
+
+  .notification-card .rental-request-actions .notification-action-button {
+    flex: 1 1 0 !important;
+    width: 50% !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
   }
 }
 
 @media (max-width: 400px) {
-  .selected-delete-button {
-    min-width: 82px !important;
-    padding: 6px 9px !important;
+  .notification-card .rental-request-actions .notification-action-button {
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 6px !important;
     font-size: 8px !important;
   }
+}
 
-  .delete-icon-button {
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 13px !important;
+
+/* =========================================================
+   FINAL ICON / CHECKBOX / OTP TIMER STYLING
+   ========================================================= */
+
+
+.custom-notification-checkbox {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  height: 42px;
+  cursor: pointer;
+}
+
+.custom-notification-checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.custom-notification-checkbox span {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #9bb4ca;
+  border-radius: 5px;
+  background: #ffffff;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.custom-notification-checkbox:hover span {
+  border-color: #2e8b70;
+  box-shadow: 0 0 0 3px rgba(46,139,112,.10);
+}
+
+.custom-notification-checkbox input:checked + span {
+  background: #2e8b70;
+  border-color: #2e8b70;
+  box-shadow: 0 2px 7px rgba(46,139,112,.20);
+}
+
+.custom-notification-checkbox input:checked + span::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+
+.custom-notification-checkbox input:focus-visible + span {
+  outline: 3px solid rgba(46,139,112,.18);
+  outline-offset: 2px;
+}
+
+.otp-countdown {
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-countdown strong {
+  min-width: 42px;
+  text-align: center;
+}
+
+.regenerate-otp-button {
+  min-width: 145px !important;
+  background: #eef7f3 !important;
+  border-color: #2e8b70 !important;
+  color: #246f5a !important;
+}
+
+.regenerate-otp-button:hover:not(:disabled) {
+  background: #e0f2eb !important;
+  border-color: #246f5a !important;
+}
+
+
+/* =========================================================
+   DEPENDENCY-FREE NOTIFICATION ICON
+   ========================================================= */
+
+.notification-bell-icon {
+  position: relative;
+  width: 18px;
+  height: 19px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e8b70;
+  font-size: 0;
+}
+
+/* Bell body */
+.notification-bell-icon::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 8px 8px 3px 3px;
+}
+
+/* Bell bottom / clapper */
+.notification-bell-icon::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  bottom: 2px;
+  width: 16px;
+  height: 4px;
+  border-bottom: 2px solid currentColor;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 6px 2px 0 -4px currentColor;
+}
+
+
+/* =========================================================
+   SELECT-ALL CHECKBOX
+   Same visual style as each notification checkbox
+   ========================================================= */
+
+.select-all-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  cursor: pointer;
+}
+
+.select-all-checkbox .notification-checkbox-box {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #9bb4ca;
+  border-radius: 5px;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.select-all-checkbox:hover .notification-checkbox-box {
+  border-color: #2e8b70;
+  box-shadow: 0 0 0 3px rgba(46, 139, 112, 0.10);
+}
+
+.select-all-checkbox input:checked + .notification-checkbox-box {
+  background: #2e8b70;
+  border-color: #2e8b70;
+  box-shadow: 0 2px 7px rgba(46, 139, 112, 0.20);
+}
+
+.select-all-checkbox input:checked + .notification-checkbox-box::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+
+.select-all-checkbox input:focus-visible + .notification-checkbox-box {
+  outline: 3px solid rgba(46, 139, 112, 0.18);
+  outline-offset: 2px;
+}
+
+.select-all-checkbox .select-all-label {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #163a5f;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 700px) {
+  .select-all-checkbox {
+    gap: 8px;
+  }
+
+  .select-all-checkbox .notification-checkbox-box {
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
   }
 }

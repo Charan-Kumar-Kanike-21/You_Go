@@ -181,7 +181,7 @@ select {
 }
 
 .owner-brand span {
-  display: block;
+  /* display: block; */
 
   margin-top: 3px;
 
@@ -257,7 +257,7 @@ select {
 /* =========================================================
    NOTIFICATION BELL
 ========================================================= */
-
+/* 
 .Bell-in-Owner {
   width: 40px !important;
   height: 40px !important;
@@ -287,7 +287,7 @@ select {
 .Bell-in-Owner svg {
   width: 22px !important;
   height: 22px !important;
-}
+} */
 
 
 /* =========================================================
@@ -1811,7 +1811,7 @@ button:focus-visible {
       6px;
   }
 
-  .Bell-in-Owner {
+  /* .Bell-in-Owner {
     width:
       36px !important;
 
@@ -1826,7 +1826,7 @@ button:focus-visible {
     height:
       20px !important;
   }
-
+ */
 
   /* Navbar buttons */
 
@@ -2065,7 +2065,7 @@ button:focus-visible {
       3px;
   }
 
-  .Bell-in-Owner {
+  /* .Bell-in-Owner {
     width:
       33px !important;
 
@@ -2079,7 +2079,7 @@ button:focus-visible {
 
     height:
       18px !important;
-  }
+  } */
 
   .navbar-actions-cycle button,
   .owner-navbar
@@ -2280,7 +2280,7 @@ button:focus-visible {
       31px;
   }
 
-  .Bell-in-Owner {
+  /* .Bell-in-Owner {
     width:
       31px !important;
 
@@ -2294,7 +2294,7 @@ button:focus-visible {
 
     height:
       17px !important;
-  }
+  } */
 
   .navbar-actions-cycle button,
   .owner-navbar
@@ -2368,8 +2368,7 @@ button:focus-visible {
   .delete-cycle-btn,
   .retry-btn,
   .empty-list-btn,
-  .owner-cycle-card,
-  .Bell-in-Owner {
+  .owner-cycle-card {
     transition:
       none;
   }
@@ -3484,5 +3483,289 @@ button:focus-visible {
     .Owner-Edit-Delete .delete-cycle-btn {
       flex: 0.75 1 0 !important;
     }
+  }
+}
+
+/* =========================================================
+   LOGIN REQUIRED POPUP
+========================================================= */
+
+.owner-login-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background: rgba(15, 45, 74, 0.38);
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.owner-login-dialog {
+  width: min(410px, 100%);
+
+  padding: 27px 25px 24px;
+
+  border: 1px solid #DCE7EF;
+
+  border-radius: 18px;
+
+  background: #FFFFFF;
+
+  text-align: center;
+
+  box-shadow:
+    0 24px 60px
+    rgba(22, 58, 95, 0.20);
+
+  animation:
+    ownerLoginPopupIn
+    0.2s ease-out;
+}
+
+@keyframes ownerLoginPopupIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================================
+   LOGIN POPUP ICON
+========================================================= */
+
+.owner-login-icon {
+  width: 52px;
+  height: 52px;
+
+  margin: 0 auto 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #EAF2F8;
+
+  border: 1px solid #D8E7F0;
+
+  color: #163A5F;
+
+  font-size: 24px;
+}
+
+
+/* =========================================================
+   LOGIN POPUP TITLE
+========================================================= */
+
+.owner-login-dialog h2 {
+  margin: 0;
+
+  color: #163A5F;
+
+  font-size: 21px;
+
+  line-height: 1.25;
+
+  font-weight: 750;
+
+  letter-spacing: -0.02em;
+}
+
+
+/* =========================================================
+   LOGIN POPUP MESSAGE
+========================================================= */
+
+.owner-login-dialog p {
+  max-width: 340px;
+
+  margin: 10px auto 21px;
+
+  color: #667085;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   LOGIN POPUP BUTTONS
+========================================================= */
+
+.owner-login-actions {
+  display: grid;
+
+  grid-template-columns: 0.8fr 1.4fr;
+
+  gap: 9px;
+
+  width: 100%;
+}
+
+.owner-login-cancel,
+.owner-login-confirm {
+  min-height: 42px;
+
+  padding: 10px 12px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+/* Cancel */
+
+.owner-login-cancel {
+  border: 1px solid #D8E1E8;
+
+  background: #FFFFFF;
+
+  color: #163A5F;
+}
+
+.owner-login-cancel:hover {
+  background: #F7F9FC;
+
+  border-color: #BFCFD9;
+
+  transform: translateY(-1px);
+}
+
+
+/* Login */
+
+.owner-login-confirm {
+  border: 1px solid #163A5F;
+
+  background: #163A5F;
+
+  color: #FFFFFF;
+
+  box-shadow:
+    0 5px 14px
+    rgba(22, 58, 95, 0.13);
+}
+
+.owner-login-confirm:hover {
+  background: #0F2D4A;
+
+  border-color: #0F2D4A;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 18px
+    rgba(22, 58, 95, 0.18);
+}
+
+.owner-login-cancel:active,
+.owner-login-confirm:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 500px) {
+
+  .owner-login-overlay {
+    padding: 15px;
+  }
+
+  .owner-login-dialog {
+    width: 100%;
+
+    padding: 23px 18px 19px;
+
+    border-radius: 15px;
+  }
+
+  .owner-login-icon {
+    width: 47px;
+    height: 47px;
+
+    margin-bottom: 11px;
+
+    font-size: 22px;
+
+    border-radius: 13px;
+  }
+
+  .owner-login-dialog h2 {
+    font-size: 18px;
+  }
+
+  .owner-login-dialog p {
+    margin-top: 8px;
+    margin-bottom: 18px;
+
+    font-size: 12px;
+  }
+
+  .owner-login-actions {
+    grid-template-columns: 1fr 1.35fr;
+
+    gap: 7px;
+  }
+
+  .owner-login-cancel,
+  .owner-login-confirm {
+    min-height: 40px;
+
+    padding: 9px 8px;
+
+    font-size: 10px;
+
+    border-radius: 8px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .owner-login-dialog {
+    animation: none;
+  }
+
+  .owner-login-cancel,
+  .owner-login-confirm {
+    transition: none;
   }
 }

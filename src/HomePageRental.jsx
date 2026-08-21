@@ -531,11 +531,15 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
               price_per_hour: hourlyPrice,
               price_per_day: dailyPrice,
               location:
-                availability.location || "Location not specified",
+                availability.location ||
+                availability.location_name ||
+                availability.pickup_location ||
+                availability.hostel ||
+                cycle.location ||
+                "Location not specified",
               owner_id: cycle.owner_id,
               ownerName:
                 ownerProfile?.full_name?.trim() ||
-                ownerProfile?.name?.trim() ||
                 ownerProfile?.email?.split("@")[0] ||
                 "NITK Owner",
               ownerLocation: ownerProfile?.location || "NITK",
@@ -639,21 +643,39 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
   // =========================================
 
   const filteredCycles = cycles.filter((cycle) => {
-    const searchText =
-      search.toLowerCase().trim();
+    const searchText = String(search || "")
+      .trim()
+      .toLowerCase();
+
+    const searchableText = [
+      cycle.brand,
+      cycle.model,
+      cycle.location,
+      cycle.condition,
+      cycle.cycle_type,
+      cycle.ownerName,
+      cycle.ownerLocation,
+      cycle.geared ? "geared" : "non-geared",
+      cycle.geared ? "gear" : "non gear",
+      cycle.availabilityStatus,
+      cycle.status,
+      cycle.hourlyPrice,
+      cycle.dailyPrice,
+      cycle.rating,
+    ]
+      .filter(
+        (value) =>
+          value !== null &&
+          value !== undefined &&
+          value !== ""
+      )
+      .map((value) => String(value))
+      .join(" ")
+      .toLowerCase();
 
     const searchMatch =
-      cycle.brand
-        .toLowerCase()
-        .includes(searchText) ||
-
-      cycle.location
-        .toLowerCase()
-        .includes(searchText) ||
-
-      cycle.model
-        .toLowerCase()
-        .includes(searchText);
+      searchText === "" ||
+      searchableText.includes(searchText);
 
     const hourlyMatch =
       cycle.hourlyPrice <= hourlyPrice;

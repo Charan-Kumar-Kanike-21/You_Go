@@ -4,7 +4,7 @@ import "./Profile.css";
 
 import appLogo from "./assets/UGO_logo.jpeg";
 
-function ProfilePage({ onBack, onLogout }) {
+function ProfilePage({ onBack, onLogout, onBookingHistory }) {
   const [user, setUser] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
@@ -502,7 +502,9 @@ function ProfilePage({ onBack, onLogout }) {
               <label>NITK Email</label>
 
               <div className="profile-value non-editable">
-                {email || "Not provided"}
+                <span className="profile-email-text">
+                  {email || "Not provided"}
+                </span>
 
                 <span className="lock-icon">
                   🔒
@@ -551,36 +553,48 @@ function ProfilePage({ onBack, onLogout }) {
 
           <div className="profile-actions">
 
-            {!isEditing ? (
+            <button
+              className="booking-history-profile-btn"
+              type="button"
+              onClick={() => {
+                if (typeof onBookingHistory === "function") {
+                  onBookingHistory();
+                }
+              }}
+            >
+              <span className="profile-btn-icon">▣</span>
+              <span>Booking History</span>
+            </button>
 
+            {!isEditing ? (
               <button
                 className="edit-profile-btn"
+                type="button"
                 onClick={handleEdit}
               >
-                ✎ &nbsp; Edit Profile
+                <span className="profile-btn-icon">✎</span>
+                <span>Edit Profile</span>
               </button>
-
             ) : (
-
               <button
                 className="save-profile-btn"
+                type="button"
                 onClick={handleUpdate}
               >
-                Update Profile
+                <span className="profile-btn-icon">✓</span>
+                <span>Update Profile</span>
               </button>
+            )}
 
-              
-
-            )
-            
-          }
-              <button
-              className="edit-profile-btn"
+            <button
+              className="logout-profile-btn"
               type="button"
               onClick={handleLogout}
-              >
-              Logout
-              </button>
+            >
+              <span className="profile-btn-icon">↪</span>
+              <span>Logout</span>
+            </button>
+
           </div>
 
         </div>

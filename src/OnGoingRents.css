@@ -394,7 +394,7 @@ select {
   color:
     #667085;
 
-  font-size: 13px;
+  font-size: 13px !important;
 
   line-height: 1.45;
 }

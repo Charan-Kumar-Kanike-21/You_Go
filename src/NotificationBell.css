@@ -218,7 +218,7 @@
   min-width: 18px;
   height: 18px;
 
-  padding: 0 5px;
+  padding: 0 5px !important;
 
   display: flex;
 
@@ -229,13 +229,13 @@
 
   background: #D64545;
 
-  color: #FFFFFF;
+  color: #FFFFFF !important;
 
-  font-size: 8px;
+  font-size: 8px !important;
 
-  font-weight: 800;
+  font-weight: 800 !important;
 
-  line-height: 1;
+  line-height: 1 !important;
 
   border: 2px solid #FFFFFF;
 

@@ -8,10 +8,13 @@ function BookingPage({
   onOwnerDetails,
   onCycleSelect,
   activeFilters,
+  onBackToLogin,
+  onBookingSuccess,
 }) {
   const [hours, setHours] = useState("0");
   const [days, setDays] = useState("0");
   const [booking, setBooking] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
@@ -712,21 +715,70 @@ useEffect(() => {
     // 1. AUTHENTICATION CHECK
     // =========================================================
     // A booking can only be created by a logged-in user.
+    //
+    // Use the current Supabase session first. This is important
+    // because the booking page should show the Login Required
+    // popup immediately when there is no active session.
     try {
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-      if (userError) throw userError;
+      if (sessionError) {
+        console.error("Supabase session check error:", sessionError);
+        setShowLoginPopup(true);
+        return;
+      }
+
+      const user = session?.user ?? null;
 
       if (!user) {
-        showMessage("Please login to confirm your booking.");
+        setShowLoginPopup(true);
         return;
       }
 
       // =======================================================
-      // 2. OWNER CHECK
+      // 2. USER NET BALANCE CHECK
+      // =======================================================
+      // A user with an outstanding negative balance cannot create
+      // another booking. Fetch the balance directly from profiles
+      // so this check does not depend on the page that opened this
+      // booking screen.
+      const {
+        data: profile,
+        error: profileError,
+      } = await supabase
+        .from("profiles")
+        .select("net_balance")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (!profile) {
+        showMessage("Unable to verify your account balance.");
+        return;
+      }
+
+      const netBalance = Number(profile.net_balance ?? 0);
+
+      if (Number.isNaN(netBalance)) {
+        showMessage("Unable to verify your account balance.");
+        return;
+      }
+
+      if (netBalance < 0) {
+        showMessage(
+          "Your net balance needs to be cleared before you can make a new booking."
+        );
+        return;
+      }
+
+      // =======================================================
+      // 3. OWNER CHECK
       // =======================================================
       // A cycle owner cannot book their own cycle.
       // Fetch owner_id from the database for a fresh check.
@@ -749,7 +801,7 @@ useEffect(() => {
       }
 
       // =======================================================
-      // 3. RENTAL DURATION VALIDATION
+      // 4. RENTAL DURATION VALIDATION
       // =======================================================
 
       if (hours === "" || days === "") {
@@ -785,7 +837,7 @@ useEffect(() => {
       }
 
       // =========================================================
-      // 4. FRESHLY CHECK THE CYCLE FROM DATABASE
+      // 5. FRESHLY CHECK THE CYCLE FROM DATABASE
       // =========================================================
       //
       // Do NOT rely only on the cycle object received by the page.
@@ -844,7 +896,7 @@ useEffect(() => {
       }
 
       // =========================================================
-      // 5. FRESH OWNER AVAILABILITY CHECK
+      // 6. FRESH OWNER AVAILABILITY CHECK
       // =========================================================
       //
       // cycle_availability is the source of the owner's current
@@ -899,7 +951,7 @@ useEffect(() => {
       }
 
       // =========================================================
-      // 6. SEND BOOKING REQUEST
+      // 7. SEND BOOKING REQUEST
       // =========================================================
 
       const bookingData = {
@@ -935,16 +987,24 @@ useEffect(() => {
         "Booking request sent successfully to the cycle owner.",
         "success"
       );
+
+      // Notify App.jsx so it can navigate to Booking History.
+      if (typeof onBookingSuccess === "function") {
+        onBookingSuccess();
+      } else {
+        console.error(
+          "BookingPage: onBookingSuccess is not connected."
+        );
+      }
     } catch (error) {
       console.error("Booking validation/request error:", error);
 
-      // Keep database/API errors separate from the specific
-      // availability/login messages shown above.
-      if (!message) {
-        showMessage(
-          "Unable to confirm the booking right now. Please try again."
-        );
-      }
+      // Do not tell the user to login for every possible error.
+      // Authentication is handled explicitly above.
+      showMessage(
+        error?.message ||
+          "Unable to confirm the booking. Please try again."
+      );
     } finally {
       setBooking(false);
     }
@@ -975,6 +1035,70 @@ useEffect(() => {
 
   return (
     <div className="booking-page">
+
+      {/* =====================================================
+          LOGIN REQUIRED POPUP
+          ===================================================== */}
+
+      {showLoginPopup && (
+        <div
+          className="booking-login-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-login-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setShowLoginPopup(false);
+            }
+          }}
+        >
+          <div className="booking-login-popup">
+
+            <div className="booking-login-icon">
+              🔐
+            </div>
+
+            <h2 id="booking-login-title">
+              Login Required
+            </h2>
+
+            <p>
+              Please login or create an account before
+              confirming your booking.
+            </p>
+
+            <div className="booking-login-actions">
+              <button
+                type="button"
+                className="booking-login-cancel"
+                onClick={() => setShowLoginPopup(false)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="booking-login-button"
+                onClick={() => {
+                  setShowLoginPopup(false);
+
+                  if (typeof onBackToLogin === "function") {
+                    onBackToLogin();
+                  } else {
+                    console.error(
+                      "BookingPage: onBackToLogin is not connected."
+                    );
+                  }
+                }}
+              >
+                Login / Sign Up
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       <nav className="booking-navbar">
         <button className="booking-brand" onClick={onBack} aria-label="Back">
           <span className="brand-mark">🚲</span>

@@ -9,12 +9,13 @@ import { supabase } from "./supabase";
 import Landing from "./Landing";
 import Login from "./Login";
 import SignUp from "./SignUp";
-import ChoicePage from "./ChoicePage";
+// import ChoicePage from "./ChoicePage";
 import HomePageRental from "./HomePageRental";
 import Listing from "./Listing";
 import Profile from "./Profile";
 import ForgotPassword from "./ForgotPassword";
 import BookingPage from "./BookingPage";
+import BookingHistory from "./BookingHistory";
 import CycleOwner from "./CycleOwner";
 import OnGoingRents from "./OnGoingRents";
 import ReportPage from "./ReportPage";
@@ -263,6 +264,7 @@ const enablePushNotifications = async () => {
     Profile: "/profile",
     ForgotPassword: "/forgot-password",
     BookingPage: "/booking",
+    BookingHistory: "/booking-history",
     CycleOwner: "/my-cycles",
     OnGoingRents: "/ongoing-rentals",
     ReportPage: "/report",
@@ -845,12 +847,12 @@ useEffect(() => {
     }
 
     console.log("Opening Razorpay with:");
-    console.log("Key:", "rzp_test_TNLQlLSlXg9lGR");
+    console.log("Key:", "rzp_test_TSYPUKku7mLFkO");
     console.log("Order:", payment.provider_order_id);
     console.log("Amount:", Number(payment.amount) * 100);
 
     const options = {
-      key: "rzp_test_TNLQlLSlXg9lGR",
+      key: "rzp_test_TSYPUKku7mLFkO",
 
       amount: Math.round(Number(payment.amount) * 100),
 
@@ -1057,6 +1059,7 @@ useEffect(() => {
         "OnGoingRents",
         "AdminDashboard",
         "NotificationPage",
+        "BookingHistory",
       ];
 
       if (
@@ -1078,7 +1081,7 @@ useEffect(() => {
           ) {
             setPage("AdminDashboard");
           } else {
-            setPage("HomePageRental")
+            setPage("HomePageRental");
           }
         }
       }
@@ -1341,7 +1344,9 @@ useEffect(() => {
                   "AdminDashboard"
                 );
               } else {
-                setPage("HomePageRental")
+                setPage(
+                  "HomePageRental"
+                );
               }
             }
           }
@@ -1391,6 +1396,7 @@ useEffect(() => {
       "OnGoingRents",
       "AdminDashboard",
       "NotificationPage",
+      "BookingHistory",
     ];
 
     if (pagesToSave.includes(page)) {
@@ -1411,7 +1417,25 @@ useEffect(() => {
   // PROFILE
   // =========================================================
 
+  const [profileReturnPage, setProfileReturnPage] =
+    useState("HomePageRental");
+
   const [selectedBookingId, setSelectedBookingId] = useState(null);
+
+  // =========================================================
+  // BOOKING HISTORY
+  // =========================================================
+  // Stores the page from which Booking History was opened.
+  // This is intentionally independent from ChoicePage because
+  // ChoicePage is being removed from the active flow.
+  const [bookingHistoryReturnPage, setBookingHistoryReturnPage] =
+    useState("HomePageRental");
+
+  // Preserve BookingPage duration while visiting Booking History.
+  const [bookingDraft, setBookingDraft] = useState({
+    days: "0",
+    hours: "0",
+  });
 
   // =========================================================
   // NOTIFICATIONS
@@ -1448,6 +1472,9 @@ useEffect(() => {
   // =========================================================
   // ONGOING RENT RETURN PAGE
   // =========================================================
+
+  const [ongoingRentsReturnPage, setOngoingRentsReturnPage] =
+    useState("HomePageRental");
 
   // =========================================================
   // HANDLE REPORT ISSUE
@@ -1603,6 +1630,28 @@ useEffect(() => {
   };
 
   // =========================================================
+  // OPEN BOOKING HISTORY
+  // =========================================================
+
+  const handleOpenBookingHistory = (
+    returnPage = "HomePageRental"
+  ) => {
+    setBookingHistoryReturnPage(returnPage);
+    setPage("BookingHistory");
+  };
+
+  // =========================================================
+  // BOOKING REQUEST SUCCESS
+  // =========================================================
+
+  const handleBookingSuccess = () => {
+    // The selected cycle remains in state, so returning from
+    // Booking History brings the user back to the same BookingPage.
+    setBookingHistoryReturnPage("BookingPage");
+    setPage("BookingHistory");
+  };
+
+  // =========================================================
   // OPEN OWNER DETAILS
   // =========================================================
 
@@ -1673,10 +1722,6 @@ useEffect(() => {
     setPage(notificationReturnPage);
   };
 
-  const handleBackToNotificatios = () => {
-    setPage("NotificationPage");
-  }
-
   // =========================================================
   // LANDING → LOGIN
   // =========================================================
@@ -1724,11 +1769,13 @@ useEffect(() => {
     }
   };
 
-  const [ongoingRentsReturnPage, setOngoingRentsReturnPage] =
-    useState("HomePageRental");
+  // =========================================================
+  // CHOICE PAGE → RENTAL HOME PAGE
+  // =========================================================
 
-  const [profileReturnPage, setProfileReturnPage] =
-    useState("HomePageRental");
+  const handleRentalChoice = () => {
+    setPage("HomePageRental");
+  };
 
   // =========================================================
   // FORGOT PASSWORD
@@ -2867,7 +2914,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking-acceptance",
+          "https://stem61.app.n8n.cloud/webhook/booking-acceptance",
           {
             method: "POST",
 
@@ -2923,6 +2970,94 @@ const handleNotificationAction = async (
       setPage("Security");
 
       break;
+
+    // --------------------------------------------------
+    // REGENERATE RENTAL OTP
+    // --------------------------------------------------
+
+    case "regenerate_rental_otp":
+
+      try {
+
+        const response = await fetch(
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/renerate-otp",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+              booking_id:
+                notification?.action_data?.booking_id,
+
+              // Send the existing notification details too
+              notification_id:
+                notification?.id,
+
+              owner_id:
+                notification?.action_data?.owner_id,
+
+              renter_id:
+                notification?.action_data?.renter_id,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Failed to regenerate rental OTP"
+          );
+        }
+
+        /*
+         * The backend may return JSON, but we should not fail just
+         * because the webhook returns an empty/non-JSON response.
+         */
+        const responseText = await response.text();
+
+        let data = {};
+
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch {
+            data = {
+              message: responseText,
+            };
+          }
+        }
+
+        console.log(
+          "Rental OTP regenerated successfully:",
+          data
+        );
+
+        /*
+         * IMPORTANT:
+         * Return the backend result to NotificationPage.
+         *
+         * NotificationPage uses the returned expiry_time immediately
+         * to restart the 15-minute countdown. Supabase realtime/fetch
+         * will subsequently pick up the actual user notification and
+         * session OTP generated by the backend.
+         */
+        return data;
+
+      } catch (error) {
+
+        console.error(
+          "Regenerate rental OTP error:",
+          error
+        );
+
+        /*
+         * Propagate the error so NotificationPage does NOT show
+         * "OTP regenerated" when the backend call actually failed.
+         */
+        throw error;
+      }
 
 
     // --------------------------------------------------
@@ -3005,6 +3140,41 @@ const handleNotificationAction = async (
           onOwnerDetails={
             handleOpenOwnerDetails
           }
+          initialDays={bookingDraft.days}
+          initialHours={bookingDraft.hours}
+          onDurationChange={(days, hours) => {
+            setBookingDraft((previous) => {
+              const nextDays = String(days);
+              const nextHours = String(hours);
+
+              if (
+                previous.days === nextDays &&
+                previous.hours === nextHours
+              ) {
+                return previous;
+              }
+
+              return {
+                days: nextDays,
+                hours: nextHours,
+              };
+            });
+          }}
+          onBookingSuccess={handleBookingSuccess}
+          onBackToLogin = {handleBackToLogin}
+        />
+      )}
+
+
+      {/* =====================================================
+          BOOKING HISTORY
+          ===================================================== */}
+
+      {page === "BookingHistory" && (
+        <BookingHistory
+          onBack={() => {
+            setPage(bookingHistoryReturnPage);
+          }}
         />
       )}
 
@@ -3028,8 +3198,8 @@ const handleNotificationAction = async (
       {/* =====================================================
           CHOICE PAGE
       ===================================================== */}
-{/* 
-      {page === "ChoicePage" && (
+
+      {/* {page === "ChoicePage" && (
         <ChoicePage
           onRentalChoice={
             handleRentalChoice
@@ -3102,6 +3272,9 @@ const handleNotificationAction = async (
       {page === "Profile" && (
         <Profile
           onBack={handleProfileBack}
+          onBookingHistory={() =>
+            handleOpenBookingHistory("Profile")
+          }
           onLogout={async () => {
 
             const { error } =
@@ -3247,7 +3420,6 @@ const handleNotificationAction = async (
       {page === "OTP" && (
         <OTP
           onBookingId = {bookingId}
-          onBackToNotifications={handleBackToNotificatios}
         />
       )}
 
