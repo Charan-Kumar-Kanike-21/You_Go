@@ -1618,3 +1618,358 @@
     margin-right: 56px !important;
   }
 }
+
+
+/* =========================================================
+   CANCEL BOOKING ACTIONS
+========================================================= */
+
+.booking-strip-actions {
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px 14px 0;
+}
+
+.booking-strip-cancel-button {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #e6bcbc;
+  border-radius: 8px;
+  background: #fff7f7;
+  color: #b42318;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.booking-strip-cancel-button:hover:not(:disabled) {
+  background: #fdeaea;
+  border-color: #d99a9a;
+  transform: translateY(-1px);
+}
+
+.booking-strip-cancel-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.booking-cancel-feedback {
+  grid-column: 1 / -1;
+  margin: -4px 16px 12px 0;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.booking-cancel-feedback.success {
+  color: #23765c;
+  background: #eef9f3;
+  border: 1px solid #c9e3d8;
+}
+
+.booking-cancel-feedback.error {
+  color: #b42318;
+  background: #fff5f4;
+  border: 1px solid #f0ceca;
+}
+
+@media (max-width: 800px) {
+  .booking-strip-actions {
+    min-width: 125px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-strip-actions {
+    width: 100%;
+    min-width: 0;
+    padding: 0 14px 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .booking-strip-details-button,
+  .booking-strip-cancel-button {
+    width: 100%;
+  }
+
+  .booking-cancel-feedback {
+    margin: -4px 14px 12px;
+  }
+}
+
+
+.booking-cancel-page-feedback {
+  margin: 0 0 12px;
+}
+
+@media (max-width: 600px) {
+  .booking-strip-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================================================
+   BOOKING HISTORY SELECTION / DELETE
+========================================================= */
+
+.booking-history-selection-bar {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #dfe7ee;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgba(22, 58, 95, 0.035);
+}
+
+.booking-history-select-all {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #163a5f;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  user-select: none;
+}
+
+.booking-history-select-all input,
+.booking-strip-checkbox input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.booking-history-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #b8c7d3;
+  border-radius: 5px;
+  background: #ffffff;
+  transition: background 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.booking-history-select-all input:checked + .booking-history-checkbox,
+.booking-strip-checkbox input:checked + .booking-history-checkbox {
+  border-color: #2e8b70;
+  background: #2e8b70;
+  box-shadow: 0 2px 6px rgba(46, 139, 112, 0.2);
+}
+
+.booking-history-select-all input:checked + .booking-history-checkbox::after,
+.booking-strip-checkbox input:checked + .booking-history-checkbox::after {
+  content: "✓";
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.booking-history-select-all input:focus-visible + .booking-history-checkbox,
+.booking-strip-checkbox input:focus-visible + .booking-history-checkbox {
+  box-shadow: 0 0 0 3px rgba(46, 139, 112, 0.14);
+}
+
+.booking-history-selection-actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.booking-history-selected-count {
+  color: #667085;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.booking-history-delete-button {
+  min-height: 34px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2b2b2;
+  border-radius: 8px;
+  background: #fff6f6;
+  color: #b42318;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease, transform 0.2s ease;
+}
+
+.booking-history-delete-button:hover:not(:disabled) {
+  background: #fdeaea;
+  border-color: #d58e8e;
+  transform: translateY(-1px);
+}
+
+.booking-history-delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.booking-history-delete-feedback {
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+
+.booking-history-delete-feedback.success {
+  color: #23765c;
+  background: #eef9f3;
+  border: 1px solid #c9e3d8;
+}
+
+.booking-history-delete-feedback.error {
+  color: #b42318;
+  background: #fff5f4;
+  border: 1px solid #f0ceca;
+}
+
+.booking-history-strip {
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    border-color 0.2s ease, background 0.2s ease;
+}
+
+.booking-history-strip-selected {
+  border-color: #9dcfc0;
+  background: #fbfefd;
+  box-shadow: 0 6px 20px rgba(46, 139, 112, 0.08);
+}
+
+.booking-strip-checkbox {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.booking-strip-checkbox .booking-history-checkbox {
+  width: 19px;
+  height: 19px;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.booking-history-strip .booking-strip-image {
+  margin-left: 28px;
+}
+
+.booking-history-strip {
+  grid-template-columns: 110px minmax(0, 1fr) 132px;
+}
+
+@media (max-width: 800px) {
+  .booking-history-strip {
+    grid-template-columns: 90px minmax(0, 1fr) 110px;
+  }
+
+  .booking-strip-checkbox {
+    left: 8px;
+  }
+
+  .booking-history-strip .booking-strip-image {
+    margin-left: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-history-selection-bar {
+    min-height: 46px;
+    padding: 7px 9px;
+  }
+
+  .booking-history-select-all {
+    font-size: 10px;
+    gap: 7px;
+  }
+
+  .booking-history-checkbox {
+    width: 17px;
+    height: 17px;
+  }
+
+  .booking-history-selection-actions {
+    gap: 7px;
+  }
+
+  .booking-history-selected-count {
+    display: none;
+  }
+
+  .booking-history-delete-button {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 9px;
+  }
+
+  .booking-history-strip {
+    position: relative;
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .booking-strip-checkbox {
+    top: 38px;
+    left: 7px;
+    transform: none;
+  }
+
+  .booking-history-strip .booking-strip-image {
+    margin-left: 22px;
+  }
+}
+
+@media (max-width: 350px) {
+  .booking-history-selection-bar {
+    gap: 7px;
+  }
+
+  .booking-history-delete-button {
+    padding: 0 8px;
+  }
+
+  .booking-history-strip .booking-strip-image {
+    margin-left: 20px;
+  }
+
+  .booking-strip-checkbox {
+    left: 6px;
+  }
+}

@@ -2338,3 +2338,315 @@ button:focus-visible {
       none;
   }
 }
+
+/* =========================================================
+   OWNER DETAILS
+========================================================= */
+
+.owner-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.owner-detail-item {
+  min-width: 0;
+  padding: 11px 13px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  background: #F7F9FC;
+}
+
+.owner-detail-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #98A2B3;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.9px;
+}
+
+.owner-detail-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #163A5F;
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+/* =========================================================
+   ACTIVE RENTAL ACTION BUTTONS — DESKTOP
+   ========================================================= */
+
+.rental-action-buttons {
+  width: min(620px, 100%);
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 14px;
+}
+
+.rental-action-buttons .report-issue-btn,
+.rental-action-buttons .return-cycle-btn {
+  flex: 1 1 0;
+  width: 100%;
+  max-width: 300px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 22px;
+  white-space: nowrap;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rental-action-buttons .report-issue-btn {
+  border: 1px solid rgba(214, 69, 69, 0.28);
+  background: #FDF2F2;
+  color: #C63E3E;
+}
+
+.rental-action-buttons .report-issue-btn:hover {
+  background: #FBE5E5;
+  border-color: rgba(214, 69, 69, 0.42);
+  transform: translateY(-1px);
+}
+
+.rental-action-buttons .return-cycle-btn {
+  border: 1px solid #163A5F;
+  background: #163A5F;
+  color: #FFFFFF;
+  box-shadow: 0 6px 16px rgba(22, 58, 95, 0.14);
+}
+
+.rental-action-buttons .return-cycle-btn:hover {
+  background: #0F2D4A;
+  border-color: #0F2D4A;
+  transform: translateY(-1px);
+}
+
+/* Keep the explanatory text aligned with the button group */
+.return-section > p {
+  margin: 11px auto 0;
+  max-width: 620px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .owner-details {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+
+/* =========================================================
+   ACTIVE RENTAL ACTIONS - DESKTOP VISIBILITY
+   ========================================================= */
+
+.rental-actions,
+.ongoing-rental-actions,
+.rental-action-buttons,
+.return-action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  visibility: visible;
+  opacity: 1;
+}
+
+.rental-actions button,
+.ongoing-rental-actions button,
+.rental-action-buttons button,
+.return-action-row button {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Keep both actions visible on desktop when rental is active */
+@media (min-width: 769px) {
+  .rental-actions,
+  .ongoing-rental-actions,
+  .rental-action-buttons,
+  .return-action-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+
+  .rental-actions .return-cycle-button,
+  .ongoing-rental-actions .return-cycle-button,
+  .rental-action-buttons .return-cycle-button,
+  .return-action-row .return-cycle-button {
+    display: inline-flex !important;
+    visibility: visible !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL DESKTOP BUTTON OVERRIDE
+   ========================================================= */
+
+@media (min-width: 701px) {
+  .return-section .rental-action-buttons {
+    width: min(620px, 100%) !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    gap: 14px !important;
+  }
+
+  .return-section .rental-action-buttons > button {
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    min-width: 0 !important;
+    min-height: 52px !important;
+    margin: 0 !important;
+    padding: 0 22px !important;
+    white-space: nowrap !important;
+    border-radius: 11px !important;
+  }
+
+  .return-section .rental-action-buttons .report-issue-btn {
+    border: 1px solid rgba(214, 69, 69, 0.28) !important;
+    background: #FDF2F2 !important;
+    color: #C63E3E !important;
+  }
+
+  .return-section .rental-action-buttons .return-cycle-btn {
+    border: 1px solid #163A5F !important;
+    background: #163A5F !important;
+    color: #FFFFFF !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .return-section .rental-action-buttons {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 9px !important;
+  }
+
+  .return-section .rental-action-buttons > button {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL MOBILE IMAGE FIX
+========================================================= */
+
+.cycle-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.cycle-image-container .cycle-image {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+@media (max-width: 600px) {
+  .cycle-image-container {
+    width: 100% !important;
+    height: 215px !important;
+    flex: 0 0 215px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .cycle-image-container {
+    height: 195px !important;
+    flex-basis: 195px !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .cycle-image-container {
+    height: 175px !important;
+    flex-basis: 175px !important;
+  }
+}
+
+
+/* =========================================================
+   OWNER / RENTER ACTIONS
+========================================================= */
+
+/* Owner: only Report Issue */
+.return-section.owner-actions .rental-action-buttons {
+  width: min(300px, 100%) !important;
+  margin: 0 auto !important;
+}
+
+.return-section.owner-actions .report-issue-btn {
+  width: 100% !important;
+  max-width: none !important;
+  flex: 1 1 100% !important;
+}
+
+/* Renter: Report Issue + Return Cycle */
+.return-section.renter-actions .rental-action-buttons {
+  width: min(620px, 100%) !important;
+  margin: 0 auto !important;
+}
+
+.return-section.renter-actions .report-issue-btn,
+.return-section.renter-actions .return-cycle-btn {
+  flex: 1 1 0 !important;
+}
+
+@media (max-width: 700px) {
+  .return-section.owner-actions .rental-action-buttons,
+  .return-section.renter-actions .rental-action-buttons {
+    width: 100% !important;
+  }
+
+  .return-section.owner-actions .report-issue-btn,
+  .return-section.renter-actions .report-issue-btn,
+  .return-section.renter-actions .return-cycle-btn {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+
+/* =========================================================
+   NO ACTIVE RENTAL
+========================================================= */
+
+.rental-message.no-active-rental {
+  min-height: 58vh;
+}
+
+.rental-message.no-active-rental .empty-icon {
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  font-size: 36px;
+}
+
+.rental-message.no-active-rental h2 {
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+.rental-message.no-active-rental p {
+  max-width: 360px;
+}

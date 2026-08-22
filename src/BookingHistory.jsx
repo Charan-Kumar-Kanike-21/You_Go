@@ -11,6 +11,7 @@ import { supabase } from "./supabase";
 */
 const WITHDRAW_BACKEND_URL = "https://ugo-cyclesharing.app.n8n.cloud/webhook/withdraw";
 const PAY_BALANCE_BACKEND_URL = "";
+const CANCEL_BOOKING_BACKEND_URL = "https://ugo-cyclesharing.app.n8n.cloud/webhook/cancel-booking";
 
 /*
   Add the real support numbers here later.
@@ -49,6 +50,17 @@ function BookingHistory({ onBack }) {
   const [payLoading, setPayLoading] = useState(false);
   const [payMessage, setPayMessage] = useState("");
   const [payError, setPayError] = useState("");
+
+  // Cancel booking
+  const [cancelBookingId, setCancelBookingId] = useState(null);
+  const [cancelMessage, setCancelMessage] = useState("");
+  const [cancelError, setCancelError] = useState("");
+
+  // Delete booking-history selection
+  const [selectedBookingIds, setSelectedBookingIds] = useState([]);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   // ============================================================
   // FETCH BOOKING HISTORY + NET BALANCE
@@ -118,7 +130,7 @@ function BookingHistory({ onBack }) {
           start_time,
           end_time,
           updated_at,
-          pickup_time,
+          start_time,
           returned_at,
           cancelled_at,
           return_deadline,
@@ -234,6 +246,9 @@ function BookingHistory({ onBack }) {
       // are stored, so every strip/details view can reliably determine
       // whether this booking belongs to the owner or renter.
       setBookings(normalizedBookings);
+      setSelectedBookingIds([]);
+      setDeleteMessage("");
+      setDeleteError("");
     } catch (err) {
       console.error("Error fetching booking history:", err);
 
@@ -580,6 +595,216 @@ function BookingHistory({ onBack }) {
   };
 
   // ============================================================
+  // DELETE BOOKING HISTORY
+  // ============================================================
+
+  const toggleBookingSelection = (bookingId) => {
+    setSelectedBookingIds((current) =>
+      current.includes(bookingId)
+        ? current.filter((id) => id !== bookingId)
+        : [...current, bookingId]
+    );
+
+    setDeleteMessage("");
+    setDeleteError("");
+  };
+
+  const toggleSelectAllBookings = () => {
+    setSelectedBookingIds((current) => {
+      if (current.length === bookings.length) {
+        return [];
+      }
+
+      return bookings.map((booking) => booking.id);
+    });
+
+    setDeleteMessage("");
+    setDeleteError("");
+  };
+
+  const allBookingsSelected =
+    bookings.length > 0 &&
+    selectedBookingIds.length === bookings.length;
+
+  const deleteSelectedBookings = async () => {
+    if (!selectedBookingIds.length || deleteLoading) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedBookingIds.length} selected booking ${
+        selectedBookingIds.length === 1 ? "history entry" : "history entries"
+      }? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setDeleteLoading(true);
+    setDeleteMessage("");
+    setDeleteError("");
+
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+
+      if (!user) {
+        throw new Error("Please login before deleting booking history.");
+      }
+
+      // Delete only bookings that belong to the authenticated user
+      // as renter or owner. This prevents another user's booking
+      // from being deleted by manipulating the selected IDs.
+      const { data: ownedBookings, error: ownershipError } =
+        await supabase
+          .from("booking_table")
+          .select("id")
+          .in("id", selectedBookingIds)
+          .or(`renter_id.eq.${user.id},owner_id.eq.${user.id}`);
+
+      if (ownershipError) throw ownershipError;
+
+      const deletableIds = (ownedBookings || []).map(
+        (booking) => booking.id
+      );
+
+      if (!deletableIds.length) {
+        throw new Error(
+          "No selected booking history entries belong to your account."
+        );
+      }
+
+      const { error: deleteErrorFromSupabase } = await supabase
+        .from("booking_table")
+        .delete()
+        .in("id", deletableIds);
+
+      if (deleteErrorFromSupabase) {
+        throw deleteErrorFromSupabase;
+      }
+
+      setBookings((current) =>
+        current.filter(
+          (booking) => !deletableIds.includes(booking.id)
+        )
+      );
+
+      setSelectedBookingIds([]);
+      setDeleteMessage(
+        `${deletableIds.length} booking ${
+          deletableIds.length === 1 ? "history entry" : "history entries"
+        } deleted successfully.`
+      );
+    } catch (err) {
+      console.error("Delete booking history error:", err);
+
+      setDeleteError(
+        err.message ||
+          "Unable to delete the selected booking history."
+      );
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // ============================================================
+  // CANCEL BOOKING
+  // ============================================================
+
+  const canCancelBooking = (booking) => {
+    const status = String(booking?.status || "")
+      .trim()
+      .toLowerCase();
+
+    return status === "requested" || status === "slot_booked";
+  };
+
+  const handleCancelBooking = async (booking) => {
+    if (!booking?.id || !canCancelBooking(booking)) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
+
+    if (!confirmed) return;
+
+    setCancelBookingId(booking.id);
+    setCancelMessage("");
+    setCancelError("");
+
+    try {
+      if (!CANCEL_BOOKING_BACKEND_URL) {
+        throw new Error(
+          "Cancel booking backend URL is not configured."
+        );
+      }
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+
+      if (!user) {
+        throw new Error("Please login before cancelling a booking.");
+      }
+
+      const response = await fetch(
+        CANCEL_BOOKING_BACKEND_URL,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            booking_id: booking.id,
+            user_id: user.id,
+            status: booking.status,
+          }),
+        }
+      );
+
+      let responseData = {};
+
+      try {
+        responseData = await response.json();
+      } catch {
+        responseData = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          responseData?.message ||
+            "Unable to cancel the booking."
+        );
+      }
+
+      setCancelMessage(
+        responseData?.message ||
+          "Booking cancelled successfully."
+      );
+
+      // Refresh the existing booking history connection so the
+      // backend's final booking status is displayed immediately.
+      await fetchBookingHistory();
+    } catch (err) {
+      console.error("Cancel booking error:", err);
+      setCancelError(
+        err.message ||
+          "Unable to cancel the booking. Please try again."
+      );
+    } finally {
+      setCancelBookingId(null);
+    }
+  };
+
+  // ============================================================
   // PAY NOW
   // ============================================================
 
@@ -806,11 +1031,11 @@ function BookingHistory({ onBack }) {
               </div>
 
               <div className="booking-details-timeline">
-                {booking.pickup_time && (
+                {booking.start_time && (
                   <div>
                     <span>Picked up</span>
                     <strong>
-                      {formatDateTime(booking.pickup_time)}
+                      {formatDateTime(booking.start_time)}
                     </strong>
                   </div>
                 )}
@@ -1267,7 +1492,69 @@ function BookingHistory({ onBack }) {
         {!loading &&
           !error &&
           bookings.length > 0 && (
-            <div className="booking-history-list">
+            <>
+              {(cancelError || cancelMessage) && cancelBookingId === null && (
+                <div
+                  className={`booking-cancel-feedback ${
+                    cancelError ? "error" : "success"
+                  } booking-cancel-page-feedback`}
+                  role="alert"
+                >
+                  {cancelError || cancelMessage}
+                </div>
+              )}
+
+              <div className="booking-history-selection-bar">
+                <label className="booking-history-select-all">
+                  <input
+                    type="checkbox"
+                    checked={allBookingsSelected}
+                    onChange={toggleSelectAllBookings}
+                    disabled={deleteLoading}
+                  />
+                  <span className="booking-history-checkbox"></span>
+                  <span>Select All</span>
+                </label>
+
+                <div className="booking-history-selection-actions">
+                  {selectedBookingIds.length > 0 && (
+                    <span className="booking-history-selected-count">
+                      {selectedBookingIds.length} selected
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    className="booking-history-delete-button"
+                    onClick={deleteSelectedBookings}
+                    disabled={
+                      selectedBookingIds.length === 0 ||
+                      deleteLoading
+                    }
+                  >
+                    {deleteLoading
+                      ? "Deleting..."
+                      : `Delete${
+                          selectedBookingIds.length
+                            ? ` (${selectedBookingIds.length})`
+                            : ""
+                        }`}
+                  </button>
+                </div>
+              </div>
+
+              {(deleteError || deleteMessage) && (
+                <div
+                  className={`booking-history-delete-feedback ${
+                    deleteError ? "error" : "success"
+                  }`}
+                  role="alert"
+                >
+                  {deleteError || deleteMessage}
+                </div>
+              )}
+
+              <div className="booking-history-list">
               {bookings.map((booking) => {
                 const cycle = booking.cycles || {};
                 const image = getCycleImage(booking);
@@ -1279,9 +1566,25 @@ function BookingHistory({ onBack }) {
 
                 return (
                   <article
-                    className="booking-history-strip"
+                    className={`booking-history-strip ${
+                      selectedBookingIds.includes(booking.id)
+                        ? "booking-history-strip-selected"
+                        : ""
+                    }`}
                     key={booking.id}
                   >
+                    <label className="booking-strip-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={selectedBookingIds.includes(booking.id)}
+                        onChange={() =>
+                          toggleBookingSelection(booking.id)
+                        }
+                        disabled={deleteLoading}
+                      />
+                      <span className="booking-history-checkbox"></span>
+                    </label>
+
                     <div className="booking-strip-image">
                       {image ? (
                         <img
@@ -1342,18 +1645,35 @@ function BookingHistory({ onBack }) {
                       )}
                     </div>
 
-                    <button
-                      type="button"
-                      className="booking-strip-details-button"
-                      onClick={() => openBookingDetails(booking)}
-                    >
-                      <span>View Details</span>
-                      <span>→</span>
-                    </button>
+                    <div className="booking-strip-actions">
+                      <button
+                        type="button"
+                        className="booking-strip-details-button"
+                        onClick={() => openBookingDetails(booking)}
+                      >
+                        <span>View Details</span>
+                        <span>→</span>
+                      </button>
+
+                      {canCancelBooking(booking) && (
+                        <button
+                          type="button"
+                          className="booking-strip-cancel-button"
+                          onClick={() => handleCancelBooking(booking)}
+                          disabled={cancelBookingId === booking.id}
+                        >
+                          {cancelBookingId === booking.id
+                            ? "Cancelling..."
+                            : "Cancel Booking"}
+                        </button>
+                      )}
+                    </div>
+
                   </article>
                 );
               })}
-            </div>
+              </div>
+            </>
           )}
       </main>
     </div>

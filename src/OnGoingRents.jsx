@@ -65,35 +65,187 @@ function OnGoingRents({ onReportIssue, onReturn }) {
       // status
       // ========================================================
 
-      const { data, error } = await supabase
-        .from("booking_table")
-        .select(`
-            *,
-            cycles (
-            id,
-            brand,
-            model,
-            location,
-            owner_id,
-            cycle_images (
-                image_url,
-                display_order
-            )
-            )
-        `)
-        .or(`renter_id.eq.${user.id},owner_id.eq.${user.id}`)
-        .is("returned_at", null)
-        .is("cancelled_at", null)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        let bookingData = null;
+        let bookingError = null;
 
-      if (error) {
-        throw error;
+        /* ========================================================
+          FIRST: CHECK ACTIVE RENTAL AS RENTER
+        ======================================================== */
+
+        const { data: renterBooking, error: renterError } =
+          await supabase
+            .from("booking_table")
+            .select(`
+              *,
+              cycles (
+                id,
+                brand,
+                model,
+                owner_id
+              )
+            `)
+            .eq("renter_id", user.id)
+            .eq("status", "active")
+            .is("returned_at", null)
+            .is("cancelled_at", null)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (renterError) {
+          console.error(
+            "Error checking renter active rental:",
+            renterError
+          );
+        }
+
+        /* ========================================================
+          IF NOT A RENTER, CHECK ACTIVE RENTAL AS OWNER
+        ======================================================== */
+
+        if (!renterBooking) {
+          const { data: ownerBooking, error: ownerError } =
+            await supabase
+              .from("booking_table")
+              .select(`
+                *,
+                cycles (
+                  id,
+                  brand,
+                  model,
+                  owner_id
+                )
+              `)
+              .eq("owner_id", user.id)
+              .eq("status", "active")
+              .is("returned_at", null)
+              .is("cancelled_at", null)
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+          if (ownerError) {
+            console.error(
+              "Error checking owner active rental:",
+              ownerError
+            );
+          }
+
+          bookingData = ownerBooking;
+        } else {
+          bookingData = renterBooking;
+        }
+
+      if (bookingError) {
+        throw bookingError;
       }
 
-      setIsRenter(data?.renter_id === user.id);
-      setRental(data);
+      if (!bookingData) {
+        setIsRenter(false);
+        setRental(null);
+        return;
+      }
+
+      // Fetch the related data separately so one missing optional
+      // column/relation does not break the complete rental card.
+      const cycleId = bookingData.cycle_id || bookingData.cycles?.id;
+      const ownerId =
+        bookingData.owner_id || bookingData.cycles?.owner_id;
+
+      let cycleImages = [];
+      let cycleLocation = "";
+      let ownerProfile = null;
+
+      if (cycleId) {
+        const { data: imageRows, error: imageError } = await supabase
+          .from("cycle_images")
+          .select("image_url, display_order")
+          .eq("cycle_id", cycleId)
+          .order("display_order", { ascending: true });
+
+        if (imageError) {
+          console.warn("Unable to load cycle images:", imageError);
+        } else {
+          cycleImages = imageRows || [];
+        }
+
+        // Location is commonly stored in cycle_availability.
+        const { data: availabilityRows, error: availabilityError } =
+          await supabase
+            .from("cycle_availability")
+            .select("*")
+            .eq("cycle_id", cycleId)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+        if (availabilityError) {
+          console.warn(
+            "Unable to load cycle availability:",
+            availabilityError
+          );
+        } else if (availabilityRows?.length) {
+          const row = availabilityRows[0];
+          cycleLocation =
+            row.location ||
+            row.location_name ||
+            row.pickup_location ||
+            row.hostel ||
+            "";
+        }
+
+        // If the availability table does not contain the location,
+        // fetch the location directly from the cycle record.
+        if (!cycleLocation) {
+          const {
+            data: cycleLocationRow,
+            error: cycleLocationError,
+          } = await supabase
+            .from("cycles")
+            .select("location")
+            .eq("id", cycleId)
+            .maybeSingle();
+
+          if (cycleLocationError) {
+            console.warn(
+              "Unable to load cycle location from cycles:",
+              cycleLocationError
+            );
+          }
+
+          cycleLocation =
+            cycleLocationRow?.location || "";
+        }
+      }
+
+      if (ownerId) {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id, full_name, email, phone")
+          .eq("id", ownerId)
+          .maybeSingle();
+
+        if (profileError) {
+          console.warn("Unable to load owner profile:", profileError);
+        } else {
+          ownerProfile = profile;
+        }
+      }
+
+      const enrichedRental = {
+        ...bookingData,
+        cycles: {
+          ...(bookingData.cycles || {}),
+          location:
+            cycleLocation ||
+            bookingData.cycles?.location ||
+            "Location unavailable",
+          cycle_images: cycleImages,
+        },
+        owner_profile: ownerProfile,
+      };
+
+      setIsRenter(bookingData.renter_id === user.id);
+      setRental(enrichedRental);
     } catch (err) {
       console.error("Error fetching rental:", err);
       setError("Unable to load your active rental.");
@@ -268,6 +420,8 @@ function OnGoingRents({ onReportIssue, onReturn }) {
   // ============================================================
 
   const openReturnModal = () => {
+    if (!isRenter) return;
+
     setShowReturnModal(true);
     setReturnMethod("");
   };
@@ -347,7 +501,7 @@ function OnGoingRents({ onReportIssue, onReturn }) {
     return (
       <div className="my-rental-page">
 
-        <div className="rental-message">
+        <div className="rental-message no-active-rental">
           <div className="empty-icon">🚲</div>
 
           <h2>No Active Rental</h2>
@@ -372,9 +526,29 @@ function OnGoingRents({ onReportIssue, onReturn }) {
         (b.display_order || 0)
     ) || [];
 
+  const cycleImagePath = sortedImages[0]?.image_url;
+
+  const { data: cycleImageUrlData } = cycleImagePath
+    ? supabase.storage
+        .from("cycle-images")
+        .getPublicUrl(cycleImagePath)
+    : { data: null };
+
   const cycleImage =
-    sortedImages[0]?.image_url ||
+    cycleImageUrlData?.publicUrl ||
+    cycleImagePath ||
     "/assets/cycle-placeholder.jpg";
+
+  const ownerName =
+    rental.owner_profile?.full_name?.trim() ||
+    rental.owner_profile?.email?.split("@")[0] ||
+    "Owner";
+
+  const ownerEmail =
+    rental.owner_profile?.email || "";
+
+  const ownerPhone =
+    rental.owner_profile?.phone || "";
 
   // ============================================================
   // MAIN PAGE
@@ -444,6 +618,28 @@ function OnGoingRents({ onReportIssue, onReturn }) {
               📍 {rental.cycles?.location ||
                 "Location unavailable"}
             </p>
+
+            <div className="owner-details">
+              <div className="owner-detail-item">
+                <span className="owner-detail-label">OWNER</span>
+                <strong>{ownerName}</strong>
+              </div>
+
+              <div className="owner-detail-item">
+                <span className="owner-detail-label">CYCLE LOCATION</span>
+                <strong>
+                  {rental.cycles?.location ||
+                    "Location unavailable"}
+                </strong>
+              </div>
+
+              {ownerPhone && (
+                <div className="owner-detail-item">
+                  <span className="owner-detail-label">CONTACT</span>
+                  <strong>{ownerPhone}</strong>
+                </div>
+              )}
+            </div>
 
           </div>
 
@@ -615,42 +811,45 @@ function OnGoingRents({ onReportIssue, onReturn }) {
 
         </div>
 
-        {/* RETURN BUTTON */}
+        {/* ACTION BUTTONS */}
 
-       {/* ACTION BUTTONS */}
+        <div className={`return-section ${
+          isRenter ? "renter-actions" : "owner-actions"
+        }`}>
 
-            <div className="return-section">
+          <div className="rental-action-buttons">
 
-            <div className="rental-action-buttons">
+            <button
+              className="report-issue-btn"
+              onClick={() => onReportIssue?.(rental)}
+            >
+              ⚠️ Report an Issue
+            </button>
 
-                <button
-                className="report-issue-btn"
-                onClick={() => onReportIssue(rental)}
-                >
-                ⚠️ Report an Issue
-                </button>
-
-                {isRenter && <button
+            {isRenter && !timeInfo.rentalCompleted && (
+              <button
                 className="return-cycle-btn"
                 onClick={openReturnModal}
-                >
+              >
                 Return Cycle
-                </button>}
+              </button>
+            )}
 
-            </div>
+          </div>
 
-            <p>
-                Having a problem with the cycle?
-                Report it to the administration.
-            </p>
+          <p>
+            {isRenter
+              ? "Having a problem with the cycle? Report it to the administration."
+              : "Report any issue with this cycle to the administration."}
+          </p>
 
-            </div>
+        </div>
 
       </div>
 
       {/* RETURN MODAL */}
 
-      {showReturnModal && (
+      {isRenter && showReturnModal && (
         <div
           className="modal-overlay"
           onClick={closeReturnModal}

@@ -1,138 +1,353 @@
-console.log(
-  "🚀🚀🚀 pwaInstall.js LOADED 🚀🚀🚀"
-);
+// ============================================================
+// UGO PWA INSTALL HELPER
+// ============================================================
+
+const INSTALL_STORAGE_KEY =
+  "ugo_app_installed";
+
 let deferredPrompt = null;
 
-console.log("=================================");
-console.log("PWA INSTALL MODULE LOADED");
-console.log("=================================");
 
-console.log(
-  "beforeinstallprompt supported:",
-  "onbeforeinstallprompt" in window
-);
+// ============================================================
+// CHECK STANDALONE MODE
+// ============================================================
 
+export const isStandalonePWA = () => {
+  const standaloneMode =
+    window.matchMedia(
+      "(display-mode: standalone)"
+    ).matches;
+
+  const fullscreenMode =
+    window.matchMedia(
+      "(display-mode: fullscreen)"
+    ).matches;
+
+  const minimalUiMode =
+    window.matchMedia(
+      "(display-mode: minimal-ui)"
+    ).matches;
+
+  const iosStandalone =
+    window.navigator.standalone === true;
+
+  return (
+    standaloneMode ||
+    fullscreenMode ||
+    minimalUiMode ||
+    iosStandalone
+  );
+};
+
+
+// ============================================================
+// CHECK LOCAL INSTALL STATE
+// ============================================================
+
+export const hasSavedInstallState = () => {
+  try {
+    return (
+      localStorage.getItem(
+        INSTALL_STORAGE_KEY
+      ) === "true"
+    );
+  } catch (error) {
+    console.warn(
+      "Unable to read PWA install state:",
+      error
+    );
+
+    return false;
+  }
+};
+
+
+// ============================================================
+// SAVE INSTALL STATE
+// ============================================================
+
+export const saveInstallState = () => {
+  try {
+    localStorage.setItem(
+      INSTALL_STORAGE_KEY,
+      "true"
+    );
+
+    console.log(
+      "✅ UGO installation state saved."
+    );
+  } catch (error) {
+    console.warn(
+      "Unable to save PWA install state:",
+      error
+    );
+  }
+};
+
+
+// ============================================================
+// CLEAR INSTALL STATE
+// ============================================================
+
+export const clearInstallState = () => {
+  try {
+    localStorage.removeItem(
+      INSTALL_STORAGE_KEY
+    );
+
+    console.log(
+      "UGO installation state cleared."
+    );
+  } catch (error) {
+    console.warn(
+      "Unable to clear PWA install state:",
+      error
+    );
+  }
+};
+
+
+// ============================================================
+// CHECK INSTALLED RELATED APPS
+//
+// This gives Chrome another way to report an
+// installed related application/PWA when supported.
+// ============================================================
+
+export const checkInstalledRelatedApps =
+  async () => {
+    try {
+      if (
+        typeof navigator
+          .getInstalledRelatedApps !==
+        "function"
+      ) {
+        return false;
+      }
+
+      const apps =
+        await navigator.getInstalledRelatedApps();
+
+      console.log(
+        "Installed related apps:",
+        apps
+      );
+
+      return (
+        Array.isArray(apps) &&
+        apps.length > 0
+      );
+
+    } catch (error) {
+      console.warn(
+        "Unable to check installed related apps:",
+        error
+      );
+
+      return false;
+    }
+  };
+
+
+// ============================================================
+// COMPLETE INSTALL CHECK
+// ============================================================
+
+export const checkPWAInstalled =
+  async () => {
+
+    // 1. Already running as installed PWA
+    if (isStandalonePWA()) {
+      saveInstallState();
+      return true;
+    }
+
+    // 2. Previously installed from this browser
+    if (hasSavedInstallState()) {
+      return true;
+    }
+
+    // 3. Browser-supported installed app detection
+    const relatedAppInstalled =
+      await checkInstalledRelatedApps();
+
+    if (relatedAppInstalled) {
+      saveInstallState();
+      return true;
+    }
+
+    return false;
+  };
+
+
+// ============================================================
+// BEFORE INSTALL PROMPT
+// ============================================================
 
 window.addEventListener(
   "beforeinstallprompt",
   (event) => {
 
     console.log(
-      "🔥🔥🔥 beforeinstallprompt FIRED 🔥🔥🔥"
+      "🔥 UGO beforeinstallprompt captured."
     );
 
-    console.log(
-      "Event received:",
-      event
-    );
-
-    // Prevent Chrome from showing its own
-    // automatic install UI.
     event.preventDefault();
 
     deferredPrompt = event;
 
-    console.log(
-      "✅ PWA install prompt saved"
+    window.dispatchEvent(
+      new CustomEvent(
+        "ugo-install-available"
+      )
     );
-
   }
 );
-// ======================================================
-// GET CURRENT INSTALL PROMPT
-// ======================================================
+
+
+// ============================================================
+// APP INSTALLED EVENT
+// ============================================================
+
+window.addEventListener(
+  "appinstalled",
+  () => {
+
+    console.log(
+      "🎉 UGO PWA installed."
+    );
+
+    deferredPrompt = null;
+
+    saveInstallState();
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "ugo-app-installed"
+      )
+    );
+  }
+);
+
+
+// ============================================================
+// GET INSTALL PROMPT
+// ============================================================
 
 export const getInstallPrompt = () => {
-
-    
-
-  console.log(
-    "getInstallPrompt() called"
-  );
-
-  console.log(
-    "Current deferredPrompt:",
-    deferredPrompt
-  );
-
   return deferredPrompt;
 };
 
 
-// ======================================================
+// ============================================================
+// CHECK WHETHER INSTALL PROMPT IS AVAILABLE
+// ============================================================
+
+export const isInstallPromptAvailable =
+  () => {
+    return !!deferredPrompt;
+  };
+
+
+// ============================================================
 // INSTALL PWA
-// ======================================================
+// ============================================================
 
 export const installPWA = async () => {
 
-  console.log(
-    "installPWA() called"
-  );
-
-  // ------------------------------------------
-  // Check whether prompt exists
-  // ------------------------------------------
-
   if (!deferredPrompt) {
 
-    console.warn(
-      "❌ No deferred install prompt available."
+    console.log(
+      "⚠️ No PWA install prompt is available."
     );
 
     return {
-      available: false,
-      outcome: null,
+      outcome: "unavailable",
+      installed: false,
     };
   }
 
-
   try {
 
-    console.log(
-      "📱 Showing PWA install prompt..."
-    );
+    const promptEvent =
+      deferredPrompt;
 
-    await deferredPrompt.prompt();
-
-
-    // ------------------------------------------
-    // Wait for user's decision
-    // ------------------------------------------
-
-    const { outcome } =
-      await deferredPrompt.userChoice;
-
-
-    console.log(
-      "User install decision:",
-      outcome
-    );
-
-
-    // Prompt can only be used once
+    // Prevent the same prompt from
+    // being used multiple times.
     deferredPrompt = null;
 
+    await promptEvent.prompt();
+
+    const choiceResult =
+      await promptEvent.userChoice;
+
+    console.log(
+      "UGO PWA user choice:",
+      choiceResult
+    );
+
+    if (
+      choiceResult?.outcome ===
+      "accepted"
+    ) {
+
+      saveInstallState();
+
+      return {
+        ...choiceResult,
+        installed: true,
+      };
+    }
 
     return {
-      available: true,
-      outcome,
+      ...choiceResult,
+      installed: false,
     };
 
   } catch (error) {
 
     console.error(
-      "❌ Error showing PWA install prompt:",
+      "UGO PWA installation error:",
       error
     );
 
-    deferredPrompt = null;
-
     return {
-      available: false,
-      outcome: null,
+      outcome: "error",
+      installed: false,
       error,
     };
-
   }
-
 };
+
+
+// ============================================================
+// DEBUG HELPER
+// ============================================================
+
+export const getPWAStatus = () => {
+
+  return {
+    standalone:
+      isStandalonePWA(),
+
+    saved:
+      hasSavedInstallState(),
+
+    promptAvailable:
+      !!deferredPrompt,
+
+    browser:
+      window.matchMedia(
+        "(display-mode: browser)"
+      ).matches,
+  };
+};
+
+
+// ============================================================
+// OPTIONAL GLOBAL DEBUG
+// ============================================================
+
+console.log(
+  "UGO PWA helper loaded."
+);

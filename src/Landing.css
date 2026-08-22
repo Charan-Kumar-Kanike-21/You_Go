@@ -1,4 +1,3 @@
-
 /* =================================
 RESET
 ================================= */
@@ -19,7 +18,11 @@ body,
 body {
     overflow-x: hidden;
     overflow-y: auto;
-    font-family: Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
 
@@ -29,23 +32,18 @@ LANDING PAGE
 
 .landing {
     position: relative;
+
     width: 100%;
     min-height: 100vh;
+    min-height: 100svh;
+
     overflow: hidden;
 
-    background:
-        radial-gradient(
-            circle at center,
-            #294d3d 0%,
-            #142c22 45%,
-            #07120e 100%
-        );
-
-    color: white;
+    background: #f4f6f8;
 
     transition:
-        opacity 1s ease,
-        transform 1s ease;
+        opacity 0.7s ease,
+        transform 0.7s ease;
 }
 
 
@@ -55,7 +53,10 @@ FADE OUT
 
 .landing-finished {
     opacity: 0;
-    transform: scale(1.03);
+
+    transform: scale(1.02);
+
+    pointer-events: none;
 }
 
 
@@ -66,56 +67,48 @@ BACKGROUND GLOW
 .background-glow {
     position: absolute;
 
-    top: 50%;
+    top: 42%;
     left: 50%;
 
-    width: min(750px, 80vw);
-    height: min(750px, 80vw);
+    width:
+        min(800px, 90vw);
 
-    transform: translate(-50%, -50%);
+    height:
+        min(800px, 90vw);
+
+    transform:
+        translate(-50%, -50%);
 
     border-radius: 50%;
 
     background:
         radial-gradient(
             circle,
-            rgba(69, 214, 111, 0.20),
-            transparent 68%
+            rgba(69, 214, 111, 0.12),
+            rgba(69, 214, 111, 0.04) 45%,
+            transparent 72%
         );
 
     filter: blur(30px);
 
     z-index: 1;
+
+    pointer-events: none;
 }
 
 
 /* =================================
-GROUND
+ROAD
 ================================= */
 
 .road {
     position: absolute;
 
-    left: -10%;
-    bottom: -35%;
+    inset: 0;
 
-    width: 120%;
-    height: 65%;
+    pointer-events: none;
 
-    background:
-        linear-gradient(
-            to bottom,
-            transparent,
-            rgba(0, 0, 0, 0.55)
-        );
-
-    transform:
-        perspective(700px)
-        rotateX(55deg);
-
-    transform-origin: bottom;
-
-    z-index: 2;
+    z-index: 1;
 }
 
 
@@ -129,17 +122,50 @@ TOP BAR
     top: 30px;
     left: 40px;
 
-    z-index: 20;
+    z-index: 30;
 }
 
 .brand {
     font-size: 20px;
+
     font-weight: 700;
+
     letter-spacing: 2px;
+
+    color: #163a5f;
 }
 
 .brand span {
-    color: #45d66f;
+    color: #45a96b;
+}
+
+
+/* =================================
+MAIN CONTENT
+================================= */
+
+.landing-content {
+    position: relative;
+
+    z-index: 10;
+
+    width: 100%;
+
+    min-height: 100vh;
+    min-height: 100svh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        90px
+        20px
+        75px;
 }
 
 
@@ -148,19 +174,22 @@ LOGO CONTAINER
 ================================= */
 
 .logo-container {
-    position: absolute;
+    position: relative;
 
-    top: 42%;
-    left: 50%;
+    width:
+        min(360px, 55vw);
 
-    width: min(520px, 70vw);
-    height: min(520px, 70vw);
+    height:
+        min(360px, 55vw);
 
-    transform: translate(-50%, -50%);
+    flex-shrink: 0;
 
     display: flex;
-    justify-content: center;
+
     align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
 
     z-index: 10;
 }
@@ -189,7 +218,12 @@ LOGO GLOW
     filter: blur(35px);
 
     animation:
-        logoGlow 3s ease-in-out infinite;
+        logoGlow
+        3s
+        ease-in-out
+        infinite;
+
+    z-index: 1;
 }
 
 
@@ -208,12 +242,15 @@ MAIN LOGO
     z-index: 2;
 
     animation:
-        logoAppear 1.5s ease forwards;
+        logoAppear
+        1.5s
+        ease
+        forwards;
 
     filter:
         drop-shadow(
             0 20px 40px
-            rgba(0, 0, 0, 0.45)
+            rgba(0, 0, 0, 0.25)
         );
 }
 
@@ -226,12 +263,16 @@ LOGO APPEAR
 
     0% {
         opacity: 0;
-        transform: scale(0.85);
+
+        transform:
+            scale(0.85);
     }
 
     100% {
         opacity: 1;
-        transform: scale(1);
+
+        transform:
+            scale(1);
     }
 }
 
@@ -244,52 +285,61 @@ LOGO GLOW
 
     0% {
         opacity: 0.45;
-        transform: scale(0.95);
+
+        transform:
+            scale(0.95);
     }
 
     50% {
         opacity: 0.85;
-        transform: scale(1.05);
+
+        transform:
+            scale(1.05);
     }
 
     100% {
         opacity: 0.45;
-        transform: scale(0.95);
+
+        transform:
+            scale(0.95);
     }
 }
 
 
 /* =================================
-WELCOME TEXT
+WELCOME
 ================================= */
 
 .welcome {
-    position: absolute;
+    position: relative;
 
-    left: 50%;
-    bottom: 16%;
-
-    width: 90%;
-
-    transform:
-        translateX(-50%)
-        translateY(25px);
+    width: 100%;
 
     text-align: center;
 
     z-index: 15;
 
     opacity: 0;
+
+    transform:
+        translateY(25px);
+
+    margin-bottom: 22px;
 }
 
 
 /* =================================
-WELCOME APPEAR
+WELCOME ANIMATION
 ================================= */
 
 .animation-started .welcome {
+
     animation:
-        welcomeAppear 1s ease 0.8s forwards;
+        welcomeAppear
+        1s
+        ease
+        0.8s
+        forwards;
 }
 
 
@@ -299,7 +349,6 @@ WELCOME APPEAR
         opacity: 0;
 
         transform:
-            translateX(-50%)
             translateY(25px);
     }
 
@@ -307,29 +356,45 @@ WELCOME APPEAR
         opacity: 1;
 
         transform:
-            translateX(-50%)
             translateY(0);
     }
 }
 
 
 /* =================================
-WELCOME HEADINGS
+HEADINGS
 ================================= */
 
 .welcome h1 {
+
     margin: 0;
 
-    font-size: clamp(22px, 3vw, 30px);
+    font-size:
+        clamp(
+            22px,
+            2.5vw,
+            30px
+        );
 
     line-height: 1.25;
 
     font-weight: 500;
+
+    color: #163a5f;
 }
 
+
+/* =================================
+GREEN TEXT
+================================= */
+
 .green-text {
-    color: #45d66f;
-    font-weight: 700 !important;
+
+    color:
+        #45a96b !important;
+
+    font-weight:
+        700 !important;
 }
 
 
@@ -338,69 +403,273 @@ SUBTEXT
 ================================= */
 
 .welcome p {
-    margin-top: 10px;
 
-    font-size: clamp(13px, 1.5vw, 16px);
+    margin:
+        10px
+        0
+        0;
+
+    font-size:
+        clamp(
+            13px,
+            1.5vw,
+            16px
+        );
 
     letter-spacing: 1px;
 
     color:
-        rgba(255, 255, 255, 0.7);
+        #667085;
 }
 
 
 /* =================================
-GET STARTED BUTTON
+ACTION AREA
 ================================= */
 
+.landing-actions {
+
+    position: relative;
+
+    width:
+        min(330px, 88vw);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 11px;
+
+    z-index: 25;
+
+    opacity: 0;
+
+    animation:
+        actionsAppear
+        0.8s
+        ease
+        1.3s
+        forwards;
+}
+
+
+@keyframes actionsAppear {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* =================================
+BUTTONS
+================================= */
+
+.install-button,
+.browser-button,
 .start-button {
-    position: absolute;
 
-    left: 50%;
-    bottom: 8%;
+    width: 100%;
 
-    transform: translateX(-50%);
+    min-height: 52px;
 
-    z-index: 20;
+    padding:
+        12px
+        24px;
 
-    padding: 14px 32px;
-
-    border: 2px solid #45d66f;
     border-radius: 30px;
 
-    background: transparent;
+    font-size: 15px;
 
-    color: white;
-
-    font-size: 16px;
     font-weight: 600;
 
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 
     cursor: pointer;
 
-    transition: 0.3s ease;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease;
 
     white-space: nowrap;
 }
 
-.start-button span {
+
+/* =================================
+INSTALL
+================================= */
+
+.install-button {
+    border:
+        2px solid
+        #163a5f;
+    background: white;
+    color: #163a5f;
+        box-shadow:
+        0 8px 25px
+    rgba(
+        69,
+        199,
+        106,
+        0.22
+    );
+}
+
+.install-button:hover {
+
+    border:
+        2px solid
+        #163a5f;
+
+    background:
+        #45c76a;
+
+    color:
+        black;
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            69,
+            199,
+            106,
+            0.22
+        );
+}
+
+.install-button:hover:not(:disabled) {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 13px 32px
+        rgba(
+            69,
+            199,
+            106,
+            0.32
+        );
+}
+
+.install-button:disabled {
+
+    opacity: 0.7;
+
+    cursor:
+        not-allowed;
+}
+
+.button-icon {
+
+    margin-right: 8px;
+}
+
+
+/* =================================
+BROWSER
+================================= */
+
+.browser-button {
+
+    border:
+        2px solid
+        #163a5f;
+
+    background:
+        transparent;
+
+    color:
+        #163a5f;
+}
+
+.browser-button span {
+
     margin-left: 10px;
+
+    font-size: 19px;
+}
+
+.browser-button:hover {
+
+    background:
+        #163a5f;
+
+    color:
+        #ffffff;
+
+    transform:
+        translateY(-2px);
+}
+
+
+/* =================================
+GET STARTED
+================================= */
+
+.start-button {
+
+    border:
+        2px solid
+        #45c76a;
+
+    background:
+        white;
+
+    color:
+        #163a5f;
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            69,
+            199,
+            106,
+            0.22
+        );
+}
+
+.start-button span {
+
+    margin-left: 10px;
+
     font-size: 20px;
 }
 
 .start-button:hover {
-    background: #45d66f;
 
-    color: #07120e;
+    border: black !important;
+
+    background: #45c76a;
+
+    color: black;
 
     transform:
-        translateX(-50%)
         translateY(-3px);
 
     box-shadow:
-        0 10px 30px
-        rgba(69, 214, 111, 0.25);
+        0 13px 32px
+        rgba(
+            69,
+            199,
+            106,
+            0.32
+        );
 }
 
 
@@ -409,29 +678,34 @@ FOOTER
 ================================= */
 
 .bottom-section {
+
     position: absolute;
 
     left: 50%;
-    bottom: 20px;
+    bottom: 18px;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
     width: 100%;
 
     text-align: center;
 
-    z-index: 20;
+    z-index: 30;
+
+    pointer-events: none;
 }
 
 .bottom-section p {
+
     margin: 0;
 
-    font-size: 13px;
+    font-size: 12px;
 
-    letter-spacing: 1px;
+    letter-spacing: 0.7px;
 
     color:
-        rgba(255, 255, 255, 0.6);
+        #98a2b3;
 }
 
 
@@ -441,56 +715,26 @@ TABLET
 
 @media (max-width: 900px) {
 
-    .logo-container {
-        width: 450px;
-        height: 450px;
-        top: 40%;
+    .landing-content {
+
+        padding:
+            100px
+            20px
+            75px;
     }
-
-    .main-logo {
-        width: 90%;
-        height: 90%;
-    }
-
-    .welcome {
-        bottom: 16%;
-    }
-}
-
-
-/* =================================
-SMALL LAPTOP / TABLET
-================================= */
-
-@media (max-height: 700px) and (min-width: 601px) {
 
     .logo-container {
-        width: 350px;
-        height: 350px;
 
-        top: 38%;
-    }
+        width:
+            min(340px, 65vw);
 
-    .welcome {
-        bottom: 14%;
+        height:
+            min(340px, 65vw);
     }
 
     .welcome h1 {
-        font-size: 24px;
-    }
 
-    .welcome p {
-        margin-top: 6px;
-        font-size: 14px;
-    }
-
-    .start-button {
-        bottom: 5%;
-        padding: 11px 27px;
-    }
-
-    .bottom-section {
-        bottom: 8px;
+        font-size: 26px;
     }
 }
 
@@ -501,94 +745,266 @@ MOBILE
 
 @media (max-width: 600px) {
 
+    .landing {
+
+        min-height:
+            100svh;
+    }
+
+
     .top-bar {
+
         top: 20px;
         left: 20px;
     }
 
+
     .brand {
+
         font-size: 14px;
+
+        letter-spacing:
+            1.3px;
     }
+
+
+    .landing-content {
+
+        min-height:
+            100svh;
+
+        justify-content:
+            flex-start;
+
+        padding:
+            105px
+            20px
+            70px;
+    }
+
 
     .logo-container {
-        width: min(330px, 75vw);
-        height: min(330px, 75vw);
 
-        top: 36%;
+        width:
+            min(280px, 70vw);
+
+        height:
+            min(280px, 70vw);
+
+        margin-bottom:
+            5px;
     }
+
 
     .main-logo {
-        width: 90%;
-        height: 90%;
+
+        width: 92%;
+        height: 92%;
     }
+
 
     .welcome {
-        bottom: 17%;
-        width: 92%;
+
+        margin-bottom:
+            20px;
     }
+
 
     .welcome h1 {
+
         font-size: 23px;
+
+        line-height: 1.28;
     }
+
 
     .welcome p {
+
+        margin-top: 8px;
+
         font-size: 14px;
     }
 
+
+    .landing-actions {
+
+        width:
+            min(310px, 86vw);
+
+        gap: 9px;
+    }
+
+
+    .install-button,
+    .browser-button,
     .start-button {
-        bottom: 7%;
 
-        padding: 12px 25px;
+        min-height:
+            50px;
 
-        font-size: 14px;
+        padding:
+            11px
+            20px;
+
+        font-size:
+            14px;
     }
+
 
     .bottom-section {
-        bottom: 10px;
+
+        bottom:
+            10px;
     }
 
+
     .bottom-section p {
-        font-size: 11px;
+
+        font-size:
+            10px;
     }
 }
 
 
 /* =================================
-VERY SMALL HEIGHT
+SMALL MOBILE
 ================================= */
 
-@media (max-height: 550px) {
+@media (max-width: 380px) {
+
+    .landing-content {
+
+        padding-top:
+            90px;
+    }
+
 
     .logo-container {
-        width: 280px;
-        height: 280px;
 
-        top: 35%;
+        width:
+            min(240px, 68vw);
+
+        height:
+            min(240px, 68vw);
     }
 
-    .welcome {
-        bottom: 13%;
-    }
 
     .welcome h1 {
-        font-size: 20px;
+
+        font-size:
+            20px;
     }
+
 
     .welcome p {
-        font-size: 12px;
-        margin-top: 5px;
+
+        font-size:
+            12px;
     }
 
+
+    .landing-actions {
+
+        width:
+            min(280px, 86vw);
+    }
+
+
+    .install-button,
+    .browser-button,
     .start-button {
-        bottom: 4%;
 
-        padding: 10px 22px;
+        min-height:
+            46px;
 
-        font-size: 13px;
-    }
-
-    .bottom-section {
-        display: none;
+        font-size:
+            13px;
     }
 }
 
+
+/* =================================
+SHORT SCREENS
+================================= */
+
+@media (max-height: 650px) {
+
+    .landing-content {
+
+        justify-content:
+            flex-start;
+
+        padding-top:
+            70px;
+    }
+
+
+    .logo-container {
+
+        width:
+            210px;
+
+        height:
+            210px;
+
+        margin-bottom:
+            0;
+    }
+
+
+    .welcome {
+
+        margin-bottom:
+            12px;
+    }
+
+
+    .welcome h1 {
+
+        font-size:
+            19px;
+    }
+
+
+    .welcome p {
+
+        margin-top:
+            4px;
+
+        font-size:
+            12px;
+    }
+
+
+    .landing-actions {
+
+        width:
+            270px;
+
+        gap:
+            7px;
+    }
+
+
+    .install-button,
+    .browser-button,
+    .start-button {
+
+        min-height:
+            42px;
+
+        padding:
+            8px
+            16px;
+
+        font-size:
+            12px;
+    }
+
+
+    .bottom-section {
+
+        display:
+            none;
+    }
+}

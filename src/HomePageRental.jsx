@@ -230,7 +230,7 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
     return status
       .replace(/[_-]+/g, " ")
       .replace(/\\s+/g, " ")
-      .replace(/\\b\\w/g, (letter) =>
+      .replace(/\b\w/g, (letter) =>
         letter.toUpperCase()
       );
   };
@@ -249,6 +249,35 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
     );
   };
 
+
+  // =========================================
+  // DYNAMIC ACTIVE BOOKING STATUS
+  // =========================================
+  // booking_table is checked only for bookings whose status is
+  // exactly "active". An active booking means the cycle is
+  // currently being rented and must be shown as Active to every
+  // homepage user. If there is no active booking, the normal
+  // cycle_availability status is used.
+  const getEffectiveCycleStatus = (
+    availability,
+    bookingRowsByCycleId
+  ) => {
+    const cycleId = getAvailabilityCycleId(availability);
+    const availabilityStatus = getAvailabilityStatus(availability);
+
+    const bookings =
+      bookingRowsByCycleId.get(String(cycleId)) || [];
+
+    const hasActiveBooking = bookings.some((booking) =>
+      String(booking?.status || "")
+        .trim()
+        .toLowerCase() === "active"
+    );
+
+    return hasActiveBooking
+      ? "active"
+      : availabilityStatus;
+  };
   // =========================================
   // FETCH + SORT RENTAL CYCLES
   // =========================================
@@ -301,7 +330,47 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
         }
 
         
+        // Fetch ONLY currently active rentals from booking_table.
+        // A booking with any other status is ignored for homepage status.
         const {
+          data: bookingRows,
+          error: bookingError,
+        } = await supabase
+          .from("booking_table")
+          .select("cycle_id, status")
+          .in("cycle_id", cycleIds)
+          .eq("status", "active");
+
+        if (bookingError) {
+          console.warn(
+            "Unable to fetch booking statuses; using cycle_availability:",
+            bookingError
+          );
+        }
+
+        const bookingRowsByCycleId = new Map();
+
+        console.log(
+          "Active booking rows used for cycle status:",
+          bookingRows
+        );
+
+        console.log(
+          "Refreshed active booking rows:",
+          bookingRows
+        );
+
+        (bookingRows || []).forEach((booking) => {
+          const key = String(booking.cycle_id);
+
+          if (!bookingRowsByCycleId.has(key)) {
+            bookingRowsByCycleId.set(key, []);
+          }
+
+          bookingRowsByCycleId.get(key).push(booking);
+        });
+
+const {
           data: cycleRows,
           error: cycleError,
         } = await supabase
@@ -446,9 +515,18 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
 
             console.log("ownerprofile: ", ownerProfile);
 
-            const availabilityStatus = getAvailabilityStatus(availability);
+            // IMPORTANT:
+            // This is the final status that must be shown to EVERY user.
+            // It is calculated from booking_table first, then falls back
+            // to cycle_availability.
+            const effectiveStatus =
+              getEffectiveCycleStatus(
+                availability,
+                bookingRowsByCycleId
+              );
+
             const availabilityPriority =
-              availabilityStatus === "available" ? 0 : 1;
+              effectiveStatus === "available" ? 0 : 1;
 
             // Rule #2: price from cycles.
             const hourlyPrice = Number(
@@ -553,9 +631,13 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
               geared: ["gear", "geared"].includes(
                 String(cycle.cycle_type || "").toLowerCase()
               ),
-              status: cycle.status,
+              // Keep all three status fields synchronized.
+              // The UI should never read the stale raw availability
+              // status when booking_table has already reserved the cycle.
+              status: effectiveStatus,
+              cycleStatus: effectiveStatus,
               is_verified: cycle.is_verified,
-              availabilityStatus,
+              availabilityStatus: effectiveStatus,
               availabilityPriority,
               userDistance,
               ownerDistance,
@@ -610,6 +692,177 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
 
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  // =========================================
+  // REALTIME CYCLE STATUS UPDATES
+  // =========================================
+  // Listen to both tables because a rental becoming active or ending
+  // may update booking_table, cycle_availability, or both.
+  useEffect(() => {
+    let mounted = true;
+
+    const refreshCycleStatuses = async () => {
+      if (!mounted) return;
+
+      try {
+        const {
+          data: availabilityRows,
+          error: availabilityError,
+        } = await supabase
+          .from("cycle_availability")
+          .select("*");
+
+        if (availabilityError) {
+          console.warn(
+            "Unable to refresh cycle availability:",
+            availabilityError
+          );
+          return;
+        }
+
+        const cycleIds = [
+          ...new Set(
+            (availabilityRows || [])
+              .map(getAvailabilityCycleId)
+              .filter(Boolean)
+          ),
+        ];
+
+        if (!cycleIds.length) return;
+
+        const {
+          data: bookingRows,
+          error: bookingError,
+        } = await supabase
+          .from("booking_table")
+          .select("cycle_id, status")
+          .in("cycle_id", cycleIds)
+          .eq("status", "active");
+
+        if (bookingError) {
+          console.warn(
+            "Unable to refresh active booking statuses:",
+            bookingError
+          );
+        }
+
+        const bookingRowsByCycleId = new Map();
+
+        (bookingRows || []).forEach((booking) => {
+          const key = String(booking.cycle_id);
+
+          if (!bookingRowsByCycleId.has(key)) {
+            bookingRowsByCycleId.set(key, []);
+          }
+
+          bookingRowsByCycleId.get(key).push(booking);
+        });
+
+        if (!mounted) return;
+
+        setCycles((previousCycles) => {
+          const updatedCycles = previousCycles.map((cycle) => {
+            const availability = (availabilityRows || []).find(
+              (row) =>
+                String(getAvailabilityCycleId(row)) ===
+                String(cycle.id)
+            );
+
+            if (!availability) {
+              return cycle;
+            }
+
+            const nextStatus = getEffectiveCycleStatus(
+              availability,
+              bookingRowsByCycleId
+            );
+
+            return {
+              ...cycle,
+              status: nextStatus,
+              cycleStatus: nextStatus,
+              availabilityStatus: nextStatus,
+              availabilityPriority:
+                nextStatus === "available" ? 0 : 1,
+            };
+          });
+
+          // Keep the original homepage ordering rule after a
+          // status change: available cycles stay above booked ones.
+          return [...updatedCycles].sort((a, b) => {
+            if (
+              a.availabilityPriority !==
+              b.availabilityPriority
+            ) {
+              return (
+                a.availabilityPriority -
+                b.availabilityPriority
+              );
+            }
+
+            if (a.hourlyPrice !== b.hourlyPrice) {
+              return a.hourlyPrice - b.hourlyPrice;
+            }
+
+            if (a.userDistance !== b.userDistance) {
+              return a.userDistance - b.userDistance;
+            }
+
+            if (a.ownerDistance !== b.ownerDistance) {
+              return a.ownerDistance - b.ownerDistance;
+            }
+
+            if (a.rating !== b.rating) {
+              return b.rating - a.rating;
+            }
+
+            return 0;
+          });
+        });
+      } catch (statusError) {
+        console.warn(
+          "Dynamic cycle status refresh failed:",
+          statusError
+        );
+      }
+    };
+
+    const availabilityChannel = supabase
+      .channel("homepage-cycle-availability-status")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "cycle_availability",
+        },
+        () => {
+          refreshCycleStatuses();
+        }
+      )
+      .subscribe();
+
+    const bookingChannel = supabase
+      .channel("homepage-booking-status")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "booking_table",
+        },
+        () => {
+          refreshCycleStatuses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(availabilityChannel);
+      supabase.removeChannel(bookingChannel);
     };
   }, []);
 
@@ -1233,9 +1486,14 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
 
                         <span
                           className={
-                            cycle.availabilityPriority === 0
+                            cycle.availabilityStatus === "available"
                               ? "available-badge"
-                              : "availability-badge other"
+                              : `availability-badge ${String(
+                                  cycle.availabilityStatus || "unknown"
+                                )
+                                  .trim()
+                                  .toLowerCase()
+                                  .replace(/[^a-z0-9]+/g, "-")}`
                           }
                         >
                           {formatAvailabilityStatus(

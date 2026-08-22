@@ -2457,6 +2457,16 @@ select {
   color: #667085;
   border: 1px solid #e5e7eb;
 }
+
+/* =========================================================
+   ACTIVE RENTAL BADGE
+========================================================= */
+
+.availability-badge.active {
+  background: #fff4e5;
+  color: #b54708;
+  border: 1px solid #fedf89;
+}
 /* =========================================================
    CYCLE CARD — BALANCED PROPORTIONS
 ========================================================= */

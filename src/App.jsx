@@ -847,12 +847,12 @@ useEffect(() => {
     }
 
     console.log("Opening Razorpay with:");
-    console.log("Key:", "rzp_test_TSYPUKku7mLFkO");
+    console.log("Key:", "rzp_live_TSl3eQnxqmNP83");
     console.log("Order:", payment.provider_order_id);
     console.log("Amount:", Number(payment.amount) * 100);
 
     const options = {
-      key: "rzp_test_TSYPUKku7mLFkO",
+      key: "rzp_test_TSslW485AyMVnu",
 
       amount: Math.round(Number(payment.amount) * 100),
 
@@ -1640,6 +1640,14 @@ useEffect(() => {
     setPage("BookingHistory");
   };
 
+ 
+  // =========================================================
+  //  handle Otp Page Continue
+  // =========================================================
+
+  const handleOtpPageContinue = () => {
+  setPage("BookingHistory");
+};
   // =========================================================
   // BOOKING REQUEST SUCCESS
   // =========================================================
@@ -1793,6 +1801,10 @@ useEffect(() => {
     setPage("Listing");
   };
 
+  const handleNotifications = () => {
+    setPage("NotificationPage");
+  }
+
   // =========================================================
   // OPEN ONGOING RENTS
   // =========================================================
@@ -1832,460 +1844,6 @@ useEffect(() => {
   const handleProfileBack = () => {
     setPage(profileReturnPage);
   };
-
-  // =========================================================
-  // NOTIFICATION ACTIONS
-  // =========================================================
-
-  // const handleNotificationAction = (
-  //   notification,
-  //   actionType
-  // ) => {
-  //   switch (actionType) {
-  //     // -----------------------------------------------------
-  //     // RETURN CYCLE
-  //     // -----------------------------------------------------
-
-  //     case "RETURN_CYCLE":
-  //       setPage("ReturnPage");
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW RENTAL
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_RENTAL":
-  //       setPage("OnGoingRents");
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW REPORT
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_REPORT":
-  //       setPage("ReportPage");
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW CYCLE
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_CYCLE":
-  //       if (
-  //         notification.type ===
-  //         "CYCLE_VERIFICATION_ASSIGNED"
-  //       ) {
-  //         if (!notification.cycle_id) {
-  //           console.error(
-  //             "Cycle ID is missing from notification:",
-  //             notification
-  //           );
-
-  //           alert(
-  //             "Cycle ID not found in this notification."
-  //           );
-
-  //           return;
-  //         }
-
-  //         setSelectedCycle({
-  //           id: notification.cycle_id,
-  //         });
-
-  //         setPage("CycleVerification");
-  //       } else {
-  //         setPage("BookingPage");
-  //       }
-
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW EXTENSION
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_EXTENSION":
-  //       console.log(
-  //         "Open extension request"
-  //       );
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW ACCOUNT
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_ACCOUNT":
-  //       console.log(
-  //         "Open account"
-  //       );
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // RETRY PAYMENT
-  //     // -----------------------------------------------------
-
-  //     case "RETRY_PAYMENT":
-  //       console.log(
-  //         "Retry payment"
-  //       );
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW DISPUTE
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_DISPUTE":
-  //       console.log(
-  //         "Open payment dispute"
-  //       );
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // VIEW SECURITY
-  //     // -----------------------------------------------------
-
-  //     case "VIEW_SECURITY":
-  //       console.log(
-  //         "Open security settings"
-  //       );
-  //       break;
-
-  //     // -----------------------------------------------------
-  //     // DEFAULT
-  //     // -----------------------------------------------------
-
-  //     default:
-  //       console.log(
-  //         "Unknown notification action:",
-  //         actionType
-  //       );
-  //   }
-  // };
-
-  // const handleNotificationAction = (
-  //   notification,
-  //   actionType,
-  //   actionData
-  // ) => {
-
-  //   console.log(
-  //     "Handling notification action:",
-  //     {
-  //       notification,
-  //       actionType,
-  //       actionData,
-  //     }
-  //   );
-
-
-  //   /* =========================================================
-  //     ENTER RENTAL OTP
-  //     =========================================================
-      
-  //     Owner clicks:
-      
-  //     [ Enter OTP ]
-      
-  //     Opens OTP page.
-      
-  //     Required action_data:
-  //     {
-  //       booking_id,
-  //       cycle_id,
-  //       renter_id,
-  //       owner_id
-  //     }
-  //   */
-
-  //   if (
-  //     actionType === "ENTER_RENTAL_OTP"
-  //   ) {
-
-  //     setPage("OTP");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     }); 
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     REPORT OWNER
-  //     =========================================================
-      
-  //     Used when:
-      
-  //     OTP expired because owner was absent.
-      
-  //     Opens report page.
-      
-  //     Required action_data:
-  //     {
-  //       booking_id,
-  //       owner_id,
-  //       renter_id,
-  //       cycle_id
-  //     }
-  //   */
-
-  //   if (
-  //     actionType === "REPORT_OWNER"
-  //   ) {
-
-  //     setPage("ReportPage");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     VIEW EXTENSION
-  //     =========================================================
-      
-  //     Opens extension request page.
-      
-  //     Required action_data:
-  //     {
-  //       booking_id,
-  //       extension_request_id,
-  //       cycle_id,
-  //       owner_id,
-  //       renter_id
-  //     }
-  //   */
-
-  //   if (
-  //     actionType === "VIEW_EXTENSION"
-  //   ) {
-
-  //     setCurrentPage("extension");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     RETURN CYCLE
-  //     =========================================================
-      
-  //     Opens return page.
-      
-  //     Required action_data:
-  //     {
-  //       booking_id,
-  //       cycle_id,
-  //       owner_id,
-  //       renter_id
-  //     }
-  //   */
-
-  //   if (
-  //     actionType === "RETURN_CYCLE"
-  //   ) {
-
-  //     setCurrentPage("return");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     VIEW REPORT
-  //     =========================================================
-      
-  //     Used by admins for:
-      
-  //     RETURN_PROBLEM_REPORTED
-  //     USER_REPORTED
-  //     OWNER_REPORTED
-  //     RENTER_REPORTED
-  //     CYCLE_REPORTED
-      
-  //     Required action_data:
-  //     {
-  //       report_id,
-  //       reporter_id,
-  //       reported_user_id,
-  //       booking_id,
-  //       cycle_id
-  //     }
-  //   */
-
-  //   if (
-  //     actionType === "VIEW_REPORT"
-  //   ) {
-
-  //     setCurrentPage("reportDetails");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     VIEW CYCLE
-  //     =========================================================
-      
-  //     Used mainly for:
-      
-  //     CYCLE_VERIFICATION_ASSIGNED
-      
-  //     Opens cycle verification/details page.
-      
-  //     Required action_data:
-  //     {
-  //       cycle_id,
-  //       owner_id,
-  //       admin_id
-  //     }
-  //   */
-
-  //   if (
-  //     actionType === "VIEW_CYCLE"
-  //   ) {
-
-  //     setCurrentPage("cycleDetails");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     RETRY PAYMENT
-  //     =========================================================
-      
-  //     Payment failed.
-      
-  //     Opens payment flow again using the same order details.
-      
-  //     action_data should contain the information required by
-  //     your payment flow, for example:
-      
-  //     {
-  //       booking_id,
-  //       payment_id,
-  //       order_id,
-  //       amount,
-  //       currency
-  //     }
-      
-  //     IMPORTANT:
-  //     The actual Razorpay initialization should happen in
-  //     your payment page/component, not directly inside this
-  //     notification router.
-  //   */
-
-  //   if (
-  //     actionType === "RETRY_PAYMENT"
-  //   ) {
-
-  //     setCurrentPage("payment");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     VIEW SECURITY
-  //     =========================================================
-      
-  //     Opens security/review page.
-      
-  //     Used for:
-      
-  //     NEW_LOGIN_DETECTED
-  //     SECURITY_ALERT
-  //     etc.
-  //   */
-
-  //   if (
-  //     actionType === "VIEW_SECURITY"
-  //   ) {
-
-  //     setCurrentPage("security");
-
-  //     setPageData({
-  //       notification,
-  //       actionType,
-  //       ...actionData,
-  //     });
-
-  //     return;
-  //   }
-
-
-  //   /* =========================================================
-  //     UNKNOWN ACTION
-  //     =========================================================
-  //   */
-
-  //   console.warn(
-  //     "Unknown notification action:",
-  //     actionType,
-  //     actionData
-  //   );
-  // };
-  // // }
-
-  // if (authLoading || !page) {
-  //   return (
-  //     <div
-  //       style={{
-  //         minHeight: "100vh",
-  //         display: "flex",
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         background:
-  //           "radial-gradient(circle at center, rgba(45, 130, 72, 0.75), rgba(6, 27, 20, 1))",
-  //         color: "white",
-  //         fontSize: "18px",
-  //       }}
-  //     >
-  //       Loading...
-  //     </div>
-  //   );
-  // }
-
-
-
 
   // =========================================================
   // MOBILE / RENTAL SECTION NAVIGATION
@@ -3408,7 +2966,7 @@ const handleNotificationAction = async (
             reporterRole
           }
           onBack={
-            handleOnGoingRentsBack
+            handleOnGoingRents
           }
         />
       )}
@@ -3420,6 +2978,8 @@ const handleNotificationAction = async (
       {page === "OTP" && (
         <OTP
           onBookingId = {bookingId}
+          onBackToNotifications={handleNotifications}
+          onContinue = {handleOtpPageContinue}
         />
       )}
 

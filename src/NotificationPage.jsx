@@ -36,10 +36,20 @@ function NotificationPage({ onAction, onBack }) {
   // The parent/backend action connection remains unchanged.
   const [rentalDecisions, setRentalDecisions] = useState({});
   const [processingRentalId, setProcessingRentalId] = useState(null);
+
+  // Cycle IDs for which this owner already has an active rental.
+  // Every other pending request for the same cycle must keep its
+  // Accept/Reject buttons visible but disabled.
+  const [activeRentalCycleIds, setActiveRentalCycleIds] = useState([]);
   const [otpRegeneratedIds, setOtpRegeneratedIds] = useState({});
   // Notifications selected with the checkboxes.
   const [selectedNotificationIds, setSelectedNotificationIds] = useState([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
+
+  // Rental request details subpage. This is used only for
+  // rental_request_received notifications.
+  const [selectedRentalDetails, setSelectedRentalDetails] = useState(null);
+  const [rentalDetailsLoading, setRentalDetailsLoading] = useState(false);
 
   // One shared clock drives all notification countdowns.
   // The backend-provided expiry_time remains the source of truth.
@@ -204,8 +214,36 @@ function NotificationPage({ onAction, onBack }) {
     );
   };
 
+  const getRentalBookingId = (notification) => {
+    const data = notification?.action_data || {};
+
+    return (
+      data.booking_id ||
+      data.bookingId ||
+      data.booking?.id ||
+      notification?.booking_id ||
+      notification?.bookingId ||
+      null
+    );
+  };
+
+  const hasActiveRentalForCycle = (notification) => {
+    const cycleId = getRentalCycleId(notification);
+
+    if (!cycleId) return false;
+
+    return activeRentalCycleIds.some(
+      (activeCycleId) =>
+        String(activeCycleId) === String(cycleId)
+    );
+  };
+
   /*
    * Rental decision is persisted inside notifications.action_data.
+   *
+   * In addition, active bookings are checked directly from booking_table
+   * so the one-active-rental-per-cycle rule still works after a refresh
+   * or when the other request notifications do not contain a decision.
    *
    * We keep rentalDecisions as a local cache for the current page,
    * but action_data is the source of truth so the decision survives
@@ -233,11 +271,33 @@ function NotificationPage({ onAction, onBack }) {
     getPersistedRentalDecision(notification) ||
     null;
 
+    const isRentalRequestTemporarilyLocked = (notification) => {
+      const actionData = notification?.action_data;
+
+      if (!actionData || typeof actionData !== "object") {
+        return false;
+      }
+
+      return actionData.rental_locked === true;
+    };
+
   const hasAcceptedRentalForCycle = (notification) => {
     const cycleId = getRentalCycleId(notification);
 
     if (!cycleId) return false;
 
+    // First check active bookings fetched from booking_table.
+    if (hasActiveRentalForCycle(notification)) {
+      const bookingId = getRentalBookingId(notification);
+
+      // If this notification itself is the already-active booking,
+      // it must not be blocked by its own active booking.
+      if (!bookingId) {
+        return true;
+      }
+    }
+
+    // Also check persisted/local Accepted decisions on notifications.
     return notifications.some((item) => {
       if (String(item.id) === String(notification.id)) {
         return false;
@@ -274,95 +334,436 @@ function NotificationPage({ onAction, onBack }) {
     }
   };
 
-  const handleRentalDecision = async (notification, decision) => {
-    if (!notification?.id || processingRentalId) return;
+  /*
+   * Open the renter-details subpage for a rental request.
+   *
+   * The notification action_data normally contains booking_id.
+   * We fetch the latest booking + renter profile so the owner sees
+   * the actual current renter information.
+   */
+  const openRentalDetails = async (notification) => {
+    if (!isRentalRequestNotification(notification)) return;
 
-    const currentDecision = getRentalDecision(notification);
-    if (currentDecision) return;
-
-    if (
-      decision === "accepted" &&
-      hasAcceptedRentalForCycle(notification)
-    ) {
-      return;
-    }
-
-    const action =
-      decision === "accepted"
-        ? "accepted_rental_request"
-        : "rejected_rental_request";
-
-    setProcessingRentalId(notification.id);
+    setRentalDetailsLoading(true);
+    setSelectedRentalDetails({
+      notification,
+      renterName: "Loading...",
+      renterPhone: "Loading...",
+      rentalDuration: "Loading...",
+    });
 
     try {
-      if (typeof onAction !== "function") {
-        throw new Error(
-          "Notification action handler is not provided."
-        );
-      }
-
-      // Preserve the existing parent/backend connection.
-      await onAction(action, notification);
-
-      /*
-       * Persist the owner's choice in the notification itself.
-       * This is what makes Accepted/Rejected survive a page refresh.
-       *
-       * We merge the existing action_data so no existing backend
-       * connection/data is overwritten.
-       */
-      const existingActionData =
+      const actionData =
         notification?.action_data &&
         typeof notification.action_data === "object"
           ? notification.action_data
           : {};
 
-      const updatedActionData = {
-        ...existingActionData,
-        rental_decision: decision,
-      };
+      const bookingId =
+        actionData.booking_id ||
+        actionData.bookingId ||
+        actionData.booking?.id ||
+        notification?.booking_id ||
+        null;
 
-      const { data: updatedNotification, error: decisionUpdateError } =
-        await supabase
-          .from("notifications")
-          .update({
-            action_data: updatedActionData,
-          })
-          .eq("id", notification.id)
-          .eq("user_id", notification.user_id)
-          .select("*")
-          .single();
+      let booking = null;
 
-      if (decisionUpdateError) {
-        throw decisionUpdateError;
+      if (bookingId) {
+        const {
+          data,
+          error: bookingError,
+        } = await supabase
+          .from("booking_table")
+          .select(`
+            id,
+            renter_id,
+            no_of_hours,
+            no_of_days
+          `)
+          .eq("id", bookingId)
+          .maybeSingle();
+
+        if (bookingError) throw bookingError;
+        booking = data;
       }
 
-      setRentalDecisions((previous) => ({
-        ...previous,
-        [notification.id]: decision,
-      }));
+      const renterId =
+        booking?.renter_id ||
+        actionData.renter_id ||
+        actionData.renterId ||
+        actionData.user_id ||
+        actionData.userId ||
+        null;
 
-      setNotifications((previousNotifications) =>
-        previousNotifications.map((item) =>
-          item.id === notification.id
-            ? {
-                ...item,
-                ...(updatedNotification || {}),
-                action_data: updatedActionData,
-              }
-            : item
-        )
+      let renterProfile = null;
+
+      if (renterId) {
+        const {
+          data,
+          error: profileError,
+        } = await supabase
+          .from("profiles")
+          .select("full_name, phone, email")
+          .eq("id", renterId)
+          .maybeSingle();
+
+        if (profileError) throw profileError;
+        renterProfile = data;
+      }
+
+      const renterName =
+        renterProfile?.full_name?.trim() ||
+        renterProfile?.email?.split("@")[0] ||
+        actionData.renter_name ||
+        actionData.renterName ||
+        "Renter";
+
+      const renterPhone =
+        renterProfile?.phone ||
+        actionData.renter_phone ||
+        actionData.renterPhone ||
+        "Mobile number unavailable";
+
+      const days =
+        booking?.no_of_days ??
+        actionData.no_of_days ??
+        actionData.noOfDays ??
+        actionData.days ??
+        0;
+
+      const hours =
+        booking?.no_of_hours ??
+        actionData.no_of_hours ??
+        actionData.noOfHours ??
+        actionData.hours ??
+        0;
+
+      const numericDays = Number(days) || 0;
+      const numericHours = Number(hours) || 0;
+
+      let rentalDuration =
+        actionData.rental_duration ||
+        actionData.rentalDuration ||
+        actionData.duration ||
+        null;
+
+      if (!rentalDuration) {
+        const durationParts = [];
+
+        if (numericDays > 0) {
+          durationParts.push(
+            `${numericDays} day${numericDays === 1 ? "" : "s"}`
+          );
+        }
+
+        if (numericHours > 0) {
+          durationParts.push(
+            `${numericHours} hour${numericHours === 1 ? "" : "s"}`
+          );
+        }
+
+        rentalDuration =
+          durationParts.length > 0
+            ? durationParts.join(" ")
+            : "Duration unavailable";
+      }
+
+      setSelectedRentalDetails({
+        notification,
+        renterName,
+        renterPhone,
+        rentalDuration,
+      });
+    } catch (err) {
+      console.error(
+        "Error fetching rental request details:",
+        err
       );
 
-      if (!notification.is_read) {
-        await markNotificationAsRead(notification.id);
-      }
-    } catch (err) {
-      console.error("Rental request action failed:", err);
+      setSelectedRentalDetails({
+        notification,
+        renterName: "Renter unavailable",
+        renterPhone: "Mobile number unavailable",
+        rentalDuration: "Duration unavailable",
+      });
     } finally {
-      setProcessingRentalId(null);
+      setRentalDetailsLoading(false);
     }
   };
+
+  const closeRentalDetails = () => {
+    setSelectedRentalDetails(null);
+    setRentalDetailsLoading(false);
+  };
+
+const handleRentalDecision = async (notification, decision) => {
+  if (!notification?.id || processingRentalId) return;
+
+  const currentDecision = getRentalDecision(notification);
+
+  if (currentDecision) return;
+
+  /*
+   * TEMPORARY LOCK
+   *
+   * Another request for this cycle may already have been accepted.
+   * The notification remains visible, but Accept/Reject are blocked.
+   *
+   * The lock is stored in action_data so it survives page refreshes.
+   */
+  if (isRentalRequestTemporarilyLocked(notification)) {
+    return;
+  }
+
+  /*
+   * Existing same-cycle protection.
+   */
+  if (
+    decision === "accepted" &&
+    hasAcceptedRentalForCycle(notification)
+  ) {
+    return;
+  }
+
+  const action =
+    decision === "accepted"
+      ? "accepted_rental_request"
+      : "rejected_rental_request";
+
+  setProcessingRentalId(notification.id);
+
+  try {
+    if (typeof onAction !== "function") {
+      throw new Error(
+        "Notification action handler is not provided."
+      );
+    }
+
+    /*
+     * DO NOT disturb the existing backend connection.
+     */
+    await onAction(action, notification);
+
+    /*
+     * Preserve existing action_data.
+     */
+    const existingActionData =
+      notification?.action_data &&
+      typeof notification.action_data === "object"
+        ? notification.action_data
+        : {};
+
+    /*
+     * Store this owner's decision.
+     */
+    const updatedActionData = {
+      ...existingActionData,
+      rental_decision: decision,
+
+      /*
+       * The notification which was actually accepted/rejected
+       * must not be locked.
+       */
+      rental_locked: false,
+    };
+
+    const {
+      data: updatedNotification,
+      error: decisionUpdateError,
+    } = await supabase
+      .from("notifications")
+      .update({
+        action_data: updatedActionData,
+      })
+      .eq("id", notification.id)
+      .eq("user_id", notification.user_id)
+      .select("*")
+      .single();
+
+    if (decisionUpdateError) {
+      throw decisionUpdateError;
+    }
+
+    /*
+     * Preserve existing local decision state.
+     */
+    setRentalDecisions((previous) => ({
+      ...previous,
+      [notification.id]: decision,
+    }));
+
+    /*
+     * Update this notification locally.
+     */
+    setNotifications((previousNotifications) =>
+      previousNotifications.map((item) =>
+        item.id === notification.id
+          ? {
+              ...item,
+              ...(updatedNotification || {}),
+              action_data: updatedActionData,
+            }
+          : item
+      )
+    );
+
+    /*
+     * =========================================================
+     * TEMPORARY BLOCKING
+     * =========================================================
+     *
+     * Only when an owner ACCEPTS a request:
+     *
+     *   Same cycle
+     *        ↓
+     * Other rental requests
+     *        ↓
+     * rental_locked = true
+     *
+     * Their cards remain visible.
+     * Their Accept/Reject buttons become disabled.
+     *
+     * We do NOT mark them as rejected.
+     */
+    if (decision === "accepted") {
+      const cycleId = getRentalCycleId(notification);
+
+      if (cycleId) {
+        const lockTimestamp =
+          new Date().toISOString();
+
+        const otherRentalNotifications =
+          notifications.filter((item) => {
+            /*
+             * Don't lock the accepted notification itself.
+             */
+            if (
+              String(item.id) ===
+              String(notification.id)
+            ) {
+              return false;
+            }
+
+            /*
+             * Only rental-request notifications.
+             */
+            if (
+              !isRentalRequestNotification(item)
+            ) {
+              return false;
+            }
+
+            /*
+             * Only notifications belonging to
+             * the same cycle.
+             */
+            const itemCycleId =
+              getRentalCycleId(item);
+
+            return (
+              itemCycleId &&
+              String(itemCycleId) ===
+                String(cycleId)
+            );
+          });
+
+        /*
+         * Persist the temporary lock in Supabase.
+         */
+        for (const item of otherRentalNotifications) {
+          const itemActionData =
+            item?.action_data &&
+            typeof item.action_data === "object"
+              ? item.action_data
+              : {};
+
+          /*
+           * Don't overwrite existing action_data.
+           */
+          const lockedActionData = {
+            ...itemActionData,
+
+            rental_locked: true,
+            rental_lock_reason:
+              "another_request_accepted",
+            rental_locked_at: lockTimestamp,
+          };
+
+          const { error: lockError } =
+            await supabase
+              .from("notifications")
+              .update({
+                action_data: lockedActionData,
+              })
+              .eq("id", item.id)
+              .eq("user_id", item.user_id);
+
+          if (lockError) {
+            console.error(
+              "Unable to temporarily lock rental request:",
+              item.id,
+              lockError
+            );
+          }
+        }
+
+        /*
+         * Immediately update the UI.
+         *
+         * This means the owner doesn't have to wait for
+         * Realtime to see the buttons become disabled.
+         */
+        setNotifications((previousNotifications) =>
+          previousNotifications.map((item) => {
+            const shouldLock =
+              otherRentalNotifications.some(
+                (other) =>
+                  String(other.id) ===
+                  String(item.id)
+              );
+
+            if (!shouldLock) {
+              return item;
+            }
+
+            const currentActionData =
+              item?.action_data &&
+              typeof item.action_data === "object"
+                ? item.action_data
+                : {};
+
+            return {
+              ...item,
+              action_data: {
+                ...currentActionData,
+                rental_locked: true,
+                rental_lock_reason:
+                  "another_request_accepted",
+                rental_locked_at: lockTimestamp,
+              },
+            };
+          })
+        );
+      }
+    }
+
+    /*
+     * Existing notification-read logic.
+     */
+    if (!notification.is_read) {
+      await markNotificationAsRead(
+        notification.id
+      );
+    }
+  } catch (err) {
+    console.error(
+      "Rental request action failed:",
+      err
+    );
+  } finally {
+    setProcessingRentalId(null);
+  }
+};
 
   /*
   |--------------------------------------------------------------------------
@@ -544,6 +945,8 @@ function NotificationPage({ onAction, onBack }) {
 
       if (!user) {
 
+        setActiveRentalCycleIds([]);
+
         setError(
           "User is not logged in."
         );
@@ -557,6 +960,38 @@ function NotificationPage({ onAction, onBack }) {
         user.id
       );
 
+      /*
+       * Find cycles for which this owner already has an ACTIVE
+       * booking. This is the authoritative UI check for the rule:
+       *
+       *     one active rental per cycle
+       *
+       * Therefore, if cycle A already has an active booking, all
+       * other rental-request notifications for cycle A must keep
+       * Accept + Reject visible but disabled.
+       *
+       * A different cycle can still be accepted normally.
+       */
+      const {
+        data: activeOwnerBookings,
+        error: activeBookingError,
+      } = await supabase
+        .from("booking_table")
+        .select("id, cycle_id, renter_id, status")
+        .eq("owner_id", user.id)
+        .eq("status", "active")
+        .is("returned_at", null)
+        .is("cancelled_at", null);
+
+      if (activeBookingError) {
+        throw activeBookingError;
+      }
+
+      const activeCycleIds = (activeOwnerBookings || [])
+        .map((booking) => booking.cycle_id)
+        .filter(Boolean);
+
+      setActiveRentalCycleIds(activeCycleIds);
 
       /*
        * Fetch notifications belonging
@@ -1002,9 +1437,7 @@ function NotificationPage({ onAction, onBack }) {
 
           <div className="notification-empty">
 
-            <div className="notification-empty-icon">
-              🔔
-            </div>
+            <div className="notification-empty-icon notification-empty-bell" aria-hidden="true">♧</div>
 
             <h2>
               Loading notifications...
@@ -1076,6 +1509,72 @@ function NotificationPage({ onAction, onBack }) {
   | MAIN PAGE
   |--------------------------------------------------------------------------
   */
+
+                            /*
+   * Rental details subpage.
+   * This is intentionally rendered only when a rental request
+   * notification has been selected.
+   */
+  if (selectedRentalDetails) {
+    return (
+      <main className="notification-page rental-details-page">
+        <section className="rental-details-subpage">
+          <button
+            type="button"
+            className="rental-details-back-button"
+            onClick={closeRentalDetails}
+            aria-label="Back to notifications"
+          >
+            ← Back
+          </button>
+
+          <div className="rental-details-header">
+            <div className="rental-details-header-icon" aria-hidden="true">
+              ♙
+            </div>
+
+            <div>
+              <h2>Rental Request Details</h2>
+              <p>Review the renter details before accepting the rental.</p>
+            </div>
+          </div>
+
+          {rentalDetailsLoading ? (
+            <div className="rental-details-loading">
+              <span className="rental-action-spinner" />
+              Loading renter details...
+            </div>
+          ) : (
+            <div className="rental-details-list">
+              <div className="rental-detail-row">
+                <span className="rental-detail-icon" aria-hidden="true">♙</span>
+                <div>
+                  <small>User Name</small>
+                  <strong>{selectedRentalDetails.renterName}</strong>
+                </div>
+              </div>
+
+              <div className="rental-detail-row">
+                <span className="rental-detail-icon" aria-hidden="true">☎</span>
+                <div>
+                  <small>Mobile Number</small>
+                  <strong>{selectedRentalDetails.renterPhone}</strong>
+                </div>
+              </div>
+
+              <div className="rental-detail-row">
+                <span className="rental-detail-icon" aria-hidden="true">◷</span>
+                <div>
+                  <small>Rental Duration</small>
+                  <strong>{selectedRentalDetails.rentalDuration}</strong>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
+    );
+  }
 
   return (
 
@@ -1220,7 +1719,10 @@ function NotificationPage({ onAction, onBack }) {
             <div className="notification-empty">
 
               <div className="notification-empty-icon">
-                🔔
+                  <span
+                    className="notification-bell-icon"
+                    aria-hidden="true"
+                  ></span>
               </div>
 
 
@@ -1388,8 +1890,13 @@ function NotificationPage({ onAction, onBack }) {
                             const decision =
                               getRentalDecision(notification);
 
-                            const anotherAccepted =
+                            const cycleAlreadyOccupied =
                               hasAcceptedRentalForCycle(
+                                notification
+                              );
+
+                              const temporarilyLocked =
+                              isRentalRequestTemporarilyLocked(
                                 notification
                               );
 
@@ -1454,49 +1961,78 @@ function NotificationPage({ onAction, onBack }) {
                                   </div>
                                 )}
 
-                                <div className="rental-request-action-buttons">
-                                  {/* ACCEPT */}
+                                <div
+                                  className={`rental-request-action-buttons ${
+                                    cycleAlreadyOccupied
+                                      ? "rental-cycle-occupied"
+                                      : ""
+                                  }`}
+                                >
+                                  {/* VIEW RENTER DETAILS */}
                                   <button
                                     type="button"
-                                    className="notification-action-button accept-button"
-                                    disabled={
-                                      isProcessing ||
-                                      anotherAccepted
-                                    }
+                                    className="rental-details-icon-button"
                                     onClick={() =>
-                                      handleRentalDecision(
-                                        notification,
-                                        "accepted"
-                                      )
+                                      openRentalDetails(notification)
                                     }
-                                    title={
-                                      anotherAccepted
-                                        ? "Another rental request for this cycle has already been accepted."
-                                        : "Accept this rental request"
-                                    }
+                                    aria-label="View renter details"
+                                    title="View renter details"
                                   >
-                                    {isProcessing ? (
-                                      <span className="rental-action-spinner" />
-                                    ) : (
-                                      <>
-                                        Accept
-                                        <span>✓</span>
-                                      </>
-                                    )}
+                                    <span aria-hidden="true">ⓘ</span>
                                   </button>
+
+                                  {/* ACCEPT */}
+                                  <button
+                                      type="button"
+                                      className="notification-action-button accept-button"
+                                      disabled={
+                                        isProcessing ||
+                                        cycleAlreadyOccupied ||
+                                        temporarilyLocked
+                                      }
+                                      onClick={() =>
+                                        handleRentalDecision(
+                                          notification,
+                                          "accepted"
+                                        )
+                                      }
+                                      title={
+                                        temporarilyLocked
+                                          ? "Temporarily unavailable because another request for this cycle has been accepted."
+                                          : cycleAlreadyOccupied
+                                          ? "Another rental request for this cycle has already been accepted."
+                                          : "Accept this rental request"
+                                      }
+                                    >
+                                      {isProcessing ? (
+                                        <span className="rental-action-spinner" />
+                                      ) : (
+                                        <>
+                                          Accept
+                                          <span>✓</span>
+                                        </>
+                                      )}
+                                    </button>
 
                                   {/* REJECT */}
                                   <button
                                     type="button"
                                     className="notification-action-button reject-button"
-                                    disabled={isProcessing}
+                                    disabled={
+                                      isProcessing ||
+                                      temporarilyLocked
+                                    }
                                     onClick={() =>
                                       handleRentalDecision(
                                         notification,
                                         "rejected"
                                       )
                                     }
-                                    title="Reject this rental request"
+                                    title={
+                                      temporarilyLocked
+                                        ? "Temporarily unavailable because another request for this cycle has been accepted."
+                                        : "Reject this rental request"
+                                    }
                                   >
                                     Reject
                                     <span>✕</span>
@@ -1565,7 +2101,7 @@ function NotificationPage({ onAction, onBack }) {
                               );
                             }
 
-                            return (
+  return (
                               <div className="otp-active-block">
                                 {otpRegeneratedIds[notification.id] && (
                                   <div className="otp-regenerated-status">

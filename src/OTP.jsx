@@ -1,13 +1,104 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./OTP.css";
+import { supabase } from "./supabase";
 
-function OTP({ onBookingId, onBackToNotifications }) {
+function OTP({ onBookingId, onBackToNotifications, onContinue }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
+  // Booking information shown on the OTP page.
+  const [renterName, setRenterName] = useState("Loading...");
+  const [cycleName, setCycleName] = useState("Loading...");
+  const [bookingLoading, setBookingLoading] = useState(true);
+
   const inputRefs = useRef([]);
+
+  // ------------------------------------------------------------
+  // FETCH RENTER + CYCLE DETAILS
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const fetchBookingDetails = async () => {
+      if (!onBookingId) {
+        setRenterName("Renter");
+        setCycleName("Cycle");
+        setBookingLoading(false);
+        return;
+      }
+
+      try {
+        setBookingLoading(true);
+
+        const {
+          data: booking,
+          error: bookingError,
+        } = await supabase
+          .from("booking_table")
+          .select(`
+            id,
+            renter_id,
+            cycle_id,
+            cycles (
+              id,
+              brand,
+              model
+            )
+          `)
+          .eq("id", onBookingId)
+          .maybeSingle();
+
+        if (bookingError) throw bookingError;
+
+        if (!booking) {
+          setRenterName("Renter");
+          setCycleName("Cycle");
+          return;
+        }
+
+        // Fetch renter name from profiles using booking_table.renter_id.
+        if (booking.renter_id) {
+          const {
+            data: renterProfile,
+            error: renterError,
+          } = await supabase
+            .from("profiles")
+            .select("full_name, email")
+            .eq("id", booking.renter_id)
+            .maybeSingle();
+
+          if (renterError) throw renterError;
+
+          setRenterName(
+            renterProfile?.full_name?.trim() ||
+            renterProfile?.email?.split("@")[0] ||
+            "Renter"
+          );
+        } else {
+          setRenterName("Renter");
+        }
+
+        const cycle = booking.cycles;
+
+        const cycleLabel = [
+          cycle?.brand,
+          cycle?.model,
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        setCycleName(cycleLabel || "Cycle");
+      } catch (error) {
+        console.error("Error fetching OTP booking details:", error);
+        setRenterName("Renter");
+        setCycleName("Cycle");
+      } finally {
+        setBookingLoading(false);
+      }
+    };
+
+    fetchBookingDetails();
+  }, [onBookingId]);
 
   const handleChange = (value, index) => {
     // Only allow numbers
@@ -91,67 +182,207 @@ function OTP({ onBookingId, onBackToNotifications }) {
         }
       );
 
+      /*
+       * The webhook may return different response formats, and in some
+       * n8n workflows it may return an empty/very small response even
+       * though the database was successfully updated.
+       */
+      const responseText = await response.text();
+
       let result = null;
 
-      try {
-        result = await response.json();
-      } catch {
-        result = null;
+      if (responseText) {
+        try {
+          result = JSON.parse(responseText);
+        } catch {
+          result = responseText;
+        }
       }
 
-      console.log("n8n OTP verification response:", result);
+      console.log("OTP verification HTTP status:", response.status);
+      console.log("OTP verification webhook response:", result);
 
       if (!response.ok) {
+        const backendError =
+          typeof result === "string"
+            ? result
+            : result?.message ||
+              result?.error ||
+              result?.body?.message ||
+              result?.body?.error ||
+              "";
+
         throw new Error(
-          result?.message ||
+          backendError ||
           `OTP verification failed: ${response.status} ${response.statusText}`
         );
       }
 
       /*
-       * IMPORTANT:
-       * Do not show "Rental Started" merely because the HTTP
-       * request succeeded. Wait for the backend's actual
-       * verification response.
+       * ------------------------------------------------------------
+       * SOURCE OF TRUTH: booking_table.status
+       * ------------------------------------------------------------
        *
-       * Supported success response formats:
-       *   { verified: true }
-       *   { success: true }
-       *   { status: "verified" }
-       *   { status: "success" }
-       *   { message: "...verified..." }
+       * Your booking status enum contains `otp_verified`.
+       * After the backend verifies the OTP, it should update the
+       * booking status to otp_verified.
+       *
+       * This is more reliable than depending on the exact text/shape
+       * returned by the n8n webhook.
        */
-      const backendStatus = String(
-        result?.status ?? ""
-      ).trim().toLowerCase();
+      let bookingStatus = null;
 
-      const backendMessage = String(
-        result?.message ??
-        result?.response ??
-        result?.result ??
-        ""
-      ).trim().toLowerCase();
+      const checkBookingStatus = async () => {
+        const {
+          data: booking,
+          error: bookingError,
+        } = await supabase
+          .from("booking_table")
+          .select("status")
+          .eq("id", onBookingId)
+          .maybeSingle();
 
-      const otpVerified =
-        result?.verified === true ||
-        result?.success === true ||
-        backendStatus === "verified" ||
-        backendStatus === "success" ||
-        backendMessage.includes("otp verified") ||
-        backendMessage.includes("otp verification successful") ||
-        backendMessage.includes("successfully verified");
+        if (bookingError) {
+          console.error(
+            "Error checking booking verification status:",
+            bookingError
+          );
+          return null;
+        }
 
-      if (!otpVerified) {
+        return booking?.status
+          ? String(booking.status).trim().toLowerCase()
+          : null;
+      };
+
+      /*
+       * Give the backend a short amount of time to finish updating
+       * booking_table. We check a few times instead of assuming that
+       * the HTTP response itself means verification succeeded.
+       */
+      for (let attempt = 0; attempt < 5; attempt++) {
+        bookingStatus = await checkBookingStatus();
+
+        console.log(
+          `Booking status check ${attempt + 1}:`,
+          bookingStatus
+        );
+
+        if (
+          bookingStatus === "payment_pending" ||
+          bookingStatus === "active"
+        ) {
+          break;
+        }
+
+        if (attempt < 4) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, 500)
+          );
+        }
+      }
+
+      /*
+       * Also inspect the webhook response. This is a fallback in case
+       * the backend confirms verification in its response but the DB
+       * update has not become visible yet.
+       */
+      const responseCandidates = [];
+
+      const collectResponseValues = (value) => {
+        if (value === null || value === undefined) return;
+
+        if (typeof value === "string") {
+          responseCandidates.push(value);
+          return;
+        }
+
+        if (typeof value !== "object") return;
+
+        Object.entries(value).forEach(([key, child]) => {
+          if (
+            key.toLowerCase().includes("otp") ||
+            key.toLowerCase().includes("verif") ||
+            key.toLowerCase().includes("success") ||
+            key.toLowerCase().includes("status") ||
+            key.toLowerCase().includes("message") ||
+            key.toLowerCase().includes("result") ||
+            key.toLowerCase().includes("response")
+          ) {
+            if (
+              typeof child === "string" ||
+              typeof child === "boolean" ||
+              typeof child === "number"
+            ) {
+              responseCandidates.push(String(child));
+            }
+          }
+
+          if (child && typeof child === "object") {
+            collectResponseValues(child);
+          }
+        });
+      };
+
+      if (Array.isArray(result)) {
+        result.forEach(collectResponseValues);
+      } else {
+        collectResponseValues(result);
+      }
+
+      const normalizedResponse = responseCandidates
+        .join(" ")
+        .trim()
+        .toLowerCase();
+
+      const responseConfirmsVerification =
+        normalizedResponse.includes("otp verified") ||
+        normalizedResponse.includes("otp successfully verified") ||
+        normalizedResponse.includes("otp verification successful") ||
+        normalizedResponse.includes("successfully verified") ||
+        normalizedResponse.includes("verification successful") ||
+        normalizedResponse.includes("verification success") ||
+        normalizedResponse.includes("verified successfully") ||
+        normalizedResponse.includes("verified: true") ||
+        normalizedResponse.includes("success: true");
+
+      /*
+       * SUCCESS:
+       * - Prefer booking_table.status = otp_verified/active.
+       * - Otherwise accept an explicit verification confirmation
+       *   from the webhook.
+       */
+      const verified =
+        bookingStatus === "payment_pending" ||
+        bookingStatus === "active" ||
+        responseConfirmsVerification;
+
+      if (!verified) {
+        console.error(
+          "OTP verification was not confirmed.",
+          {
+            bookingStatus,
+            webhookResponse: result,
+          }
+        );
+
         setError(
-          result?.message ||
           "OTP verification was not confirmed by the backend. Please try again."
         );
         return;
       }
 
+      /*
+       * Clear every previous error before changing the screen.
+       * This prevents the red OTP error from remaining visible
+       * after a successful verification.
+       */
+      setError("");
       setSuccess(true);
     } catch (error) {
       console.error("OTP verification error:", error);
+
+      setSuccess(false);
       setError(
         error.message ||
         "Unable to verify OTP. Please try again."
@@ -160,7 +391,6 @@ function OTP({ onBookingId, onBackToNotifications }) {
       setVerifying(false);
     }
   };
-
   const handleClear = () => {
     setOtp(["", "", "", "", "", ""]);
     setError("");
@@ -176,11 +406,7 @@ function OTP({ onBookingId, onBackToNotifications }) {
         <button
           type="button"
           className="otp-back-button"
-          onClick={() => {
-            if (typeof onBackToNotifications === "function") {
-              onBackToNotifications();
-            }
-          }}
+          onClick={onBackToNotifications}
           aria-label="Back to notifications"
         >
           <span className="otp-back-arrow">←</span>
@@ -198,11 +424,11 @@ function OTP({ onBookingId, onBackToNotifications }) {
           </span>
 
           <h1>
-            Rental Started
+            OTP Successfully Verified
           </h1>
 
           <p>
-            The renter has been successfully verified.
+            OTP successfully verified.
             The rental can now officially begin.
           </p>
 
@@ -213,9 +439,7 @@ function OTP({ onBookingId, onBackToNotifications }) {
 
           <button
             className="continue-button"
-            onClick={() => {
-              console.log("Continue to active rental");
-            }}
+            onClick={onContinue}
           >
             Continue
           </button>
@@ -232,11 +456,7 @@ function OTP({ onBookingId, onBackToNotifications }) {
       <button
         type="button"
         className="otp-back-button"
-        onClick={() => {
-          if (typeof onBackToNotifications === "function") {
-            onBackToNotifications();
-          }
-        }}
+        onClick={onBackToNotifications}
         aria-label="Back to notifications"
       >
         <span className="otp-back-arrow">←</span>
@@ -268,12 +488,16 @@ function OTP({ onBookingId, onBackToNotifications }) {
 
           <div className="info-row">
             <span>Renter</span>
-            <strong>Student Name</strong>
+            <strong>
+              {bookingLoading ? "Loading..." : renterName}
+            </strong>
           </div>
 
           <div className="info-row">
             <span>Cycle</span>
-            <strong>Campus Cycle #104</strong>
+            <strong>
+              {bookingLoading ? "Loading..." : cycleName}
+            </strong>
           </div>
 
         </div>
