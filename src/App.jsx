@@ -852,7 +852,7 @@ useEffect(() => {
     console.log("Amount:", Number(payment.amount) * 100);
 
     const options = {
-      key: "rzp_test_TSslW485AyMVnu",
+      key: "rzp_live_TSl3eQnxqmNP83",
 
       amount: Math.round(Number(payment.amount) * 100),
 
