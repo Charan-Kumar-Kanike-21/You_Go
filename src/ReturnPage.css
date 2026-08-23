@@ -942,3 +942,31 @@
     min-height: 48px;
   }
 }
+
+/* =========================================================
+   BACKEND RESPONSE
+   The success screen displays the message returned by the
+   return webhook instead of using a hard-coded frontend message.
+========================================================= */
+
+.backend-response-message {
+  padding: 16px 18px;
+  margin: 16px auto 22px;
+  max-width: 390px;
+
+  border: 1px solid #C9E3D9;
+  border-radius: 14px;
+
+  background: #F7FBF9;
+  color: #172027 !important;
+
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 1.6;
+
+  word-break: break-word;
+}
+
+.return-button:disabled {
+  cursor: wait;
+}

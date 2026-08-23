@@ -271,15 +271,19 @@ function NotificationPage({ onAction, onBack }) {
     getPersistedRentalDecision(notification) ||
     null;
 
-    const isRentalRequestTemporarilyLocked = (notification) => {
-      const actionData = notification?.action_data;
+   const isRentalRequestTemporarilyLocked = (notification) => {
+    const decision = getRentalDecision(notification);
 
-      if (!actionData || typeof actionData !== "object") {
-        return false;
-      }
+    // The request that was itself accepted/rejected must
+    // continue showing its final decision.
+    if (decision) {
+      return false;
+    }
 
-      return actionData.rental_locked === true;
-    };
+    // Another request for this same cycle has already
+    // been accepted.
+    return hasAcceptedRentalForCycle(notification);
+  };
 
   const hasAcceptedRentalForCycle = (notification) => {
     const cycleId = getRentalCycleId(notification);
@@ -501,6 +505,7 @@ const handleRentalDecision = async (notification, decision) => {
 
   const currentDecision = getRentalDecision(notification);
 
+  console.log("current desicion :",currentDecision);
   if (currentDecision) return;
 
   /*
@@ -567,6 +572,8 @@ const handleRentalDecision = async (notification, decision) => {
       rental_locked: false,
     };
 
+    console.log("updated action data :",updatedActionData);
+
     const {
       data: updatedNotification,
       error: decisionUpdateError,
@@ -591,6 +598,8 @@ const handleRentalDecision = async (notification, decision) => {
       ...previous,
       [notification.id]: decision,
     }));
+
+    console.log("rental descisions :", rentalDecisions);
 
     /*
      * Update this notification locally.
@@ -627,6 +636,8 @@ const handleRentalDecision = async (notification, decision) => {
      */
     if (decision === "accepted") {
       const cycleId = getRentalCycleId(notification);
+
+      console.log("cycle id:", cycleId);
 
       if (cycleId) {
         const lockTimestamp =
@@ -688,6 +699,8 @@ const handleRentalDecision = async (notification, decision) => {
               "another_request_accepted",
             rental_locked_at: lockTimestamp,
           };
+
+          console.log("locked action data: ",lockedActionData);
 
           const { error: lockError } =
             await supabase
@@ -1529,13 +1542,11 @@ const handleRentalDecision = async (notification, decision) => {
           </button>
 
           <div className="rental-details-header">
-            <div className="rental-details-header-icon" aria-hidden="true">
-              ♙
-            </div>
-
-            <div>
-              <h2>Rental Request Details</h2>
-              <p>Review the renter details before accepting the rental.</p>
+            <div className="rental-details-title-group">
+              <div className="rental-details-heading-copy">
+                <h2>Rental Request Details</h2>
+                <p>Review the renter details before accepting the rental.</p>
+              </div>
             </div>
           </div>
 
@@ -1548,25 +1559,31 @@ const handleRentalDecision = async (notification, decision) => {
             <div className="rental-details-list">
               <div className="rental-detail-row">
                 <span className="rental-detail-icon" aria-hidden="true">♙</span>
-                <div>
-                  <small>User Name</small>
-                  <strong>{selectedRentalDetails.renterName}</strong>
+                <div className="rental-detail-content">
+                  <span className="rental-detail-label">User Name</span>
+                  <strong className="rental-detail-value">
+                    {selectedRentalDetails.renterName}
+                  </strong>
                 </div>
               </div>
 
               <div className="rental-detail-row">
                 <span className="rental-detail-icon" aria-hidden="true">☎</span>
-                <div>
-                  <small>Mobile Number</small>
-                  <strong>{selectedRentalDetails.renterPhone}</strong>
+                <div className="rental-detail-content">
+                  <span className="rental-detail-label">Mobile Number</span>
+                  <strong className="rental-detail-value">
+                    {selectedRentalDetails.renterPhone}
+                  </strong>
                 </div>
               </div>
 
               <div className="rental-detail-row">
                 <span className="rental-detail-icon" aria-hidden="true">◷</span>
-                <div>
-                  <small>Rental Duration</small>
-                  <strong>{selectedRentalDetails.rentalDuration}</strong>
+                <div className="rental-detail-content">
+                  <span className="rental-detail-label">Rental Duration</span>
+                  <strong className="rental-detail-value">
+                    {selectedRentalDetails.rentalDuration}
+                  </strong>
                 </div>
               </div>
             </div>
@@ -1966,6 +1983,10 @@ const handleRentalDecision = async (notification, decision) => {
                                     cycleAlreadyOccupied
                                       ? "rental-cycle-occupied"
                                       : ""
+                                  } ${
+                                    temporarilyLocked
+                                      ? "rental-request-actions-locked"
+                                      : ""
                                   }`}
                                 >
                                   {/* VIEW RENTER DETAILS */}
@@ -1978,7 +1999,10 @@ const handleRentalDecision = async (notification, decision) => {
                                     aria-label="View renter details"
                                     title="View renter details"
                                   >
-                                    <span aria-hidden="true">ⓘ</span>
+                                    <span
+                                      className="rental-profile-icon"
+                                      aria-hidden="true"
+                                    />
                                   </button>
 
                                   {/* ACCEPT */}

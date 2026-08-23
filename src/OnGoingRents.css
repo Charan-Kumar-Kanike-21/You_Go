@@ -2048,31 +2048,57 @@ select {
   ------------------------------------------------------- */
 
   .modal-overlay {
+    /* Keep the return dialog above the mobile bottom navigation
+       and vertically centered instead of opening as a bottom sheet. */
     align-items:
-      flex-end;
+      center;
+
+    justify-content:
+      center;
 
     padding:
-      10px;
+      20px 12px 95px;
   }
 
   .return-modal {
     width:
-      100%;
+      min(430px, 100%);
 
     max-height:
-      calc(100vh - 20px);
+      calc(100vh - 115px);
 
     max-height:
-      calc(100svh - 20px);
+      calc(100svh - 115px);
 
     overflow-y:
       auto;
 
     padding:
-      23px 17px 18px;
+      23px 17px 22px;
+
+    margin:
+      auto;
 
     border-radius:
       16px;
+  }
+
+  /* Make Continue clearly visible and centered inside the modal. */
+  .confirm-return-btn {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      min(100%, 360px);
+
+    margin:
+      18px auto 0;
   }
 
   .return-modal h2 {

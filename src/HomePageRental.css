@@ -2448,24 +2448,46 @@ select {
 }
 
 
-/* =========================================================
-   AVAILABILITY BADGES
-========================================================= */
-
-.availability-badge.other {
-  background: #f7f9fc;
-  color: #667085;
-  border: 1px solid #e5e7eb;
+/* Available */
+.availability-badge.available {
+  background: #ECFDF3;
+  color: #027A48;
+  border: 1px solid #ABEFC6;
 }
 
-/* =========================================================
-   ACTIVE RENTAL BADGE
-========================================================= */
+/* Rented */
+.availability-badge.rented {
+  background: #FFF4E5;
+  color: #B54708;
+  border: 1px solid #FEC84B;
+}
 
-.availability-badge.active {
-  background: #fff4e5;
-  color: #b54708;
-  border: 1px solid #fedf89;
+/* Unavailable */
+.availability-badge.unavailable {
+  background: #FEF3F2;
+  color: #B42318;
+  border: 1px solid #FECDCA;
+}
+
+/* Maintenance */
+.availability-badge.maintenance {
+  background: #F2F4F7;
+  color: #344054;
+  border: 1px solid #D0D5DD;
+}
+
+/* Pending */
+.availability-badge.booked {
+  background: #F4F3FF;
+  color: #5925DC;
+  border: 1px solid #D9D6FE;
+}
+
+/* Any unknown/new status */
+.availability-badge.other {
+  background: #F2F4F7;
+  color: #667085;
+  border: 1px solid #D0D5DD;
 }
 /* =========================================================
    CYCLE CARD — BALANCED PROPORTIONS
@@ -8006,4 +8028,107 @@ select {
 
     text-align: center !important;
   }
+}
+
+/*
+  HomePageRental — CYCLE DETAILS FONT SIZE ONLY
+  Add/import this file AFTER HomePageRental.css.
+
+  ONLY font-size is changed.
+  No width, height, margin, padding, gap, position, color,
+  border, shadow, grid, flex, image, or responsive layout
+  property is changed.
+*/
+
+.home-page .cycle-name h2 { font-size: 18px !important; }
+.home-page .cycle-model { font-size: 12px !important; }
+.home-page .cycle-price-line strong { font-size: 15px !important; }
+.home-page .cycle-price-line span { font-size: 11px !important; }
+.home-page .cycle-location { font-size: 12px !important; }
+.home-page .cycle-rating-block .rating-star { font-size: 13px !important; }
+.home-page .cycle-rating-block strong { font-size: 11px !important; }
+.home-page .rating-count { font-size: 10px !important; }
+.home-page .cycle-gear-badge { font-size: 11px !important; }
+.home-page .owner-details strong { font-size: 12px !important; }
+.home-page .owner-details span { font-size: 10px !important; }
+
+@media screen and (max-width: 700px) {
+  .home-page .cycle-name h2 { font-size: 14px !important; }
+  .home-page .cycle-model { font-size: 10px !important; }
+  .home-page .cycle-price-line strong { font-size: 11px !important; }
+  .home-page .cycle-price-line span { font-size: 8.5px !important; }
+  .home-page .cycle-location { font-size: 10px !important; }
+  .home-page .cycle-rating-block .rating-star { font-size: 11px !important; }
+  .home-page .cycle-rating-block strong { font-size: 9.5px !important; }
+  .home-page .rating-count { font-size: 8.5px !important; }
+  .home-page .cycle-gear-badge { font-size: 9.5px !important; }
+  .home-page .owner-details strong { font-size: 10px !important; }
+  .home-page .owner-details span { font-size: 8.5px !important; }
+}
+
+/* =========================================================
+   FINAL MOBILE CYCLE CARD HEIGHTq
+   Increase card height so all details have enough space.
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+  .cycle-grid .cycle-card {
+    height: 120px !important;
+    min-height: 120px !important;
+    max-height: 120px !important;
+  }
+
+  .cycle-grid .cycle-image {
+    height: 120px !important;
+    min-height: 120px !important;
+    max-height: 120px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 120px !important;
+    min-height: 120px !important;
+    max-height: 120px !important;
+  }
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .cycle-grid .cycle-card {
+    height: 115px !important;
+    min-height: 115px !important;
+    max-height: 115px !important;
+  }
+
+  .cycle-grid .cycle-image {
+    height: 115px !important;
+    min-height: 115px !important;
+    max-height: 115px !important;
+  }
+
+  .cycle-grid .cycle-details {
+    height: 115px !important;
+    min-height: 115px !important;
+    max-height: 115px !important;
+  }
+}
+
+.cycle-image {
+  position: relative;
+}
+
+.availability-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  padding: 6px 12px;
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+
+  z-index: 2;
 }

@@ -56,11 +56,6 @@ function BookingHistory({ onBack }) {
   const [cancelMessage, setCancelMessage] = useState("");
   const [cancelError, setCancelError] = useState("");
 
-  // Delete booking-history selection
-  const [selectedBookingIds, setSelectedBookingIds] = useState([]);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState("");
-  const [deleteError, setDeleteError] = useState("");
 
   // ============================================================
   // FETCH BOOKING HISTORY + NET BALANCE
@@ -246,9 +241,6 @@ function BookingHistory({ onBack }) {
       // are stored, so every strip/details view can reliably determine
       // whether this booking belongs to the owner or renter.
       setBookings(normalizedBookings);
-      setSelectedBookingIds([]);
-      setDeleteMessage("");
-      setDeleteError("");
     } catch (err) {
       console.error("Error fetching booking history:", err);
 
@@ -591,122 +583,6 @@ function BookingHistory({ onBack }) {
       );
     } finally {
       setWithdrawLoading(false);
-    }
-  };
-
-  // ============================================================
-  // DELETE BOOKING HISTORY
-  // ============================================================
-
-  const toggleBookingSelection = (bookingId) => {
-    setSelectedBookingIds((current) =>
-      current.includes(bookingId)
-        ? current.filter((id) => id !== bookingId)
-        : [...current, bookingId]
-    );
-
-    setDeleteMessage("");
-    setDeleteError("");
-  };
-
-  const toggleSelectAllBookings = () => {
-    setSelectedBookingIds((current) => {
-      if (current.length === bookings.length) {
-        return [];
-      }
-
-      return bookings.map((booking) => booking.id);
-    });
-
-    setDeleteMessage("");
-    setDeleteError("");
-  };
-
-  const allBookingsSelected =
-    bookings.length > 0 &&
-    selectedBookingIds.length === bookings.length;
-
-  const deleteSelectedBookings = async () => {
-    if (!selectedBookingIds.length || deleteLoading) {
-      return;
-    }
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${selectedBookingIds.length} selected booking ${
-        selectedBookingIds.length === 1 ? "history entry" : "history entries"
-      }? This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
-
-    setDeleteLoading(true);
-    setDeleteMessage("");
-    setDeleteError("");
-
-    try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError) throw userError;
-
-      if (!user) {
-        throw new Error("Please login before deleting booking history.");
-      }
-
-      // Delete only bookings that belong to the authenticated user
-      // as renter or owner. This prevents another user's booking
-      // from being deleted by manipulating the selected IDs.
-      const { data: ownedBookings, error: ownershipError } =
-        await supabase
-          .from("booking_table")
-          .select("id")
-          .in("id", selectedBookingIds)
-          .or(`renter_id.eq.${user.id},owner_id.eq.${user.id}`);
-
-      if (ownershipError) throw ownershipError;
-
-      const deletableIds = (ownedBookings || []).map(
-        (booking) => booking.id
-      );
-
-      if (!deletableIds.length) {
-        throw new Error(
-          "No selected booking history entries belong to your account."
-        );
-      }
-
-      const { error: deleteErrorFromSupabase } = await supabase
-        .from("booking_table")
-        .delete()
-        .in("id", deletableIds);
-
-      if (deleteErrorFromSupabase) {
-        throw deleteErrorFromSupabase;
-      }
-
-      setBookings((current) =>
-        current.filter(
-          (booking) => !deletableIds.includes(booking.id)
-        )
-      );
-
-      setSelectedBookingIds([]);
-      setDeleteMessage(
-        `${deletableIds.length} booking ${
-          deletableIds.length === 1 ? "history entry" : "history entries"
-        } deleted successfully.`
-      );
-    } catch (err) {
-      console.error("Delete booking history error:", err);
-
-      setDeleteError(
-        err.message ||
-          "Unable to delete the selected booking history."
-      );
-    } finally {
-      setDeleteLoading(false);
     }
   };
 
@@ -1504,56 +1380,6 @@ function BookingHistory({ onBack }) {
                 </div>
               )}
 
-              <div className="booking-history-selection-bar">
-                <label className="booking-history-select-all">
-                  <input
-                    type="checkbox"
-                    checked={allBookingsSelected}
-                    onChange={toggleSelectAllBookings}
-                    disabled={deleteLoading}
-                  />
-                  <span className="booking-history-checkbox"></span>
-                  <span>Select All</span>
-                </label>
-
-                <div className="booking-history-selection-actions">
-                  {selectedBookingIds.length > 0 && (
-                    <span className="booking-history-selected-count">
-                      {selectedBookingIds.length} selected
-                    </span>
-                  )}
-
-                  <button
-                    type="button"
-                    className="booking-history-delete-button"
-                    onClick={deleteSelectedBookings}
-                    disabled={
-                      selectedBookingIds.length === 0 ||
-                      deleteLoading
-                    }
-                  >
-                    {deleteLoading
-                      ? "Deleting..."
-                      : `Delete${
-                          selectedBookingIds.length
-                            ? ` (${selectedBookingIds.length})`
-                            : ""
-                        }`}
-                  </button>
-                </div>
-              </div>
-
-              {(deleteError || deleteMessage) && (
-                <div
-                  className={`booking-history-delete-feedback ${
-                    deleteError ? "error" : "success"
-                  }`}
-                  role="alert"
-                >
-                  {deleteError || deleteMessage}
-                </div>
-              )}
-
               <div className="booking-history-list">
               {bookings.map((booking) => {
                 const cycle = booking.cycles || {};
@@ -1566,25 +1392,9 @@ function BookingHistory({ onBack }) {
 
                 return (
                   <article
-                    className={`booking-history-strip ${
-                      selectedBookingIds.includes(booking.id)
-                        ? "booking-history-strip-selected"
-                        : ""
-                    }`}
+                    className="booking-history-strip"
                     key={booking.id}
                   >
-                    <label className="booking-strip-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={selectedBookingIds.includes(booking.id)}
-                        onChange={() =>
-                          toggleBookingSelection(booking.id)
-                        }
-                        disabled={deleteLoading}
-                      />
-                      <span className="booking-history-checkbox"></span>
-                    </label>
-
                     <div className="booking-strip-image">
                       {image ? (
                         <img
@@ -1619,7 +1429,7 @@ function BookingHistory({ onBack }) {
                         </span>
 
                         <span>
-                          {isOwner ? "You are the owner" : "Renter"}
+                          {isOwner ? "You are the owner" : "You are the Renter"}
                         </span>
 
                         <span>

@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import "./ReturnPage.css";
 import { supabase } from "./supabase";
 
-function ReturnPage({ bookingId, onBack, onBackHome }) {
+function ReturnPage({ bookingId, onBack, onBackHome, onReturnProcessing }) {
   const [booking, setBooking] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [returning, setReturning] = useState(false);
-  const [returned, setReturned] = useState(false);
 
   const [cameraOpen, setCameraOpen] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
@@ -352,10 +351,15 @@ function ReturnPage({ bookingId, onBack, onBackHome }) {
 
       // ========================================================
       // SEND TO BACKEND
+      //
+      // IMPORTANT:
+      // We wait here until the backend/n8n webhook sends its
+      // response. The frontend does NOT mark the rental returned
+      // before receiving that response.
       // ========================================================
 
       const response = await fetch(
-        "https://stem61.app.n8n.cloud/webhook/return",
+        "https://ugo-cyclesharing.app.n8n.cloud/webhook/return",
         {
           method: "POST",
           headers: {
@@ -368,17 +372,51 @@ function ReturnPage({ bookingId, onBack, onBackHome }) {
         }
       );
 
+      // Read whatever the backend sends back.
+      // This supports both JSON and plain-text responses.
+      const responseText = await response.text();
+
+      let backendResponse = responseText;
+
+      try {
+        backendResponse = responseText
+          ? JSON.parse(responseText)
+          : {};
+      } catch {
+        // Backend returned plain text, so keep responseText.
+      }
+
+      // Extract the message without forcing one exact n8n
+      // response structure.
+      const message =
+        typeof backendResponse === "string"
+          ? backendResponse
+          : backendResponse?.message ||
+            backendResponse?.msg ||
+            backendResponse?.response ||
+            backendResponse?.output ||
+            backendResponse?.status_message ||
+            JSON.stringify(backendResponse);
+
       if (!response.ok) {
         throw new Error(
-          `Backend returned ${response.status}`
+          message ||
+            `Backend returned ${response.status}`
+        );
+      }
+
+      if (!message) {
+        throw new Error(
+          "Backend completed the request but did not send a message."
         );
       }
 
       // ========================================================
-      // RETURN SUCCESSFUL
+      // BACKEND RESPONSE RECEIVED
       // ========================================================
 
-      setReturned(true);
+      setBackendMessage(message);
+      onReturnProcessing(booking.id);
 
     } catch (err) {
       console.error(
@@ -444,53 +482,6 @@ function ReturnPage({ bookingId, onBack, onBackHome }) {
           </p>
 
         </main>
-      </div>
-    );
-  }
-
-  // ============================================================
-  // SUCCESS
-  // ============================================================
-
-  if (returned) {
-    return (
-      <div className="return-page">
-
-        <main className="return-success-card">
-
-          <div className="return-success-icon">
-            ✓
-          </div>
-
-          <span className="return-eyebrow">
-            RETURN SUCCESSFUL
-          </span>
-
-          <h1>
-            Cycle Returned
-          </h1>
-
-          <p>
-            Your rental has been successfully
-            completed. Thank you for using
-            NITK Cycle Sharing.
-          </p>
-
-          <div className="return-status">
-            <span className="return-status-dot"></span>
-            Rental Completed
-          </div>
-          <div>
-            <button
-              className="return-home-button"
-              onClick={onBackHome}
-            >
-              ← Back to Home
-            </button>
-          </div>
-
-        </main>
-
       </div>
     );
   }
@@ -705,7 +696,7 @@ function ReturnPage({ bookingId, onBack, onBackHome }) {
             disabled={returning}
           >
             {returning
-              ? "Processing Return..."
+              ? "Waiting for Backend Confirmation..."
               : "Confirm Return"}
           </button>
         )}

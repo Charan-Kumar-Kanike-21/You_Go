@@ -27,6 +27,8 @@ import OwnerDetails from "./OwnerDetails";
 import CycleVerification from "./CycleVerification";
 import TermsAndConditions from "./TermsAndConditions";
 import ResetPassword from "./ResetPassword";
+import ReturnProcessing from "./ReturnProcessing";
+import ReviewPage from "./ReviewPage";
 import "./App.css";
 
 function AppContent() {
@@ -271,6 +273,8 @@ const enablePushNotifications = async () => {
     NotificationPage: "/notifications",
     OTP: "/otp",
     ReturnPage: "/return",
+    ReturnProcessing: "/return-processing",
+    ReviewPage: "/review",
     AdminDashboard: "/admin",
     OwnerDetails: "/owner-details",
     CycleVerification: "/cycle-verification",
@@ -306,6 +310,25 @@ const enablePushNotifications = async () => {
     if (location.pathname !== nextPath) {
       navigate(nextPath);
     }
+  };
+  const handleReturnProcessing = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setPage("ReturnProcessing");
+  };
+
+  // =========================================================
+  // RETURN PROCESSING → REVIEW PAGE
+  // =========================================================
+
+  const handleReturnReview = () => {
+    if (!selectedBookingId) {
+      console.error(
+        "Cannot open review page: booking ID is missing."
+      );
+      return;
+    }
+
+    setPage("ReviewPage");
   };
 
   /*
@@ -852,7 +875,7 @@ useEffect(() => {
     console.log("Amount:", Number(payment.amount) * 100);
 
     const options = {
-      key: "rzp_live_TSl3eQnxqmNP83",
+      key: "rzp_test_TSslW485AyMVnu",
 
       amount: Math.round(Number(payment.amount) * 100),
 
@@ -2328,7 +2351,7 @@ const handleNotificationAction = async (
         const options = {
 
           key:
-            "rzp_live_TSl3eQnxqmNP83",
+            "rzp_test_TSslW485AyMVnu",
 
           amount:
             order.amount,
@@ -2639,7 +2662,7 @@ const handleNotificationAction = async (
   return (
     <>
 
-      {/* {userId && (
+      {userId && (
         <button
           onClick={enablePushNotifications}
           style={{
@@ -2650,7 +2673,7 @@ const handleNotificationAction = async (
             padding: "12px 18px",
             borderRadius: "10px",
             border: "none",
-            background: "#39e879",
+            background: "white",
             color: "#031f16",
             fontWeight: "700",
             cursor: "pointer",
@@ -2658,7 +2681,7 @@ const handleNotificationAction = async (
         >
           🔔 Enable Notifications
         </button>
-      )} */}
+      )}
       {/* =====================================================
           LANDING PAGE
       ===================================================== */}
@@ -2992,6 +3015,7 @@ const handleNotificationAction = async (
            bookingId = {selectedBookingId}
            onBack={handleOnGoingRents}
            onBackHome={handleBackToHomePageRental}
+           onReturnProcessing={handleReturnProcessing}
         />
       )}
 
@@ -3069,6 +3093,28 @@ const handleNotificationAction = async (
           and does not replace existing navigation.
       ===================================================== */}
       <RentalBottomNav />
+      {/* =====================================================
+          REVIEW PAGE
+      ===================================================== */}
+
+      {page === "ReviewPage" && (
+        <ReviewPage
+          bookingId={selectedBookingId}
+          onBackHome={handleBackToHomePageRental}
+        />
+      )}
+
+      {/* =====================================================
+          RETURN PROCESSING
+      ===================================================== */}
+
+      {page === "ReturnProcessing" && (
+        <ReturnProcessing
+          bookingId={selectedBookingId}
+          onBackHome={handleBackToHomePageRental}
+          onReview={handleReturnReview}
+        />
+      )}
     </>
   );
 }

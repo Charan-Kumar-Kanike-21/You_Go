@@ -251,34 +251,6 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
 
 
   // =========================================
-  // DYNAMIC ACTIVE BOOKING STATUS
-  // =========================================
-  // booking_table is checked only for bookings whose status is
-  // exactly "active". An active booking means the cycle is
-  // currently being rented and must be shown as Active to every
-  // homepage user. If there is no active booking, the normal
-  // cycle_availability status is used.
-  const getEffectiveCycleStatus = (
-    availability,
-    bookingRowsByCycleId
-  ) => {
-    const cycleId = getAvailabilityCycleId(availability);
-    const availabilityStatus = getAvailabilityStatus(availability);
-
-    const bookings =
-      bookingRowsByCycleId.get(String(cycleId)) || [];
-
-    const hasActiveBooking = bookings.some((booking) =>
-      String(booking?.status || "")
-        .trim()
-        .toLowerCase() === "active"
-    );
-
-    return hasActiveBooking
-      ? "active"
-      : availabilityStatus;
-  };
-  // =========================================
   // FETCH + SORT RENTAL CYCLES
   // =========================================
   // HomePageRental owns all cycle data used by this page.
@@ -330,46 +302,6 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
         }
 
         
-        // Fetch ONLY currently active rentals from booking_table.
-        // A booking with any other status is ignored for homepage status.
-        const {
-          data: bookingRows,
-          error: bookingError,
-        } = await supabase
-          .from("booking_table")
-          .select("cycle_id, status")
-          .in("cycle_id", cycleIds)
-          .eq("status", "active");
-
-        if (bookingError) {
-          console.warn(
-            "Unable to fetch booking statuses; using cycle_availability:",
-            bookingError
-          );
-        }
-
-        const bookingRowsByCycleId = new Map();
-
-        console.log(
-          "Active booking rows used for cycle status:",
-          bookingRows
-        );
-
-        console.log(
-          "Refreshed active booking rows:",
-          bookingRows
-        );
-
-        (bookingRows || []).forEach((booking) => {
-          const key = String(booking.cycle_id);
-
-          if (!bookingRowsByCycleId.has(key)) {
-            bookingRowsByCycleId.set(key, []);
-          }
-
-          bookingRowsByCycleId.get(key).push(booking);
-        });
-
 const {
           data: cycleRows,
           error: cycleError,
@@ -515,15 +447,10 @@ const {
 
             console.log("ownerprofile: ", ownerProfile);
 
-            // IMPORTANT:
-            // This is the final status that must be shown to EVERY user.
-            // It is calculated from booking_table first, then falls back
-            // to cycle_availability.
+            // cycle_availability is the single source of truth
+            // for the status shown on HomePageRental.
             const effectiveStatus =
-              getEffectiveCycleStatus(
-                availability,
-                bookingRowsByCycleId
-              );
+              getAvailabilityStatus(availability);
 
             const availabilityPriority =
               effectiveStatus === "available" ? 0 : 1;
@@ -631,9 +558,8 @@ const {
               geared: ["gear", "geared"].includes(
                 String(cycle.cycle_type || "").toLowerCase()
               ),
-              // Keep all three status fields synchronized.
-              // The UI should never read the stale raw availability
-              // status when booking_table has already reserved the cycle.
+              // Keep all status fields synchronized with
+              // cycle_availability.status.
               status: effectiveStatus,
               cycleStatus: effectiveStatus,
               is_verified: cycle.is_verified,
@@ -698,8 +624,8 @@ const {
   // =========================================
   // REALTIME CYCLE STATUS UPDATES
   // =========================================
-  // Listen to both tables because a rental becoming active or ending
-  // may update booking_table, cycle_availability, or both.
+  // cycle_availability is the only source of truth for the
+  // status displayed on HomePageRental.
   useEffect(() => {
     let mounted = true;
 
@@ -722,44 +648,6 @@ const {
           return;
         }
 
-        const cycleIds = [
-          ...new Set(
-            (availabilityRows || [])
-              .map(getAvailabilityCycleId)
-              .filter(Boolean)
-          ),
-        ];
-
-        if (!cycleIds.length) return;
-
-        const {
-          data: bookingRows,
-          error: bookingError,
-        } = await supabase
-          .from("booking_table")
-          .select("cycle_id, status")
-          .in("cycle_id", cycleIds)
-          .eq("status", "active");
-
-        if (bookingError) {
-          console.warn(
-            "Unable to refresh active booking statuses:",
-            bookingError
-          );
-        }
-
-        const bookingRowsByCycleId = new Map();
-
-        (bookingRows || []).forEach((booking) => {
-          const key = String(booking.cycle_id);
-
-          if (!bookingRowsByCycleId.has(key)) {
-            bookingRowsByCycleId.set(key, []);
-          }
-
-          bookingRowsByCycleId.get(key).push(booking);
-        });
-
         if (!mounted) return;
 
         setCycles((previousCycles) => {
@@ -774,10 +662,8 @@ const {
               return cycle;
             }
 
-            const nextStatus = getEffectiveCycleStatus(
-              availability,
-              bookingRowsByCycleId
-            );
+            const nextStatus =
+              getAvailabilityStatus(availability);
 
             return {
               ...cycle,
@@ -789,8 +675,6 @@ const {
             };
           });
 
-          // Keep the original homepage ordering rule after a
-          // status change: available cycles stay above booked ones.
           return [...updatedCycles].sort((a, b) => {
             if (
               a.availabilityPriority !==
@@ -823,7 +707,7 @@ const {
         });
       } catch (statusError) {
         console.warn(
-          "Dynamic cycle status refresh failed:",
+          "Dynamic cycle availability refresh failed:",
           statusError
         );
       }
@@ -844,25 +728,9 @@ const {
       )
       .subscribe();
 
-    const bookingChannel = supabase
-      .channel("homepage-booking-status")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "booking_table",
-        },
-        () => {
-          refreshCycleStatuses();
-        }
-      )
-      .subscribe();
-
     return () => {
       mounted = false;
       supabase.removeChannel(availabilityChannel);
-      supabase.removeChannel(bookingChannel);
     };
   }, []);
 
@@ -1484,30 +1352,23 @@ const {
                           </div>
                         )}
 
-                        <span
-                          className={
-                            cycle.availabilityStatus === "available"
-                              ? "available-badge"
-                              : `availability-badge ${String(
-                                  cycle.availabilityStatus || "unknown"
-                                )
-                                  .trim()
-                                  .toLowerCase()
-                                  .replace(/[^a-z0-9]+/g, "-")}`
-                          }
-                        >
-                          {formatAvailabilityStatus(
-                            cycle.availabilityStatus
-                          )}
-                        </span>
-
-                        <button
-                          className="favorite-btn"
-                          type="button"
-                          aria-label={`Favorite ${cycle.brand}`}
-                        >
-                          ♡
-                        </button>
+                      <span
+                        className={`availability-badge ${
+                          cycle.availabilityStatus === "available"
+                            ? "available"
+                            : cycle.availabilityStatus === "rented"
+                            ? "rented"
+                            : cycle.availabilityStatus === "unavailable"
+                            ? "unavailable"
+                            : cycle.availabilityStatus === "maintenance"
+                            ? "maintenance"
+                            : cycle.availabilityStatus === "booked"
+                            ? "booked"
+                            : "other"
+                        }`}
+                      >
+                        {formatAvailabilityStatus(cycle.availabilityStatus)}
+                      </span>
 
                       </div>
 

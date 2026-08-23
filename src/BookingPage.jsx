@@ -82,6 +82,7 @@ function BookingPage({
   );
 
   const filterLocation = getText(activeFilters?.location);
+  const [cycleAvailabilityStatus, setCycleAvailabilityStatus] = useState("available");
 
   const scoreSuggestion = (item) => {
     let score = 0;
@@ -148,6 +149,40 @@ function BookingPage({
 
     return score;
   };
+
+    useEffect(() => {
+      let cancelled = false;
+
+      const loadCycleAvailabilityStatus = async () => {
+        if (!cycle?.id) return;
+
+        const { data, error } = await supabase
+          .from("cycle_availability")
+          .select("status")
+          .eq("cycle_id", cycle.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error(
+            "Unable to fetch cycle availability status:",
+            error
+          );
+          return;
+        }
+
+        if (!cancelled && data?.status) {
+          setCycleAvailabilityStatus(
+            String(data.status).trim()
+          );
+        }
+      };
+
+      loadCycleAvailabilityStatus();
+
+      return () => {
+        cancelled = true;
+      };
+    }, [cycle?.id]);
 
 useEffect(() => {
   let cancelled = false;
@@ -1151,7 +1186,7 @@ useEffect(() => {
 
               <span className="availability-badge">
                 <span />
-                Available
+                {cycleAvailabilityStatus}
               </span>
 
               {images.length > 1 && (

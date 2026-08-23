@@ -6,7 +6,10 @@ const APP_FILES = [
   "/manifest.webmanifest",
 ];
 
-// Install Service Worker
+// ============================================================
+// INSTALL SERVICE WORKER
+// ============================================================
+
 self.addEventListener("install", (event) => {
   console.log("UGO Service Worker: INSTALL");
 
@@ -19,7 +22,10 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate Service Worker
+// ============================================================
+// ACTIVATE SERVICE WORKER
+// ============================================================
+
 self.addEventListener("activate", (event) => {
   console.log("UGO Service Worker: ACTIVATE");
 
@@ -36,7 +42,10 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch handler
+// ============================================================
+// FETCH HANDLER
+// ============================================================
+
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request).catch(() => {
@@ -61,33 +70,97 @@ self.addEventListener("push", (event) => {
 
     data = {
       title: "UGO",
-      body: "You have a new notification.",
+      message: "You have a new notification.",
+      action_type: "NONE",
+      action_data: {},
     };
   }
 
+  // ----------------------------------------------------------
+  // Data sent by the Edge Function:
+  //
+  // {
+  //   title,
+  //   message,
+  //   action_type,
+  //   action_data,
+  //   notification_id
+  // }
+  // ----------------------------------------------------------
+
   const title = data.title || "UGO";
 
+  const message =
+    data.message ||
+    data.body ||
+    "You have a new notification.";
+
+  const actionType =
+    data.action_type || "NONE";
+
+  const actionData =
+    data.action_data ||
+    data.data ||
+    {};
+
+  const notificationId =
+    data.notification_id || null;
+
   const options = {
-    body: data.body || "You have a new notification.",
+    body: message,
+
     icon: "/icons/icon-192.png",
+
     badge: "/icons/icon-192.png",
-    data: data.data || {},
+
+    // Keep all information required when
+    // the notification is clicked.
+    data: {
+      notification_id: notificationId,
+      action_type: actionType,
+      action_data: actionData,
+    },
+
+    // Makes the notification behave like a normal
+    // user-visible notification.
+    requireInteraction: false,
   };
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
+    self.registration.showNotification(
+      title,
+      options
+    )
   );
 });
-
 
 // ============================================================
 // NOTIFICATION CLICK
 // ============================================================
 
 self.addEventListener("notificationclick", (event) => {
+  console.log("UGO Service Worker: NOTIFICATION CLICKED");
+
   event.notification.close();
 
-  const actionData = event.notification.data || {};
+  const notificationData =
+    event.notification.data || {};
+
+  const actionType =
+    notificationData.action_type || "NONE";
+
+  const actionData =
+    notificationData.action_data || {};
+
+  console.log(
+    "UGO notification action:",
+    actionType
+  );
+
+  console.log(
+    "UGO notification action data:",
+    actionData
+  );
 
   event.waitUntil(
     clients.matchAll({
@@ -95,14 +168,20 @@ self.addEventListener("notificationclick", (event) => {
       includeUncontrolled: true,
     }).then((clientList) => {
 
-      // If UGO is already open, focus it
+      // ------------------------------------------------------
+      // If UGO is already open, focus it.
+      // ------------------------------------------------------
+
       for (const client of clientList) {
         if ("focus" in client) {
           return client.focus();
         }
       }
 
-      // Otherwise open UGO
+      // ------------------------------------------------------
+      // Otherwise open UGO.
+      // ------------------------------------------------------
+
       if (clients.openWindow) {
         return clients.openWindow("/");
       }

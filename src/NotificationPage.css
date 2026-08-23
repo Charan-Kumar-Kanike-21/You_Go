@@ -2634,43 +2634,55 @@
 
 /* =========================================================
    TEMPORARILY LOCKED RENTAL REQUEST
-   Used when another request for the same cycle has been
-   accepted. The notification remains visible, but the
-   Accept / Reject actions are temporarily unavailable.
 ========================================================= */
 
-.rental-request-action-buttons
+.rental-request-actions-locked {
+  opacity: 0.92;
+}
+
+/* Accept + Reject inside a temporarily locked request */
+.rental-request-actions-locked
 .notification-action-button:disabled {
   cursor: not-allowed;
+  pointer-events: auto;
   opacity: 0.5;
   transform: none;
   box-shadow: none;
 }
 
-/* Locked Accept button */
-.rental-request-action-buttons
+/* Accept */
+.rental-request-actions-locked
 .accept-button:disabled {
   background: #eef2f4;
   border-color: #d5dde2;
   color: #7a8790;
+  cursor: not-allowed;
 }
 
-/* Locked Reject button */
-.rental-request-action-buttons
+/* Reject */
+.rental-request-actions-locked
 .reject-button:disabled {
   background: #f3f3f3;
   border-color: #dddddd;
   color: #8a8a8a;
-}
-
-/* Prevent hover effects when disabled */
-.rental-request-action-buttons
-.notification-action-button:disabled:hover {
-  transform: none;
-  box-shadow: none;
   cursor: not-allowed;
 }
 
+/* Absolutely prevent normal hover animation */
+.rental-request-actions-locked
+.notification-action-button:disabled:hover {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* No pointer cursor on locked Accept/Reject */
+.rental-request-actions-locked
+.accept-button:disabled:hover,
+.rental-request-actions-locked
+.reject-button:disabled:hover {
+  cursor: not-allowed;
+}
 /* =========================================================
    OPTIONAL: LOCKED REQUEST MESSAGE
    If JSX contains .rental-request-locked-message
@@ -3002,5 +3014,75 @@
 
   .rental-detail-label {
     font-size: 8px !important;
+  }
+  /* =========================================================
+   LOCKED RENTAL REQUEST ACTIONS
+   ---------------------------------------------------------
+   When another request for the same cycle is accepted,
+   the remaining rental requests stay visible but their
+   Accept / Reject buttons become unavailable.
+========================================================= */
+
+  .rental-request-action-buttons.rental-request-actions-locked
+    .notification-action-button:disabled {
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+    opacity: 0.48 !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Locked Accept button */
+  .rental-request-action-buttons.rental-request-actions-locked
+    .accept-button:disabled {
+    background: #eef2f4 !important;
+    border-color: #d5dde2 !important;
+    color: #7a8790 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* Locked Reject button */
+  .rental-request-action-buttons.rental-request-actions-locked
+    .reject-button:disabled {
+    background: #f3f3f3 !important;
+    border-color: #dddddd !important;
+    color: #8a8a8a !important;
+    cursor: not-allowed !important;
+  }
+
+  /*
+  * Prevent existing hover styles from making locked buttons
+  * look clickable.
+  */
+  .rental-request-action-buttons.rental-request-actions-locked
+    .notification-action-button:disabled:hover {
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.48 !important;
+  }
+
+  /*
+  * Make the disabled state visually obvious on the entire
+  * rental action area without disabling the renter-details
+  * button.
+  */
+  .rental-request-action-buttons.rental-request-actions-locked
+    .accept-button:disabled,
+  .rental-request-action-buttons.rental-request-actions-locked
+    .reject-button:disabled {
+    filter: grayscale(15%);
+  }
+
+  /* =========================================================
+    MOBILE
+  ========================================================= */
+
+  @media (max-width: 600px) {
+    .rental-request-action-buttons.rental-request-actions-locked
+      .notification-action-button:disabled {
+      cursor: not-allowed !important;
+      opacity: 0.45 !important;
+    }
   }
 }
