@@ -2328,7 +2328,7 @@ const handleNotificationAction = async (
         const options = {
 
           key:
-            "rzp_test_PSEUDO_KEY",
+            "rzp_live_TSl3eQnxqmNP83",
 
           amount:
             order.amount,
