@@ -30,9 +30,16 @@ import ResetPassword from "./ResetPassword";
 import ReturnProcessing from "./ReturnProcessing";
 import ReviewPage from "./ReviewPage";
 import "./App.css";
+import UgOCallProvider from "./CallProvider";
 
 function AppContent() {
-  // ============================================================
+
+  // Keep authentication state declared before any helper/effect that
+  // references it. This prevents the temporal-dead-zone error:
+  // "Cannot access 'userId' before initialization".
+  const [userId, setUserId] = useState(null);
+
+// ============================================================
 // PUSH NOTIFICATION HELPERS
 // ============================================================
 
@@ -55,14 +62,38 @@ const urlBase64ToUint8Array = (base64String) => {
     )
   );
 };
+
+
+// ============================================================
+// ENABLE PUSH NOTIFICATIONS
+// ============================================================
+//
+// This single permission/subscription handles:
+//
+// 🔔 Normal UgO notifications
+// 📞 Incoming UgO call notifications
+//
+// There is NO separate browser permission for calls.
+// ============================================================
+
 const enablePushNotifications = async () => {
   try {
-    console.log("🔔 Starting push notification setup...");
+    console.log(
+      "🔔 Starting UgO push notification setup..."
+    );
+
+    // --------------------------------------------------------
+    // 1. USER AUTHENTICATION
+    // --------------------------------------------------------
 
     if (!userId) {
       alert("Please log in first.");
       return;
     }
+
+    // --------------------------------------------------------
+    // 2. CHECK BROWSER SUPPORT
+    // --------------------------------------------------------
 
     if (!("Notification" in window)) {
       alert(
@@ -86,50 +117,88 @@ const enablePushNotifications = async () => {
     }
 
     // --------------------------------------------------------
-    // 1. Ask for notification permission
+    // 3. CHECK / REQUEST NOTIFICATION PERMISSION
     // --------------------------------------------------------
 
-    const permission =
-      await Notification.requestPermission();
+    let permission =
+      Notification.permission;
 
     console.log(
-      "Notification permission:",
+      "Current notification permission:",
       permission
     );
+
+    /*
+     * Only request permission if the browser has
+     * not decided yet.
+     */
+
+    if (permission === "default") {
+      permission =
+        await Notification.requestPermission();
+
+      console.log(
+        "Notification permission after request:",
+        permission
+      );
+    }
+
+    // --------------------------------------------------------
+    // PERMISSION DENIED
+    // --------------------------------------------------------
+
+    if (permission === "denied") {
+      alert(
+        "Notifications are blocked for UgO. " +
+        "Please allow notifications in your browser's site settings and try again."
+      );
+
+      return;
+    }
+
+    // --------------------------------------------------------
+    // PERMISSION WAS NOT GRANTED
+    // --------------------------------------------------------
 
     if (permission !== "granted") {
       alert(
         "Notification permission was not granted."
       );
+
       return;
     }
 
+    console.log(
+      "✅ Notification permission granted."
+    );
+
     // --------------------------------------------------------
-    // 2. Get the active service worker
+    // 4. GET ACTIVE SERVICE WORKER
     // --------------------------------------------------------
 
     const registration =
       await navigator.serviceWorker.ready;
 
     console.log(
-      "✅ Service Worker ready:",
+      "✅ UgO Service Worker ready:",
       registration
     );
 
     // --------------------------------------------------------
-    // 3. Check whether subscription already exists
+    // 5. CHECK EXISTING PUSH SUBSCRIPTION
     // --------------------------------------------------------
 
     let subscription =
       await registration.pushManager.getSubscription();
 
     // --------------------------------------------------------
-    // 4. Create subscription if necessary
+    // 6. CREATE PUSH SUBSCRIPTION IF REQUIRED
     // --------------------------------------------------------
 
     if (!subscription) {
       const vapidPublicKey =
-        import.meta.env.VITE_VAPID_PUBLIC_KEY;
+        import.meta.env
+          .VITE_VAPID_PUBLIC_KEY;
 
       if (!vapidPublicKey) {
         throw new Error(
@@ -138,97 +207,136 @@ const enablePushNotifications = async () => {
       }
 
       console.log(
-        "Creating new push subscription..."
+        "Creating new UgO push subscription..."
       );
 
       subscription =
         await registration.pushManager.subscribe({
           userVisibleOnly: true,
+
           applicationServerKey:
             urlBase64ToUint8Array(
               vapidPublicKey
             ),
         });
+
+      console.log(
+        "✅ New push subscription created."
+      );
+    } else {
+      console.log(
+        "✅ Existing push subscription found."
+      );
     }
 
-    console.log(
-      "✅ Push subscription:",
-      subscription
-    );
-
     // --------------------------------------------------------
-    // 5. Convert subscription to JSON
+    // 7. CONVERT SUBSCRIPTION TO JSON
     // --------------------------------------------------------
 
     const subscriptionJSON =
       subscription.toJSON();
 
     console.log(
-      "Subscription JSON:",
+      "UgO Push Subscription:",
       subscriptionJSON
     );
 
+    const endpoint =
+      subscriptionJSON.endpoint;
+
+    const p256dh =
+      subscriptionJSON.keys?.p256dh;
+
+    const auth =
+      subscriptionJSON.keys?.auth;
+
     // --------------------------------------------------------
-    // 6. Check whether this device is already saved
+    // 8. VALIDATE SUBSCRIPTION DATA
     // --------------------------------------------------------
 
-    const { data: existingSubscription, error: checkError } =
-      await supabase
-        .from("push_subscriptions")
-        .select("id")
-        .eq("user_id", userId)
-        .eq(
-          "endpoint",
-          subscription.endpoint
-        )
-        .maybeSingle();
+    if (
+      !endpoint ||
+      !p256dh ||
+      !auth
+    ) {
+      throw new Error(
+        "Push subscription is missing endpoint, p256dh or auth."
+      );
+    }
 
-    if (checkError) {
+    // --------------------------------------------------------
+    // 9. SAVE / UPDATE SUBSCRIPTION IN SUPABASE
+    // --------------------------------------------------------
+    //
+    // Your table has:
+    //
+    // UNIQUE(user_id, endpoint)
+    //
+    // Therefore upsert is safe.
+    //
+    // This handles:
+    //
+    // - first-time subscription
+    // - existing device
+    // - refreshed subscription keys
+    // --------------------------------------------------------
+
+    const {
+      data: savedSubscription,
+      error: subscriptionError,
+    } = await supabase
+      .from("push_subscriptions")
+      .upsert(
+        {
+          user_id: userId,
+
+          endpoint,
+
+          p256dh,
+
+          auth,
+
+          updated_at:
+            new Date().toISOString(),
+        },
+        {
+          onConflict:
+            "user_id,endpoint",
+        }
+      )
+      .select()
+      .maybeSingle();
+
+    if (subscriptionError) {
       console.error(
-        "Subscription check error:",
-        checkError
+        "❌ Failed to save push subscription:",
+        subscriptionError
       );
 
-      throw checkError;
+      throw subscriptionError;
     }
 
+    console.log(
+      "✅ Push subscription saved:",
+      savedSubscription
+    );
+
     // --------------------------------------------------------
-    // 7. Save only if not already present
+    // 10. SUCCESS
     // --------------------------------------------------------
-
-    if (!existingSubscription) {
-      const { error: insertError } =
-        await supabase
-          .from("push_subscriptions")
-          .insert({
-            user_id: userId,
-            endpoint: subscription.endpoint,
-            p256dh:
-              subscriptionJSON.keys?.p256dh,
-            auth:
-              subscriptionJSON.keys?.auth,
-          });
-
-      if (insertError) {
-        console.error(
-          "Subscription insert error:",
-          insertError
-        );
-
-        throw insertError;
-      }
-
-      console.log(
-        "✅ Push subscription saved to Supabase."
-      );
-    } else {
-      console.log(
-        "✅ This device is already registered."
-      );
-    }
+    //
+    // This subscription now receives BOTH:
+    //
+    // 🔔 Normal UgO notifications
+    // 📞 Incoming UgO call notifications
+    //
+    // The Edge Function decides what type of notification
+    // is being sent.
+    // --------------------------------------------------------
 
     alert(
-      "🔔 Notifications enabled successfully!"
+      "🔔 Notifications enabled successfully!\n\n" +
+      "You will also receive incoming UgO call alerts."
     );
 
   } catch (error) {
@@ -238,10 +346,127 @@ const enablePushNotifications = async () => {
     );
 
     alert(
-      "Failed to enable notifications. Check the console."
+      "Failed to enable notifications. " +
+      "Please check the console for details."
     );
   }
 };
+
+  // =========================================================
+  // NOTIFICATION SETUP UI
+  // =========================================================
+  const [showNotificationPrompt, setShowNotificationPrompt] =
+    useState(false);
+
+  const [notificationPromptBusy, setNotificationPromptBusy] =
+    useState(false);
+
+  const NOTIFICATION_SETUP_KEY = "ugo_notifications_setup_v1";
+
+  const isPushCurrentlyEnabled = async () => {
+    try {
+      if (!("Notification" in window) ||
+          Notification.permission !== "granted" ||
+          !("serviceWorker" in navigator) ||
+          !("PushManager" in window)) {
+        return false;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      const subscription =
+        await registration.pushManager.getSubscription();
+
+      return !!subscription;
+    } catch (error) {
+      console.warn(
+        "Unable to check push notification state:",
+        error
+      );
+      return false;
+    }
+  };
+
+  // First-login/device prompt:
+  // - never show when the device has already completed setup
+  // - never show when browser permission is already granted
+  // - "Not now" only closes the prompt; it does NOT mark setup complete
+  useEffect(() => {
+    if (!userId) {
+      setShowNotificationPrompt(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const checkNotificationSetup = async () => {
+      const setupCompleted =
+        localStorage.getItem(NOTIFICATION_SETUP_KEY) === "true";
+
+      const enabled = await isPushCurrentlyEnabled();
+
+      if (cancelled) return;
+
+      if (enabled) {
+        // Permission/subscription already exists. Do not ask again.
+        localStorage.setItem(NOTIFICATION_SETUP_KEY, "true");
+        setShowNotificationPrompt(false);
+        return;
+      }
+
+      // If browser permission is denied, don't repeatedly show a prompt
+      // that cannot open the permission dialog. The Notification page
+      // will explain that browser/device settings must be used.
+      if (
+        "Notification" in window &&
+        Notification.permission === "denied"
+      ) {
+        setShowNotificationPrompt(false);
+        return;
+      }
+
+      setShowNotificationPrompt(!setupCompleted);
+    };
+
+    checkNotificationSetup();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  const handleEnableNotificationsFromPrompt = async () => {
+    if (notificationPromptBusy) return;
+
+    setNotificationPromptBusy(true);
+
+    try {
+      await enablePushNotifications();
+
+      const enabled = await isPushCurrentlyEnabled();
+
+      if (enabled) {
+        localStorage.setItem(
+          NOTIFICATION_SETUP_KEY,
+          "true"
+        );
+        setShowNotificationPrompt(false);
+      }
+    } catch (error) {
+      console.error(
+        "Notification prompt setup failed:",
+        error
+      );
+    } finally {
+      setNotificationPromptBusy(false);
+    }
+  };
+
+  const handleNotificationPromptDismiss = () => {
+    // Intentionally DO NOT store "true" here.
+    // The Notification page will continue to offer Enable Notifications.
+    setShowNotificationPrompt(false);
+  };
+
   // =========================================================
   // CURRENT PAGE
   // =========================================================
@@ -934,8 +1159,6 @@ useEffect(() => {
     document.body.removeChild(script);
   };
 }, []);
-
-  const [userId, setUserId] = useState(null);
 
   const [bookingId, setBookingId] = useState("");
 useEffect(() => {
@@ -1821,6 +2044,10 @@ useEffect(() => {
   // =========================================================
 
   const handleListingChoice = () => {
+    // Normal "List a Cycle" flow
+    // Clear any previously selected edit cycle.
+    setEditingCycleId(null);
+
     setPage("Listing");
   };
 
@@ -2662,7 +2889,125 @@ const handleNotificationAction = async (
   return (
     <>
 
-      {userId && (
+      {showNotificationPrompt && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ugo-notification-prompt-title"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 999999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            background: "rgba(0, 0, 0, 0.48)",
+            backdropFilter: "blur(5px)",
+          }}
+        >
+          <div
+            style={{
+              width: "min(440px, 100%)",
+              borderRadius: "22px",
+              background: "#ffffff",
+              padding: "30px 26px 24px",
+              boxShadow: "0 24px 70px rgba(0,0,0,0.22)",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "66px",
+                height: "66px",
+                margin: "0 auto 18px",
+                borderRadius: "50%",
+                display: "grid",
+                placeItems: "center",
+                background: "#eaf8f0",
+              }}
+            >
+              <span
+                className="notification-bell-icon"
+                aria-hidden="true"
+                style={{
+                  transform: "scale(1.35)",
+                }}
+              />
+            </div>
+
+            <h2
+              id="ugo-notification-prompt-title"
+              style={{
+                margin: "0 0 10px",
+                color: "#12372b",
+                fontSize: "24px",
+                fontWeight: 800,
+              }}
+            >
+              Stay updated with UGO
+            </h2>
+
+            <p
+              style={{
+                margin: "0 auto 24px",
+                maxWidth: "360px",
+                color: "#64756e",
+                fontSize: "14px",
+                lineHeight: 1.65,
+              }}
+            >
+              Get instant updates about bookings, rentals,
+              returns and important UGO activities.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleEnableNotificationsFromPrompt}
+              disabled={notificationPromptBusy}
+              style={{
+                width: "100%",
+                minHeight: "48px",
+                border: "none",
+                borderRadius: "12px",
+                background: "#159447",
+                color: "#ffffff",
+                fontSize: "15px",
+                fontWeight: 800,
+                cursor: notificationPromptBusy
+                  ? "wait"
+                  : "pointer",
+                opacity: notificationPromptBusy ? 0.75 : 1,
+              }}
+            >
+              {notificationPromptBusy
+                ? "Enabling..."
+                : "Enable Notifications"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNotificationPromptDismiss}
+              disabled={notificationPromptBusy}
+              style={{
+                marginTop: "12px",
+                border: "none",
+                background: "transparent",
+                color: "#6b7a74",
+                fontSize: "14px",
+                fontWeight: 700,
+                cursor: notificationPromptBusy
+                  ? "default"
+                  : "pointer",
+              }}
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* {userId && (
         <button
           onClick={enablePushNotifications}
           style={{
@@ -2681,7 +3026,7 @@ const handleNotificationAction = async (
         >
           🔔 Enable Notifications
         </button>
-      )}
+      )} */}
       {/* =====================================================
           LANDING PAGE
       ===================================================== */}
@@ -2842,7 +3187,7 @@ const handleNotificationAction = async (
       {page === "Listing" && (
         <Listing
           onBack={handleCycleOwner}
-          // editCycleId={}
+          editCycleId={editingCycleId}
         />
       )}
 
@@ -2970,8 +3315,10 @@ const handleNotificationAction = async (
 
       {page === "NotificationPage" && (
         <NotificationPage
-          onAction = {handleNotificationAction}
-          onBack = {handleNotificationBack}
+          onAction={handleNotificationAction}
+          onBack={handleNotificationBack}
+          onEnableNotifications={enablePushNotifications}
+          checkPushEnabled={isPushCurrentlyEnabled}
         />
       )}
 
@@ -3130,7 +3477,9 @@ const handleNotificationAction = async (
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <UgOCallProvider supabase={supabase}>
+        <AppContent />
+      </UgOCallProvider>
     </BrowserRouter>
   );
 }

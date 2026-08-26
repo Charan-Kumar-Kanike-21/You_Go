@@ -210,16 +210,20 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
       return "unknown";
     }
 
-    return String(
+    // cycle_availability.status is the primary source of truth.
+    const rawStatus =
+      availability.status ??
       availability.availability_status ??
-        availability.availability ??
-        availability.availability_type ??
-        availability.status ??
-        availability.type ??
-        "unknown"
-    )
-      .trim()
-      .toLowerCase();
+      availability.availability ??
+      availability.availability_type ??
+      availability.type ??
+      "";
+
+    if (!rawStatus) {
+      return "unknown";
+    }
+
+    return String(rawStatus).trim().toLowerCase();
   };
 
   const formatAvailabilityStatus = (status) => {
@@ -286,14 +290,46 @@ function Home({ onProfile, onViewDetails, onNotifications, handleBackToLogin }) 
         }
 
         // 2. Get only cycles represented in cycle_availability.
-        const cycleIds = [
-          ...new Set(
-            availabilityRows
-              .map(getAvailabilityCycleId)
-              .filter(Boolean)
-          ),
-        ];
+        // Keep the latest availability row for each cycle.
+        // This prevents an older row from overriding the current status.
+        const latestAvailabilityByCycleId = new Map();
 
+        (availabilityRows || []).forEach((row) => {
+          const cycleId = getAvailabilityCycleId(row);
+          if (!cycleId) return;
+
+          const key = String(cycleId);
+          const existing = latestAvailabilityByCycleId.get(key);
+
+          const rowTime = new Date(
+            row.updated_at || row.created_at || 0
+          ).getTime();
+
+          const existingTime = existing
+            ? new Date(
+                existing.updated_at ||
+                  existing.created_at ||
+                  0
+              ).getTime()
+            : -Infinity;
+
+          if (!existing || rowTime >= existingTime) {
+            latestAvailabilityByCycleId.set(key, row);
+          }
+        });
+
+        const latestAvailabilityRows = Array.from(
+          latestAvailabilityByCycleId.values()
+        );
+
+        const cycleIds = latestAvailabilityRows
+          .map(getAvailabilityCycleId)
+          .filter(Boolean);
+
+        console.log(
+          "Latest availability rows:",
+          latestAvailabilityRows
+        );
         console.log("Cycle ids: ", cycleIds);
 
         if (!cycleIds.length) {
@@ -434,7 +470,7 @@ const {
           }
         }
 
-        const formattedCycles = availabilityRows
+        const formattedCycles = latestAvailabilityRows
           .map((availability) => {
             const cycleId = getAvailabilityCycleId(availability);
             const cycle = cycleById.get(cycleId);
@@ -650,13 +686,36 @@ const {
 
         if (!mounted) return;
 
+        const latestAvailabilityByCycleId = new Map();
+
+        (availabilityRows || []).forEach((row) => {
+          const cycleId = getAvailabilityCycleId(row);
+          if (!cycleId) return;
+
+          const key = String(cycleId);
+          const existing = latestAvailabilityByCycleId.get(key);
+
+          const rowTime = new Date(
+            row.updated_at || row.created_at || 0
+          ).getTime();
+
+          const existingTime = existing
+            ? new Date(
+                existing.updated_at ||
+                  existing.created_at ||
+                  0
+              ).getTime()
+            : -Infinity;
+
+          if (!existing || rowTime >= existingTime) {
+            latestAvailabilityByCycleId.set(key, row);
+          }
+        });
+
         setCycles((previousCycles) => {
           const updatedCycles = previousCycles.map((cycle) => {
-            const availability = (availabilityRows || []).find(
-              (row) =>
-                String(getAvailabilityCycleId(row)) ===
-                String(cycle.id)
-            );
+            const availability =
+              latestAvailabilityByCycleId.get(String(cycle.id));
 
             if (!availability) {
               return cycle;

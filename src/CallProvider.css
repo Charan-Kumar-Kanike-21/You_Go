@@ -1,0 +1,5 @@
+/*
+  CallProvider.jsx does not require separate layout CSS.
+  Its visible call UI is rendered by CallInterface / OutgoingWebRTCInterface
+  using the classes defined in CallInterface.css.
+*/

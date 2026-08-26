@@ -2,10 +2,85 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import "./NotificationPage.css";
 
-function NotificationPage({ onAction, onBack }) {
+function NotificationPage({
+  onAction,
+  onBack,
+  onEnableNotifications,
+  checkPushEnabled,
+}) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushEnabling, setPushEnabling] = useState(false);
+
+
+
+  // ---------------------------------------------------------
+  // PUSH NOTIFICATION STATE
+  // ---------------------------------------------------------
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkPushState = async () => {
+      try {
+        const enabled =
+          typeof checkPushEnabled === "function"
+            ? await checkPushEnabled()
+            : (
+                "Notification" in window &&
+                Notification.permission === "granted"
+              );
+
+        if (!cancelled) {
+          setPushEnabled(!!enabled);
+        }
+      } catch (err) {
+        console.warn(
+          "Unable to check notification permission:",
+          err
+        );
+      }
+    };
+
+    checkPushState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [checkPushEnabled]);
+
+  const handleEnablePush = async () => {
+    if (
+      pushEnabling ||
+      typeof onEnableNotifications !== "function"
+    ) {
+      return;
+    }
+
+    setPushEnabling(true);
+
+    try {
+      await onEnableNotifications();
+
+      const enabled =
+        typeof checkPushEnabled === "function"
+          ? await checkPushEnabled()
+          : (
+              "Notification" in window &&
+              Notification.permission === "granted"
+            );
+
+      setPushEnabled(!!enabled);
+    } catch (err) {
+      console.error(
+        "Unable to enable notifications:",
+        err
+      );
+    } finally {
+      setPushEnabling(false);
+    }
+  };
 
   /*
   |--------------------------------------------------------------------------
@@ -271,19 +346,15 @@ function NotificationPage({ onAction, onBack }) {
     getPersistedRentalDecision(notification) ||
     null;
 
-   const isRentalRequestTemporarilyLocked = (notification) => {
-    const decision = getRentalDecision(notification);
+    const isRentalRequestTemporarilyLocked = (notification) => {
+      const actionData = notification?.action_data;
 
-    // The request that was itself accepted/rejected must
-    // continue showing its final decision.
-    if (decision) {
-      return false;
-    }
+      if (!actionData || typeof actionData !== "object") {
+        return false;
+      }
 
-    // Another request for this same cycle has already
-    // been accepted.
-    return hasAcceptedRentalForCycle(notification);
-  };
+      return actionData.rental_locked === true;
+    };
 
   const hasAcceptedRentalForCycle = (notification) => {
     const cycleId = getRentalCycleId(notification);
@@ -505,7 +576,6 @@ const handleRentalDecision = async (notification, decision) => {
 
   const currentDecision = getRentalDecision(notification);
 
-  console.log("current desicion :",currentDecision);
   if (currentDecision) return;
 
   /*
@@ -572,8 +642,6 @@ const handleRentalDecision = async (notification, decision) => {
       rental_locked: false,
     };
 
-    console.log("updated action data :",updatedActionData);
-
     const {
       data: updatedNotification,
       error: decisionUpdateError,
@@ -598,8 +666,6 @@ const handleRentalDecision = async (notification, decision) => {
       ...previous,
       [notification.id]: decision,
     }));
-
-    console.log("rental descisions :", rentalDecisions);
 
     /*
      * Update this notification locally.
@@ -636,8 +702,6 @@ const handleRentalDecision = async (notification, decision) => {
      */
     if (decision === "accepted") {
       const cycleId = getRentalCycleId(notification);
-
-      console.log("cycle id:", cycleId);
 
       if (cycleId) {
         const lockTimestamp =
@@ -699,8 +763,6 @@ const handleRentalDecision = async (notification, decision) => {
               "another_request_accepted",
             rental_locked_at: lockTimestamp,
           };
-
-          console.log("locked action data: ",lockedActionData);
 
           const { error: lockError } =
             await supabase
@@ -1543,6 +1605,9 @@ const handleRentalDecision = async (notification, decision) => {
 
           <div className="rental-details-header">
             <div className="rental-details-title-group">
+              <span className="rental-details-header-icon" aria-hidden="true">
+                ♙
+              </span>
               <div className="rental-details-heading-copy">
                 <h2>Rental Request Details</h2>
                 <p>Review the renter details before accepting the rental.</p>
@@ -1640,6 +1705,78 @@ const handleRentalDecision = async (notification, decision) => {
 
         </header>
 
+
+        {/* =====================================================
+            PUSH NOTIFICATION SETTING
+        ====================================================== */}
+
+        {!pushEnabled && (
+          <section
+            style={{
+              marginBottom: "22px",
+              padding: "18px 20px",
+              border: "1px solid #d8e8df",
+              borderRadius: "16px",
+              background: "#f7fcf9",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "18px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <strong
+                style={{
+                  display: "block",
+                  color: "#12372b",
+                  fontSize: "16px",
+                  marginBottom: "5px",
+                }}
+              >
+                🔔 Enable Notifications
+              </strong>
+              <span
+                style={{
+                  color: "#687a72",
+                  fontSize: "13px",
+                  lineHeight: 1.5,
+                }}
+              >
+                Get instant updates about bookings, rentals and returns.
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="notification-action-button"
+              onClick={handleEnablePush}
+              disabled={pushEnabling}
+            >
+              {pushEnabling
+                ? "Enabling..."
+                : "Enable Notifications"}
+              <span>→</span>
+            </button>
+          </section>
+        )}
+
+        {pushEnabled && (
+          <section
+            style={{
+              marginBottom: "22px",
+              padding: "14px 18px",
+              border: "1px solid #d9ecdf",
+              borderRadius: "14px",
+              background: "#f8fcf9",
+              color: "#247044",
+              fontSize: "13px",
+              fontWeight: 700,
+            }}
+          >
+            ✓ Notifications are enabled
+          </section>
+        )}
 
         {/* =====================================================
             CONTENT
@@ -1982,10 +2119,6 @@ const handleRentalDecision = async (notification, decision) => {
                                   className={`rental-request-action-buttons ${
                                     cycleAlreadyOccupied
                                       ? "rental-cycle-occupied"
-                                      : ""
-                                  } ${
-                                    temporarilyLocked
-                                      ? "rental-request-actions-locked"
                                       : ""
                                   }`}
                                 >

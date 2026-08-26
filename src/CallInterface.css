@@ -1,0 +1,229 @@
+/* =========================================================
+   UgO NITK CYCLE SHARING - CALL INTERFACE
+   Matches the clean campus cycle-sharing UI.
+   ========================================================= */
+
+.ugo-incoming-call-overlay,
+.ugo-active-call-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.ugo-incoming-call-card,
+.ugo-active-call-card {
+  width: min(430px, 100%);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  padding: 32px 28px 28px;
+  text-align: center;
+  box-shadow: 0 18px 55px rgba(15, 23, 42, 0.2);
+  animation: ugo-call-card-in 0.22s ease-out;
+}
+
+.ugo-call-icon,
+.ugo-active-call-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #eef2ff;
+  border: 1px solid #dbe4ff;
+  font-size: 31px;
+}
+
+.ugo-active-call-icon {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+  animation: ugo-call-pulse 1.8s ease-in-out infinite;
+}
+
+.ugo-incoming-call-card h2,
+.ugo-active-call-card h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.ugo-incoming-call-card p,
+.ugo-active-call-card p {
+  margin: 9px 0 0;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.ugo-call-status {
+  font-weight: 600;
+  color: #475569 !important;
+}
+
+.ugo-incoming-call-buttons,
+.ugo-call-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.ugo-incoming-call-buttons button,
+.ugo-call-controls button {
+  flex: 1;
+  min-height: 46px;
+  border: 0;
+  border-radius: 11px;
+  padding: 11px 18px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+}
+
+.ugo-incoming-call-buttons button:hover,
+.ugo-call-controls button:hover {
+  transform: translateY(-1px);
+}
+
+.ugo-incoming-call-buttons button:active,
+.ugo-call-controls button:active {
+  transform: translateY(0);
+}
+
+.ugo-call-reject-button,
+.ugo-call-end-button {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 5px 14px rgba(220, 38, 38, 0.18);
+}
+
+.ugo-call-accept-button {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.18);
+}
+
+.ugo-call-mute-button {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #dbe2ea !important;
+}
+
+.ugo-call-end-button {
+  background: #dc2626;
+}
+
+.ugo-call-reject-button:hover,
+.ugo-call-end-button:hover {
+  box-shadow: 0 7px 18px rgba(220, 38, 38, 0.25);
+}
+
+.ugo-call-accept-button:hover {
+  box-shadow: 0 7px 18px rgba(37, 99, 235, 0.25);
+}
+
+.ugo-call-mute-button:hover {
+  background: #e2e8f0;
+}
+
+.ugo-incoming-call-card {
+  border-top: 4px solid #2563eb;
+}
+
+.ugo-active-call-card {
+  border-top: 4px solid #16a34a;
+}
+
+.ugo-active-call-overlay .ugo-call-status {
+  min-height: 24px;
+}
+
+.ugo-active-call-controls,
+.ugo-call-controls {
+  align-items: stretch;
+}
+
+@keyframes ugo-call-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ugo-call-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 0 0 13px rgba(22, 163, 74, 0);
+  }
+}
+
+@media (max-width: 520px) {
+  .ugo-incoming-call-overlay,
+  .ugo-active-call-overlay {
+    padding: 16px;
+  }
+
+  .ugo-incoming-call-card,
+  .ugo-active-call-card {
+    padding: 27px 20px 22px;
+    border-radius: 18px;
+  }
+
+  .ugo-incoming-call-card h2,
+  .ugo-active-call-card h2 {
+    font-size: 21px;
+  }
+
+  .ugo-call-icon,
+  .ugo-active-call-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 27px;
+  }
+
+  .ugo-incoming-call-buttons,
+  .ugo-call-controls {
+    gap: 9px;
+  }
+
+  .ugo-incoming-call-buttons button,
+  .ugo-call-controls button {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ugo-incoming-call-card,
+  .ugo-active-call-card,
+  .ugo-active-call-icon {
+    animation: none;
+  }
+
+  .ugo-incoming-call-buttons button,
+  .ugo-call-controls button {
+    transition: none;
+  }
+}
