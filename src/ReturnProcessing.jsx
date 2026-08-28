@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import "./ReturnProcessing.css";
 
-function ReturnProcessing({ bookingId, onBackHome, onReview }) {
+function ReturnProcessing({ bookingId, onBackNotifications, onReview }) {
   const [status, setStatus] = useState("processing");
   const [error, setError] = useState("");
 
@@ -92,12 +92,12 @@ function ReturnProcessing({ bookingId, onBackHome, onReview }) {
       if (typeof onReview === "function") {
         onReview();
       } else {
-        onBackHome();
+        onBackNotifications();
       }
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [status, onBackHome]);
+  }, [status, onBackNotifications]);
 
   // ============================================================
   // SUCCESS SCREEN
@@ -177,9 +177,9 @@ function ReturnProcessing({ bookingId, onBackHome, onReview }) {
 
         <button
           className="return-processing-back-button"
-          onClick={onBackHome}
+          onClick={onBackNotifications}
         >
-          ← Back to Home
+          ← Back to Notifications
         </button>
 
       </main>

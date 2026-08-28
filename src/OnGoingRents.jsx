@@ -876,7 +876,14 @@ function RentalCard({
           </button>
 
           {isRenter && rental.booking_status !== "return_pending" && (
-            <button className="return-cycle-btn" onClick={openReturnModal}>
+            <button
+              className="return-cycle-btn"
+              onClick={() => {
+                if (onReturn && rental?.id) {
+                  onReturn(rental.id);
+                }
+              }}
+            >
               Return Cycle
             </button>
           )}

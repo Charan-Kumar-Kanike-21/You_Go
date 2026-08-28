@@ -2,76 +2,52 @@ import React, { useEffect, useState, useRef } from "react";
 import "./OTP.css";
 import { supabase } from "./supabase";
 
-function OTP({ onBookingId, onBackToNotifications, onContinue }) {
+function OTP({ onBookingId, onBackToNotifications, onContinue, actionType, notification }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [verifying, setVerifying] = useState(false);
-
-  // Booking information shown on the OTP page.
+  const [backendMessage, setBackendMessage] = useState("");
   const [renterName, setRenterName] = useState("Loading...");
   const [cycleName, setCycleName] = useState("Loading...");
   const [bookingLoading, setBookingLoading] = useState(true);
-
   const inputRefs = useRef([]);
 
-  // ------------------------------------------------------------
-  // FETCH RENTER + CYCLE DETAILS
-  // ------------------------------------------------------------
+  const normalizedAction = String(actionType || notification?.action_type || "").trim().toLowerCase();
+  const isReturnOtp = normalizedAction.includes("return") && normalizedAction.includes("otp");
+
+  const webhook = isReturnOtp
+    ? "https://ugo-cyclesharing.app.n8n.cloud/webhook/return"
+    : "https://ugo-cyclesharing.app.n8n.cloud/webhook/otp-verification";
+
   useEffect(() => {
-    const fetchBookingDetails = async () => {
+    const load = async () => {
       if (!onBookingId) {
         setRenterName("Renter");
         setCycleName("Cycle");
         setBookingLoading(false);
         return;
       }
-
       try {
-        setBookingLoading(true);
-
-        const {
-          data: booking,
-          error: bookingError,
-        } = await supabase
+        const { data: booking, error: bookingError } = await supabase
           .from("booking_table")
-          .select(`
-            id,
-            renter_id,
-            cycle_id,
-            cycles (
-              id,
-              brand,
-              model
-            )
-          `)
+          .select(`id, renter_id, cycle_id, cycles (id, brand, model)`)
           .eq("id", onBookingId)
           .maybeSingle();
 
         if (bookingError) throw bookingError;
+        if (!booking) throw new Error("Booking not found");
 
-        if (!booking) {
-          setRenterName("Renter");
-          setCycleName("Cycle");
-          return;
-        }
-
-        // Fetch renter name from profiles using booking_table.renter_id.
         if (booking.renter_id) {
-          const {
-            data: renterProfile,
-            error: renterError,
-          } = await supabase
+          const { data: profile } = await supabase
             .from("profiles")
             .select("full_name, email")
             .eq("id", booking.renter_id)
             .maybeSingle();
 
-          if (renterError) throw renterError;
-
           setRenterName(
-            renterProfile?.full_name?.trim() ||
-            renterProfile?.email?.split("@")[0] ||
+            profile?.full_name?.trim() ||
+            profile?.email?.split("@")[0] ||
             "Renter"
           );
         } else {
@@ -79,508 +55,260 @@ function OTP({ onBookingId, onBackToNotifications, onContinue }) {
         }
 
         const cycle = booking.cycles;
-
-        const cycleLabel = [
-          cycle?.brand,
-          cycle?.model,
-        ]
-          .filter(Boolean)
-          .join(" ");
-
-        setCycleName(cycleLabel || "Cycle");
-      } catch (error) {
-        console.error("Error fetching OTP booking details:", error);
+        setCycleName([cycle?.brand, cycle?.model].filter(Boolean).join(" ") || "Cycle");
+      } catch (e) {
+        console.error("Error fetching OTP booking details:", e);
         setRenterName("Renter");
         setCycleName("Cycle");
       } finally {
         setBookingLoading(false);
       }
     };
-
-    fetchBookingDetails();
+    load();
   }, [onBookingId]);
 
   const handleChange = (value, index) => {
-    // Only allow numbers
     if (!/^\d*$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-
-    setOtp(newOtp);
+    const next = [...otp];
+    next[index] = value.slice(-1);
+    setOtp(next);
     setError("");
-
-    // Move to next input
-    if (value && index < otp.length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
+    if (value && index < 5) inputRefs.current[index + 1]?.focus();
   };
 
-  const handleKeyDown = (event, index) => {
-    // Move backwards when pressing Backspace
-    if (
-      event.key === "Backspace" &&
-      !otp[index] &&
-      index > 0
-    ) {
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handlePaste = (event) => {
-    event.preventDefault();
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const value = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!value) return;
+    const next = ["", "", "", "", "", ""];
+    value.split("").forEach((d, i) => { next[i] = d; });
+    setOtp(next);
+    inputRefs.current[Math.min(value.length, 5)]?.focus();
+  };
 
-    const pastedData = event.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 6);
+  const extractMessage = (value) => {
+    if (!value) return "";
+    if (typeof value === "string") return value.trim();
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const m = extractMessage(item);
+        if (m) return m;
+      }
+      return "";
+    }
+    if (typeof value === "object") {
+      return String(
+        value.message ||
+        value.body?.message ||
+        value.data?.message ||
+        value.response?.message ||
+        value.response ||
+        value.result?.message ||
+        value.result ||
+        ""
+      ).trim();
+    }
+    return "";
+  };
 
-    if (!pastedData) return;
-
-    const newOtp = [...otp];
-
-    pastedData.split("").forEach((digit, index) => {
-      newOtp[index] = digit;
-    });
-
-    setOtp(newOtp);
-
-    const nextIndex = Math.min(
-      pastedData.length,
-      otp.length - 1
+  const responseConfirmsVerification = (value) => {
+    if (!value) return false;
+    const text = JSON.stringify(value).toLowerCase();
+    return (
+      text.includes('"verified":true') ||
+      text.includes('"success":true') ||
+      text.includes('"status":"verified"') ||
+      text.includes('"status":"success"') ||
+      text.includes("otp verified") ||
+      text.includes("otp successfully verified") ||
+      text.includes("otp verification successful") ||
+      text.includes("successfully verified") ||
+      text.includes("verification successful")
     );
-
-    inputRefs.current[nextIndex]?.focus();
   };
 
   const handleVerify = async () => {
     const enteredOtp = otp.join("");
-
     if (enteredOtp.length !== 6) {
       setError("Please enter the complete 6-digit OTP.");
       return;
     }
-
+    if (!onBookingId) {
+      setError("Booking information is missing.");
+      return;
+    }
     if (verifying) return;
 
     setVerifying(true);
     setError("");
+    setBackendMessage("");
     setSuccess(false);
 
     try {
-      const response = await fetch(
-        "https://ugo-cyclesharing.app.n8n.cloud/webhook/otp-verification",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            booking_id: onBookingId,
-            OTP: enteredOtp,
-          }),
-        }
-      );
+      const response = await fetch(webhook, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          booking_id: onBookingId,
+          OTP: enteredOtp,
+        }),
+      });
 
-      /*
-       * The webhook may return different response formats, and in some
-       * n8n workflows it may return an empty/very small response even
-       * though the database was successfully updated.
-       */
-      const responseText = await response.text();
-
+      const text = await response.text();
       let result = null;
-
-      if (responseText) {
-        try {
-          result = JSON.parse(responseText);
-        } catch {
-          result = responseText;
-        }
+      if (text) {
+        try { result = JSON.parse(text); }
+        catch { result = text; }
       }
 
-      console.log("OTP verification HTTP status:", response.status);
-      console.log("OTP verification webhook response:", result);
+      const message = extractMessage(result);
 
       if (!response.ok) {
-        const backendError =
-          typeof result === "string"
-            ? result
-            : result?.message ||
-              result?.error ||
-              result?.body?.message ||
-              result?.body?.error ||
-              "";
-
-        throw new Error(
-          backendError ||
-          `OTP verification failed: ${response.status} ${response.statusText}`
-        );
+        throw new Error(message || `OTP verification failed: ${response.status}`);
       }
 
-      /*
-       * ------------------------------------------------------------
-       * SOURCE OF TRUTH: booking_table.status
-       * ------------------------------------------------------------
-       *
-       * Your booking status enum contains `otp_verified`.
-       * After the backend verifies the OTP, it should update the
-       * booking status to otp_verified.
-       *
-       * This is more reliable than depending on the exact text/shape
-       * returned by the n8n webhook.
-       */
-      let bookingStatus = null;
+      if (message) setBackendMessage(message);
 
-      const checkBookingStatus = async () => {
-        const {
-          data: booking,
-          error: bookingError,
-        } = await supabase
+      if (isReturnOtp) {
+        if (!responseConfirmsVerification(result) &&
+            !/verified|success/i.test(message)) {
+          setError(message || "Return OTP verification was not confirmed by the backend.");
+          setBackendMessage("");
+          return;
+        }
+        setSuccess(true);
+        return;
+      }
+
+      let bookingStatus = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const { data } = await supabase
           .from("booking_table")
           .select("status")
           .eq("id", onBookingId)
           .maybeSingle();
 
-        if (bookingError) {
-          console.error(
-            "Error checking booking verification status:",
-            bookingError
-          );
-          return null;
-        }
+        bookingStatus = String(data?.status || "").trim().toLowerCase();
 
-        return booking?.status
-          ? String(booking.status).trim().toLowerCase()
-          : null;
-      };
-
-      /*
-       * Give the backend a short amount of time to finish updating
-       * booking_table. We check a few times instead of assuming that
-       * the HTTP response itself means verification succeeded.
-       */
-      for (let attempt = 0; attempt < 5; attempt++) {
-        bookingStatus = await checkBookingStatus();
-
-        console.log(
-          `Booking status check ${attempt + 1}:`,
-          bookingStatus
-        );
-
-        if (
-          bookingStatus === "payment_pending" ||
-          bookingStatus === "active"
-        ) {
-          break;
-        }
-
-        if (attempt < 4) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, 500)
-          );
-        }
+        if (["otp_verified", "payment_pending", "active"].includes(bookingStatus)) break;
+        if (attempt < 4) await new Promise(r => setTimeout(r, 500));
       }
 
-      /*
-       * Also inspect the webhook response. This is a fallback in case
-       * the backend confirms verification in its response but the DB
-       * update has not become visible yet.
-       */
-      const responseCandidates = [];
-
-      const collectResponseValues = (value) => {
-        if (value === null || value === undefined) return;
-
-        if (typeof value === "string") {
-          responseCandidates.push(value);
-          return;
-        }
-
-        if (typeof value !== "object") return;
-
-        Object.entries(value).forEach(([key, child]) => {
-          if (
-            key.toLowerCase().includes("otp") ||
-            key.toLowerCase().includes("verif") ||
-            key.toLowerCase().includes("success") ||
-            key.toLowerCase().includes("status") ||
-            key.toLowerCase().includes("message") ||
-            key.toLowerCase().includes("result") ||
-            key.toLowerCase().includes("response")
-          ) {
-            if (
-              typeof child === "string" ||
-              typeof child === "boolean" ||
-              typeof child === "number"
-            ) {
-              responseCandidates.push(String(child));
-            }
-          }
-
-          if (child && typeof child === "object") {
-            collectResponseValues(child);
-          }
-        });
-      };
-
-      if (Array.isArray(result)) {
-        result.forEach(collectResponseValues);
-      } else {
-        collectResponseValues(result);
-      }
-
-      const normalizedResponse = responseCandidates
-        .join(" ")
-        .trim()
-        .toLowerCase();
-
-      const responseConfirmsVerification =
-        normalizedResponse.includes("otp verified") ||
-        normalizedResponse.includes("otp successfully verified") ||
-        normalizedResponse.includes("otp verification successful") ||
-        normalizedResponse.includes("successfully verified") ||
-        normalizedResponse.includes("verification successful") ||
-        normalizedResponse.includes("verification success") ||
-        normalizedResponse.includes("verified successfully") ||
-        normalizedResponse.includes("verified: true") ||
-        normalizedResponse.includes("success: true");
-
-      /*
-       * SUCCESS:
-       * - Prefer booking_table.status = otp_verified/active.
-       * - Otherwise accept an explicit verification confirmation
-       *   from the webhook.
-       */
       const verified =
-        bookingStatus === "payment_pending" ||
-        bookingStatus === "active" ||
-        responseConfirmsVerification;
+        ["otp_verified", "payment_pending", "active"].includes(bookingStatus) ||
+        responseConfirmsVerification(result);
 
       if (!verified) {
-        console.error(
-          "OTP verification was not confirmed.",
-          {
-            bookingStatus,
-            webhookResponse: result,
-          }
-        );
-
-        setError(
-          "OTP verification was not confirmed by the backend. Please try again."
-        );
+        setError(message || "OTP verification was not confirmed by the backend. Please try again.");
+        setBackendMessage("");
         return;
       }
 
-      /*
-       * Clear every previous error before changing the screen.
-       * This prevents the red OTP error from remaining visible
-       * after a successful verification.
-       */
-      setError("");
       setSuccess(true);
-    } catch (error) {
-      console.error("OTP verification error:", error);
-
+    } catch (e) {
+      console.error("OTP verification error:", e);
       setSuccess(false);
-      setError(
-        error.message ||
-        "Unable to verify OTP. Please try again."
-      );
+      setBackendMessage("");
+      setError(e.message || "Unable to verify OTP. Please try again.");
     } finally {
       setVerifying(false);
     }
   };
+
   const handleClear = () => {
     setOtp(["", "", "", "", "", ""]);
     setError("");
     setSuccess(false);
-
+    setBackendMessage("");
     inputRefs.current[0]?.focus();
   };
 
   if (success) {
     return (
       <div className="owner-otp-page">
-
-        <button
-          type="button"
-          className="otp-back-button"
-          onClick={onBackToNotifications}
-          aria-label="Back to notifications"
-        >
-          <span className="otp-back-arrow">←</span>
-          <span>Notifications</span>
+        <button type="button" className="otp-back-button" onClick={onBackToNotifications}>
+          <span className="otp-back-arrow">←</span><span>Notifications</span>
         </button>
-
         <div className="otp-success-card">
-
-          <div className="success-icon">
-            ✓
-          </div>
-
-          <span className="otp-eyebrow">
-            VERIFICATION SUCCESSFUL
-          </span>
-
-          <h1>
-            OTP Successfully Verified
-          </h1>
-
-          <p>
-            OTP successfully verified.
-            The rental can now officially begin.
-          </p>
-
+          <div className="success-icon">✓</div>
+          <span className="otp-eyebrow">VERIFICATION SUCCESSFUL</span>
+          <h1>{isReturnOtp ? "Return OTP Verified" : "OTP Successfully Verified"}</h1>
+          {backendMessage ? (
+            <p className="otp-backend-message" role="status">{backendMessage}</p>
+          ) : (
+            <p>{isReturnOtp ? "The return OTP has been successfully verified." : "OTP successfully verified. The rental can now officially begin."}</p>
+          )}
           <div className="rental-status">
             <span className="status-dot"></span>
-            Rental Active
+            {isReturnOtp ? "Return Verified" : "Rental Active"}
           </div>
-
-          <button
-            className="continue-button"
-            onClick={onContinue}
-          >
-            Continue
-          </button>
-
+          <button className="continue-button" onClick={onContinue}>Continue</button>
         </div>
-
       </div>
     );
   }
 
   return (
     <div className="owner-otp-page">
-
-      <button
-        type="button"
-        className="otp-back-button"
-        onClick={onBackToNotifications}
-        aria-label="Back to notifications"
-      >
-        <span className="otp-back-arrow">←</span>
-        <span>Notifications</span>
+      <button type="button" className="otp-back-button" onClick={onBackToNotifications}>
+        <span className="otp-back-arrow">←</span><span>Notifications</span>
       </button>
 
       <main className="otp-container">
-
-        {/* Top icon */}
-        <div className="otp-icon">
-          🔐
-        </div>
-
-        <span className="otp-eyebrow">
-          OWNER VERIFICATION
-        </span>
-
-        <h1>
-          Verify Renter
-        </h1>
-
+        <div className="otp-icon">🔐</div>
+        <span className="otp-eyebrow">{isReturnOtp ? "RETURN VERIFICATION" : "OWNER VERIFICATION"}</span>
+        <h1>{isReturnOtp ? "Verify Return" : "Verify Renter"}</h1>
         <p className="otp-description">
-          Enter the 6-digit OTP provided by the
-          renter to start the rental.
+          {isReturnOtp
+            ? "Enter the 6-digit OTP provided for returning the cycle."
+            : "Enter the 6-digit OTP provided by the renter to start the rental."}
         </p>
 
-        {/* Booking information */}
         <div className="booking-info">
-
-          <div className="info-row">
-            <span>Renter</span>
-            <strong>
-              {bookingLoading ? "Loading..." : renterName}
-            </strong>
-          </div>
-
-          <div className="info-row">
-            <span>Cycle</span>
-            <strong>
-              {bookingLoading ? "Loading..." : cycleName}
-            </strong>
-          </div>
-
+          <div className="info-row"><span>Renter</span><strong>{bookingLoading ? "Loading..." : renterName}</strong></div>
+          <div className="info-row"><span>Cycle</span><strong>{bookingLoading ? "Loading..." : cycleName}</strong></div>
         </div>
 
-        {/* OTP inputs */}
-        <div
-          className="otp-input-container"
-          onPaste={handlePaste}
-        >
-
+        <div className="otp-input-container" onPaste={handlePaste}>
           {otp.map((digit, index) => (
-            <input
-              key={index}
-              ref={(element) => {
-                inputRefs.current[index] = element;
-              }}
-              className={`otp-input ${
-                error ? "otp-error" : ""
-              }`}
-              type="text"
-              inputMode="numeric"
-              maxLength="1"
-              value={digit}
-              onChange={(event) =>
-                handleChange(
-                  event.target.value,
-                  index
-                )
-              }
-              onKeyDown={(event) =>
-                handleKeyDown(event, index)
-              }
-              aria-label={`OTP digit ${index + 1}`}
-            />
+            <input key={index} ref={el => { inputRefs.current[index] = el; }}
+              className={`otp-input ${error ? "otp-error" : ""}`}
+              type="text" inputMode="numeric" maxLength="1" value={digit}
+              disabled={verifying}
+              onChange={e => handleChange(e.target.value, index)}
+              onKeyDown={e => handleKeyDown(e, index)}
+              aria-label={`OTP digit ${index + 1}`} />
           ))}
-
         </div>
 
-        {error && (
-          <p className="otp-error-message">
-            {error}
-          </p>
+        {verifying && (
+          <div className="otp-verifying-message" role="status" aria-live="polite">
+            <span className="otp-loading-spinner"></span>
+            <span>Verifying OTP with the backend...</span>
+          </div>
         )}
 
-        {/* Verify */}
-        <button
-          className="verify-button"
-          onClick={handleVerify}
-          disabled={verifying}
-        >
-          {verifying ? (
-            <>
-              <span className="otp-loading-spinner" aria-hidden="true"></span>
-              Verifying OTP...
-            </>
-          ) : (
-            "Verify & Start Rental"
-          )}
+        {error && !verifying && <p className="otp-error-message">{error}</p>}
+
+        <button className="verify-button" onClick={handleVerify} disabled={verifying}>
+          {verifying ? "Verifying OTP..." : isReturnOtp ? "Verify Return OTP" : "Verify & Start Rental"}
         </button>
 
-        {/* Clear */}
-        <button
-          className="clear-button"
-          onClick={handleClear}
-          disabled={verifying}
-        >
+        <button className="clear-button" onClick={handleClear} disabled={verifying}>
           Clear OTP
         </button>
 
-        {verifying && (
-          <div className="otp-verifying-message" role="status">
-            <span className="otp-loading-spinner" aria-hidden="true"></span>
-            <span>Waiting for backend confirmation...</span>
-          </div>
-        )}
-
-        <p className="security-note">
-          🔒 The rental will begin only after
-          successful verification.
-        </p>
-
+        <p className="security-note">🔒 Verification is completed only after successful backend confirmation.</p>
       </main>
-
     </div>
   );
 }

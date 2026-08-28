@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./ReturnPage.css";
 import { supabase } from "./supabase";
 
-function ReturnPage({ bookingId, onBack, onBackHome, onReturnProcessing }) {
+function ReturnPage({ bookingId, onBack, onReturnProcessing }) {
   const [booking, setBooking] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -13,6 +13,8 @@ function ReturnPage({ bookingId, onBack, onBackHome, onReturnProcessing }) {
 
   const [cameraError, setCameraError] = useState("");
   const [error, setError] = useState("");
+
+  const [backendMessage, setBackendMessage] = useState("");
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -416,7 +418,12 @@ function ReturnPage({ bookingId, onBack, onBackHome, onReturnProcessing }) {
       // ========================================================
 
       setBackendMessage(message);
-      onReturnProcessing(booking.id);
+
+      // Show the backend confirmation on this page before leaving it.
+      // Keep the existing return-processing callback intact.
+      setTimeout(() => {
+        onReturnProcessing(booking.id);
+      }, 1800);
 
     } catch (err) {
       console.error(
@@ -578,6 +585,13 @@ function ReturnPage({ bookingId, onBack, onBackHome, onReturnProcessing }) {
         {error && (
           <div className="return-error">
             {error}
+          </div>
+        )}
+
+        {/* Backend response shown after the return is verified */}
+        {backendMessage && (
+          <div className="return-backend-message" role="status">
+            {backendMessage}
           </div>
         )}
 

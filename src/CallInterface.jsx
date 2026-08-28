@@ -8,20 +8,10 @@ import useWebRTCCall from "./useWebRTCCall";
 import "./CallInterface.css";
 
 /*
- * CallInterface
- *
- * This component handles:
- *
- * 1. Incoming call detection
- * 2. Accept
- * 3. Reject
- * 4. Active voice call
- * 5. Mute / unmute
- * 6. End call
- *
- * It should be rendered somewhere that remains mounted
- * while the user is using the UgO application.
- */
+============================================================
+CALL INTERFACE
+============================================================
+*/
 
 const CallInterface = ({
   supabase,
@@ -35,344 +25,517 @@ const CallInterface = ({
     useState(null);
 
   /*
-   * --------------------------------------------------------
-   * Listen for incoming calls
-   * --------------------------------------------------------
-   */
+  ==========================================================
+  HANDLE INCOMING CALL
+  ==========================================================
+  */
+
+  const handleIncomingCall =
+    useCallback(
+      (call) => {
+        if (!call) {
+          return;
+        }
+
+        /*
+        ------------------------------------------------------
+        ONLY CALLING SESSIONS
+        ------------------------------------------------------
+        */
+
+        if (
+          call.status !== "calling"
+        ) {
+          return;
+        }
+
+        /*
+        ------------------------------------------------------
+        IGNORE OUR OWN OUTGOING CALL
+        ------------------------------------------------------
+
+        We use outgoingBookingId exactly as your
+        existing working flow does.
+        ------------------------------------------------------
+        */
+
+        if (
+          outgoingBookingId &&
+          call.booking_id ===
+            outgoingBookingId
+        ) {
+          console.log(
+            "Ignoring own outgoing call:",
+            call.id
+          );
+
+          return;
+        }
+
+        /*
+        ------------------------------------------------------
+        USER MUST BE A PARTICIPANT
+        ------------------------------------------------------
+        */
+
+        if (
+          call.renter_id !== userId &&
+          call.owner_id !== userId
+        ) {
+          return;
+        }
+
+        console.log(
+          "Incoming UgO call:",
+          call
+        );
+
+        setIncomingCall(call);
+      },
+      [
+        outgoingBookingId,
+        userId,
+      ]
+    );
 
   /*
-   * --------------------------------------------------------
-   * HANDLE INCOMING CALL
-   * --------------------------------------------------------
-   *
-   * A call_session contains both participants, but it does
-   * not store which participant initiated the call.
-   *
-   * The current browser already knows the booking it is
-   * calling through outgoingBookingId. Therefore, ignore
-   * that booking here so the caller cannot see its own
-   * incoming-call popup.
-   */
-  const handleIncomingCall = useCallback(
-    (call) => {
-      if (!call) {
-        return;
-      }
-
-      /*
-       * Only calls in the initial calling state can
-       * produce an answer/reject popup.
-       */
-      if (call.status !== "calling") {
-        return;
-      }
-
-      /*
-       * CRITICAL:
-       * If this browser initiated a call for the same
-       * booking, do not show the incoming interface.
-       */
-      if (
-        outgoingBookingId &&
-        call.booking_id === outgoingBookingId
-      ) {
-        console.log(
-          "Ignoring own outgoing call:",
-          call.id
-        );
-        return;
-      }
-
-      /*
-       * Make sure the current user is actually one of
-       * the two participants.
-       */
-      if (
-        call.renter_id !== userId &&
-        call.owner_id !== userId
-      ) {
-        return;
-      }
-
-      console.log(
-        "Incoming UgO call:",
-        call
-      );
-
-      setIncomingCall(call);
-    },
-    [
-      outgoingBookingId,
-      userId,
-    ]
-  );
+  ==========================================================
+  SUPABASE REALTIME
+  ==========================================================
+  */
 
   useEffect(() => {
-    if (!supabase || !userId) {
+    if (
+      !supabase ||
+      !userId
+    ) {
       return;
     }
 
-    /*
-     * Listen for calls where the current user is either
-     * the owner or the renter.
-     *
-     * We later ignore calls belonging to the booking that
-     * this same browser is currently calling from.
-     */
-    const channel = supabase
-      .channel(
-        `incoming-calls-${userId}`
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "call_sessions",
-          filter: `owner_id=eq.${userId}`,
-        },
-        (payload) => {
-          handleIncomingCall(payload.new);
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "call_sessions",
-          filter: `renter_id=eq.${userId}`,
-        },
-        (payload) => {
-          handleIncomingCall(payload.new);
-        }
-      )
-      .subscribe();
+    const channel =
+      supabase
+        .channel(
+          `incoming-calls-${userId}`
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "call_sessions",
+            filter:
+              `owner_id=eq.${userId}`,
+          },
+          (payload) => {
+            handleIncomingCall(
+              payload.new
+            );
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "call_sessions",
+            filter:
+              `renter_id=eq.${userId}`,
+          },
+          (payload) => {
+            handleIncomingCall(
+              payload.new
+            );
+          }
+        )
+        .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(
+        channel
+      );
     };
   }, [
     handleIncomingCall,
     supabase,
     userId,
-    outgoingBookingId,
   ]);
 
   /*
-   * --------------------------------------------------------
-   * Start a call
-   * --------------------------------------------------------
-   *
-   * This function is what your existing
-   * "Call Owner" button should call.
-   */
+  ==========================================================
+  NEW:
+  SERVICE WORKER MESSAGE
+  ==========================================================
 
-  const startCall = useCallback(
-    async (booking) => {
-      if (!booking) {
-        console.error(
-          "Booking information is required."
-        );
-        return;
-      }
+  This does NOT create a WebRTC call.
 
-      if (!userId) {
-        console.error(
-          "User is not authenticated."
-        );
-        return;
-      }
+  It only recovers the existing call_sessions record
+  and feeds it into the existing incoming-call UI.
+  ==========================================================
+  */
 
-      /*
-       * Only renter or owner belonging to this
-       * booking can initiate the call.
-       */
-      if (
-        booking.renter_id !== userId &&
-        booking.owner_id !== userId
-      ) {
-        console.error(
-          "You are not part of this booking."
-        );
-        return;
-      }
+  useEffect(() => {
+    if (
+      !supabase ||
+      !userId
+    ) {
+      return;
+    }
 
-      /*
-       * Calls should only be allowed during
-       * an active rental.
-       */
-      if (
-        booking.status !== "active" &&
-        booking.status !== "return_pending"
-      ) {
-        console.error(
-          "Calling is available only during an active rental or while a return is pending."
-        );
-        return;
-      }
+    if (
+      !("serviceWorker" in navigator)
+    ) {
+      return;
+    }
 
-      /*
-       * Prevent multiple calls from the same
-       * interface.
-       */
-      if (activeCall || incomingCall) {
-        console.log(
-          "A call is already in progress."
-        );
-        return;
-      }
+    const handleServiceWorkerMessage =
+      async (event) => {
+        const data =
+          event.data;
 
-      try {
-        /*
-         * Create call session.
-         */
-        const { data: call, error } =
-          await supabase
-            .from("call_sessions")
-            .insert({
-              booking_id: booking.id,
-              renter_id:
-                booking.renter_id,
-              owner_id:
-                booking.owner_id,
-              status: "calling",
-            })
-            .select("*")
-            .single();
-
-        if (error) {
-          throw error;
+        if (
+          !data ||
+          data.type !==
+            "INCOMING_CALL_NOTIFICATION"
+        ) {
+          return;
         }
 
-        if (!call) {
-          throw new Error(
-            "Call session was not created."
+        const callId =
+          data.call_id;
+
+        if (!callId) {
+          return;
+        }
+
+        console.log(
+          "Incoming call from Service Worker:",
+          callId
+        );
+
+        try {
+          /*
+          ----------------------------------------------------
+          FETCH EXISTING CALL SESSION
+          ----------------------------------------------------
+          */
+
+          const {
+            data: call,
+            error,
+          } = await supabase
+            .from("call_sessions")
+            .select("*")
+            .eq(
+              "id",
+              callId
+            )
+            .maybeSingle();
+
+          if (error) {
+            throw error;
+          }
+
+          if (!call) {
+            console.warn(
+              "Call session not found:",
+              callId
+            );
+
+            return;
+          }
+
+          /*
+          ----------------------------------------------------
+          SEND INTO EXISTING CALL HANDLER
+          ----------------------------------------------------
+          */
+
+          handleIncomingCall(
+            call
+          );
+        } catch (error) {
+          console.error(
+            "Failed to recover incoming call:",
+            error
           );
         }
+      };
 
-        /*
-         * The person who pressed the button
-         * becomes the caller.
-         */
-        setActiveCall({
-          callId: call.id,
-          remoteUserId:
-            userId === booking.renter_id
-              ? booking.owner_id
-              : booking.renter_id,
-          isCaller: true,
-        });
-      } catch (error) {
-        console.error(
-          "Failed to start UgO call:",
-          error
-        );
-      }
-    },
-    [
-      activeCall,
-      incomingCall,
-      supabase,
-      userId,
-    ]
-  );
+    navigator.serviceWorker.addEventListener(
+      "message",
+      handleServiceWorkerMessage
+    );
+
+    return () => {
+      navigator.serviceWorker.removeEventListener(
+        "message",
+        handleServiceWorkerMessage
+      );
+    };
+  }, [
+    handleIncomingCall,
+    supabase,
+    userId,
+  ]);
 
   /*
-   * --------------------------------------------------------
-   * Accept incoming call
-   * --------------------------------------------------------
-   */
+  ==========================================================
+  NEW:
+  CHECK URL FOR CALL FROM SERVICE WORKER
+  ==========================================================
 
-  const acceptCall = useCallback(
-    async () => {
-      if (!incomingCall) {
-        return;
-      }
+  This handles the case where UgO was completely closed
+  and the notification opens:
 
-      try {
-        /*
-         * Mark call as ringing.
-         */
-        const { error } =
-          await supabase
+  /?incoming_call=CALL_ID
+  ==========================================================
+  */
+
+  useEffect(() => {
+    if (
+      !supabase ||
+      !userId
+    ) {
+      return;
+    }
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const callId =
+      params.get(
+        "incoming_call"
+      );
+
+    if (!callId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadIncomingCall =
+      async () => {
+        try {
+          console.log(
+            "Loading notification call:",
+            callId
+          );
+
+          const {
+            data: call,
+            error,
+          } = await supabase
             .from("call_sessions")
+            .select("*")
+            .eq(
+              "id",
+              callId
+            )
+            .maybeSingle();
+
+          if (error) {
+            throw error;
+          }
+
+          if (
+            cancelled ||
+            !call
+          ) {
+            return;
+          }
+
+          handleIncomingCall(
+            call
+          );
+
+          /*
+          ----------------------------------------------------
+          REMOVE CALL QUERY FROM URL
+          ----------------------------------------------------
+          */
+
+          const cleanUrl =
+            new URL(
+              window.location.href
+            );
+
+          cleanUrl.searchParams.delete(
+            "incoming_call"
+          );
+
+          cleanUrl.searchParams.delete(
+            "booking_id"
+          );
+
+          cleanUrl.searchParams.delete(
+            "call_action"
+          );
+
+          window.history.replaceState(
+            {},
+            document.title,
+            cleanUrl.pathname +
+              cleanUrl.search +
+              cleanUrl.hash
+          );
+        } catch (error) {
+          console.error(
+            "Failed to load notification call:",
+            error
+          );
+        }
+      };
+
+    loadIncomingCall();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    handleIncomingCall,
+    supabase,
+    userId,
+  ]);
+
+  /*
+  ==========================================================
+  ACCEPT CALL
+  ==========================================================
+  */
+
+  const acceptCall =
+    useCallback(
+      async () => {
+        if (
+          !incomingCall
+        ) {
+          return;
+        }
+
+        try {
+          /*
+          ----------------------------------------------------
+          MARK CALL AS RINGING
+          ----------------------------------------------------
+          */
+
+          const {
+            error,
+          } = await supabase
+            .from(
+              "call_sessions"
+            )
             .update({
-              status: "ringing",
+              status:
+                "ringing",
             })
             .eq(
               "id",
               incomingCall.id
             );
 
-        if (error) {
-          throw error;
+          if (error) {
+            throw error;
+          }
+
+          /*
+          ----------------------------------------------------
+          EXISTING WEBRTC RECEIVER FLOW
+          ----------------------------------------------------
+          */
+
+          setActiveCall({
+            callId:
+              incomingCall.id,
+
+            remoteUserId:
+              userId ===
+              incomingCall.renter_id
+                ? incomingCall.owner_id
+                : incomingCall.renter_id,
+
+            isCaller:
+              false,
+          });
+
+          setIncomingCall(
+            null
+          );
+        } catch (error) {
+          console.error(
+            "Failed to accept call:",
+            error
+          );
+        }
+      },
+      [
+        incomingCall,
+        supabase,
+        userId,
+      ]
+    );
+
+  /*
+  ==========================================================
+  REJECT CALL
+  ==========================================================
+  */
+
+  const rejectCall =
+    useCallback(
+      async () => {
+        if (
+          !incomingCall
+        ) {
+          return;
         }
 
-        /*
-         * Receiver joins WebRTC.
-         */
-        setActiveCall({
-          callId: incomingCall.id,
-          remoteUserId:
-            userId === incomingCall.renter_id
-              ? incomingCall.owner_id
-              : incomingCall.renter_id,
-          isCaller: false,
-        });
+        try {
+          const {
+            error,
+          } = await supabase
+            .from(
+              "call_sessions"
+            )
+            .update({
+              status:
+                "rejected",
 
-        setIncomingCall(null);
-      } catch (error) {
-        console.error(
-          "Failed to accept call:",
-          error
-        );
-      }
-    },
-    [incomingCall, supabase]
-  );
+              ended_at:
+                new Date().toISOString(),
+            })
+            .eq(
+              "id",
+              incomingCall.id
+            );
 
-  /*
-   * --------------------------------------------------------
-   * Reject incoming call
-   * --------------------------------------------------------
-   */
-
-  const rejectCall = useCallback(
-    async () => {
-      if (!incomingCall) {
-        return;
-      }
-
-      try {
-        await supabase
-          .from("call_sessions")
-          .update({
-            status: "rejected",
-            ended_at:
-              new Date().toISOString(),
-          })
-          .eq(
-            "id",
-            incomingCall.id
+          if (error) {
+            throw error;
+          }
+        } catch (error) {
+          console.error(
+            "Failed to reject call:",
+            error
           );
-      } catch (error) {
-        console.error(
-          "Failed to reject call:",
-          error
-        );
-      }
+        }
 
-      setIncomingCall(null);
-    },
-    [incomingCall, supabase]
-  );
+        setIncomingCall(
+          null
+        );
+      },
+      [
+        incomingCall,
+        supabase,
+      ]
+    );
 
   /*
-   * --------------------------------------------------------
-   * Active WebRTC call
-   * --------------------------------------------------------
-   */
+  ==========================================================
+  ACTIVE WEBRTC CALL
+  ==========================================================
+  */
 
   if (activeCall) {
     return (
@@ -381,17 +544,19 @@ const CallInterface = ({
         userId={userId}
         call={activeCall}
         onClose={() => {
-          setActiveCall(null);
+          setActiveCall(
+            null
+          );
         }}
       />
     );
   }
 
   /*
-   * --------------------------------------------------------
-   * Incoming call popup
-   * --------------------------------------------------------
-   */
+  ==========================================================
+  INCOMING CALL POPUP
+  ==========================================================
+  */
 
   if (incomingCall) {
     return (
@@ -416,7 +581,9 @@ const CallInterface = ({
             <button
               type="button"
               className="ugo-call-reject-button"
-              onClick={rejectCall}
+              onClick={
+                rejectCall
+              }
             >
               Reject
             </button>
@@ -424,7 +591,9 @@ const CallInterface = ({
             <button
               type="button"
               className="ugo-call-accept-button"
-              onClick={acceptCall}
+              onClick={
+                acceptCall
+              }
             >
               Accept
             </button>
@@ -437,20 +606,14 @@ const CallInterface = ({
     );
   }
 
-  /*
-   * Nothing to display when there is
-   * no incoming or active call.
-   */
-
   return null;
 };
 
-
 /*
- * ============================================================
- * ACTIVE CALL COMPONENT
- * ============================================================
- */
+============================================================
+ACTIVE CALL
+============================================================
+*/
 
 const ActiveCall = ({
   supabase,
@@ -466,72 +629,112 @@ const ActiveCall = ({
     remoteAudioRef,
   } = useWebRTCCall({
     supabase,
-    callId: call.callId,
+    callId:
+      call.callId,
     userId,
-    isCaller: call.isCaller,
+    isCaller:
+      call.isCaller,
     enabled: true,
   });
 
   /*
-   * Close local interface when call has ended.
-   */
+  ----------------------------------------------------------
+  CLOSE AFTER CALL ENDS
+  ----------------------------------------------------------
+  */
+
   useEffect(() => {
     if (
       callStatus === "ended" ||
       callStatus === "failed"
     ) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 1000);
+      const timer =
+        setTimeout(() => {
+          onClose();
+        }, 1000);
 
       return () => {
-        clearTimeout(timer);
+        clearTimeout(
+          timer
+        );
       };
     }
-  }, [callStatus, onClose]);
+  }, [
+    callStatus,
+    onClose,
+  ]);
 
-  const handleEndCall = async () => {
-    await endCall();
-    onClose();
-  };
+  /*
+  ----------------------------------------------------------
+  END CALL
+  ----------------------------------------------------------
+  */
 
-  let statusText = "Connecting...";
+  const handleEndCall =
+    async () => {
+      await endCall();
+      onClose();
+    };
 
-  if (callStatus === "ringing") {
-    statusText = "Ringing...";
+  /*
+  ----------------------------------------------------------
+  STATUS TEXT
+  ----------------------------------------------------------
+  */
+
+  let statusText =
+    "Connecting...";
+
+  if (
+    callStatus === "ringing"
+  ) {
+    statusText =
+      "Ringing...";
   }
 
-  if (callStatus === "connecting") {
-    statusText = "Connecting...";
+  if (
+    callStatus === "connecting"
+  ) {
+    statusText =
+      "Connecting...";
   }
 
-  if (callStatus === "connected") {
-    statusText = "Connected";
+  if (
+    callStatus === "connected"
+  ) {
+    statusText =
+      "Connected";
   }
 
-  if (callStatus === "failed") {
+  if (
+    callStatus === "failed"
+  ) {
     statusText =
       "Unable to establish the call";
   }
 
-  if (callStatus === "disconnected") {
+  if (
+    callStatus === "disconnected"
+  ) {
     statusText =
       "Connection interrupted";
   }
 
-  if (callStatus === "ended") {
-    statusText = "Call ended";
+  if (
+    callStatus === "ended"
+  ) {
+    statusText =
+      "Call ended";
   }
+
+  /*
+  ----------------------------------------------------------
+  UI
+  ----------------------------------------------------------
+  */
 
   return (
     <div className="ugo-active-call-overlay">
-
-      {/*
-       * Hidden audio element.
-       *
-       * WebRTC puts the remote audio stream
-       * into this element.
-       */}
 
       <audio
         ref={remoteAudioRef}
@@ -558,7 +761,9 @@ const ActiveCall = ({
           <button
             type="button"
             className="ugo-call-mute-button"
-            onClick={toggleMute}
+            onClick={
+              toggleMute
+            }
           >
             {isMuted
               ? "Unmute"
@@ -568,7 +773,9 @@ const ActiveCall = ({
           <button
             type="button"
             className="ugo-call-end-button"
-            onClick={handleEndCall}
+            onClick={
+              handleEndCall
+            }
           >
             End Call
           </button>

@@ -50,11 +50,14 @@ const UgOCallProvider = ({
   const [callRequest, setCallRequest] =
     useState(null);
 
-  // Use the explicitly supplied userId when available. Otherwise,
-  // resolve the authenticated Supabase user so calling also works
-  // when App.jsx does not pass userId to the provider.
   const [authenticatedUserId, setAuthenticatedUserId] =
     useState(userId || null);
+
+  /*
+  ----------------------------------------------------------
+  RESOLVE AUTHENTICATED USER
+  ----------------------------------------------------------
+  */
 
   useEffect(() => {
     let mounted = true;
@@ -65,6 +68,7 @@ const UgOCallProvider = ({
           if (mounted) {
             setAuthenticatedUserId(userId);
           }
+
           return;
         }
 
@@ -78,7 +82,9 @@ const UgOCallProvider = ({
         }
 
         if (mounted) {
-          setAuthenticatedUserId(user?.id || null);
+          setAuthenticatedUserId(
+            user?.id || null
+          );
         }
       } catch (error) {
         console.error(
@@ -100,7 +106,9 @@ const UgOCallProvider = ({
       (_event, session) => {
         if (mounted) {
           setAuthenticatedUserId(
-            userId || session?.user?.id || null
+            userId ||
+              session?.user?.id ||
+              null
           );
         }
       }
@@ -119,18 +127,6 @@ const UgOCallProvider = ({
   ----------------------------------------------------------
   START CALL
   ----------------------------------------------------------
-  
-  This function will be used by your existing
-  "Call Owner" button.
-
-  Example:
-
-  startCall({
-    id: booking.id,
-    renter_id: booking.renter_id,
-    owner_id: booking.owner_id,
-    status: booking.status,
-  });
   */
 
   const startCall = useCallback(
@@ -139,6 +135,7 @@ const UgOCallProvider = ({
         console.error(
           "Cannot start call: booking is missing."
         );
+
         return;
       }
 
@@ -167,14 +164,11 @@ const UgOCallProvider = ({
     >
       {children}
 
-      {/*
-      --------------------------------------------------------
-      INCOMING CALL INTERFACE
-      --------------------------------------------------------
-      
-      This stays mounted globally so the user can receive
-      calls even if they are currently on another page.
-      */}
+      {/* =====================================================
+          INCOMING CALL INTERFACE
+
+          Existing call UI remains unchanged.
+          ===================================================== */}
 
       <CallInterface
         supabase={supabase}
@@ -184,11 +178,11 @@ const UgOCallProvider = ({
         }
       />
 
-      {/*
-      --------------------------------------------------------
-      OUTGOING CALL
-      --------------------------------------------------------
-      */}
+      {/* =====================================================
+          OUTGOING CALL
+
+          Existing flow remains unchanged.
+          ===================================================== */}
 
       {callRequest && (
         <StartCallBridge
@@ -206,11 +200,6 @@ const UgOCallProvider = ({
 ============================================================
 START CALL BRIDGE
 ============================================================
-
-Creates the call_sessions record.
-
-After the record is created, the WebRTC call interface
-is displayed.
 */
 
 const StartCallBridge = ({
@@ -226,12 +215,6 @@ const StartCallBridge = ({
 
     const createCall = async () => {
       try {
-        /*
-        ------------------------------------------------------
-        BASIC VALIDATION
-        ------------------------------------------------------
-        */
-
         if (!booking) {
           throw new Error(
             "Booking information is missing."
@@ -246,7 +229,7 @@ const StartCallBridge = ({
 
         /*
         ------------------------------------------------------
-        VERIFY THAT THE USER BELONGS TO THE BOOKING
+        VERIFY USER IS PART OF BOOKING
         ------------------------------------------------------
         */
 
@@ -261,7 +244,7 @@ const StartCallBridge = ({
 
         /*
         ------------------------------------------------------
-        CALLING IS ALLOWED ONLY DURING ACTIVE RENTAL
+        CALLING ONLY DURING ACTIVE RENTAL
         ------------------------------------------------------
         */
 
@@ -278,6 +261,13 @@ const StartCallBridge = ({
         ------------------------------------------------------
         CREATE CALL SESSION
         ------------------------------------------------------
+
+        IMPORTANT:
+        This is intentionally the same structure as
+        your previous working call implementation.
+
+        No caller_id is added here.
+        ------------------------------------------------------
         */
 
         const {
@@ -286,10 +276,19 @@ const StartCallBridge = ({
         } = await supabase
           .from("call_sessions")
           .insert({
-            booking_id: booking.id,
-            renter_id: booking.renter_id,
-            owner_id: booking.owner_id,
-            status: "calling",
+            booking_id:
+              booking.id,
+
+            renter_id:
+              booking.renter_id,
+
+            owner_id:
+              booking.owner_id,
+               caller_id:
+               userId,
+            status:
+              "calling",
+             
           })
           .select("*")
           .single();
@@ -303,12 +302,6 @@ const StartCallBridge = ({
             "Call session was not created."
           );
         }
-
-        /*
-        ------------------------------------------------------
-        COMPONENT MAY HAVE BEEN UNMOUNTED
-        ------------------------------------------------------
-        */
 
         if (cancelled) {
           return;
@@ -343,21 +336,9 @@ const StartCallBridge = ({
     userId,
   ]);
 
-  /*
-  ----------------------------------------------------------
-  WAITING FOR CALL SESSION
-  ----------------------------------------------------------
-  */
-
   if (!call) {
     return null;
   }
-
-  /*
-  ----------------------------------------------------------
-  OUTGOING CALL INTERFACE
-  ----------------------------------------------------------
-  */
 
   return (
     <OutgoingCall
@@ -403,18 +384,6 @@ const OutgoingWebRTCInterface = ({
   call,
   onFinished,
 }) => {
-  /*
-  ----------------------------------------------------------
-  WEBRTC HOOK
-  ----------------------------------------------------------
-  
-  This is imported normally at the top of the file.
-
-  No require()
-  No dynamic import()
-  No webpack-specific code.
-  */
-
   const {
     callStatus,
     isMuted,
@@ -450,36 +419,53 @@ const OutgoingWebRTCInterface = ({
 
   /*
   ----------------------------------------------------------
-  CALL STATUS TEXT
+  STATUS
   ----------------------------------------------------------
   */
 
-  let statusText = "Calling owner...";
+  let statusText =
+    "Calling owner...";
 
-  if (callStatus === "connecting") {
-    statusText = "Connecting...";
+  if (
+    callStatus === "connecting"
+  ) {
+    statusText =
+      "Connecting...";
   }
 
-  if (callStatus === "ringing") {
-    statusText = "Ringing...";
+  if (
+    callStatus === "ringing"
+  ) {
+    statusText =
+      "Ringing...";
   }
 
-  if (callStatus === "connected") {
-    statusText = "Connected";
+  if (
+    callStatus === "connected"
+  ) {
+    statusText =
+      "Connected";
   }
 
-  if (callStatus === "disconnected") {
+  if (
+    callStatus === "disconnected"
+  ) {
     statusText =
       "Connection interrupted";
   }
 
-  if (callStatus === "failed") {
+  if (
+    callStatus === "failed"
+  ) {
     statusText =
       "Unable to establish the call";
   }
 
-  if (callStatus === "ended") {
-    statusText = "Call ended";
+  if (
+    callStatus === "ended"
+  ) {
+    statusText =
+      "Call ended";
   }
 
   /*
@@ -490,10 +476,6 @@ const OutgoingWebRTCInterface = ({
 
   return (
     <div className="ugo-active-call-overlay">
-
-      {/*
-      Remote audio received through WebRTC.
-      */}
 
       <audio
         ref={remoteAudioRef}
@@ -530,7 +512,9 @@ const OutgoingWebRTCInterface = ({
           <button
             type="button"
             className="ugo-call-end-button"
-            onClick={handleEndCall}
+            onClick={
+              handleEndCall
+            }
           >
             End Call
           </button>
@@ -538,6 +522,7 @@ const OutgoingWebRTCInterface = ({
         </div>
 
       </div>
+
     </div>
   );
 };

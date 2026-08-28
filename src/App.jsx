@@ -38,6 +38,7 @@ function AppContent() {
   // references it. This prevents the temporal-dead-zone error:
   // "Cannot access 'userId' before initialization".
   const [userId, setUserId] = useState(null);
+  const [otpPageData, setOtpPageData] = useState(null);
 
 // ============================================================
 // PUSH NOTIFICATION HELPERS
@@ -2381,6 +2382,46 @@ const handleNotificationAction = async (
     return;
   }
 
+  const normalizedNotificationAction = String(
+    action || ""
+  ).trim().toLowerCase();
+
+  if (
+    normalizedNotificationAction.includes("return") &&
+    normalizedNotificationAction.includes("otp")
+  ) {
+    const actionData =
+      notification?.action_data || {};
+
+    const returnBookingId =
+      actionData.booking_id ||
+      actionData.bookingId ||
+      actionData.booking?.id ||
+      notification?.booking_id ||
+      notification?.bookingId ||
+      null;
+
+    if (!returnBookingId) {
+      console.error(
+        "Return OTP notification is missing booking_id:",
+        notification
+      );
+      return;
+    }
+
+    setBookingId(returnBookingId);
+
+    setOtpPageData({
+      notification,
+      actionType: action,
+      ...actionData,
+    });
+
+    setPage("OTP");
+
+    return;
+  }
+
 
   /*
   |--------------------------------------------------------------------------
@@ -2394,13 +2435,38 @@ const handleNotificationAction = async (
     // ENTER RENTAL OTP
     // --------------------------------------------------
 
-    case "enter_rental_OTP":
-      setBookingId(notification.action_data.booking_id)
+    case "enter_rental_OTP": {
+      const actionData =
+        notification?.action_data || {};
+
+      const rentalBookingId =
+        actionData.booking_id ||
+        actionData.bookingId ||
+        actionData.booking?.id ||
+        notification?.booking_id ||
+        notification?.bookingId ||
+        null;
+
+      if (!rentalBookingId) {
+        console.error(
+          "Rental OTP notification is missing booking_id:",
+          notification
+        );
+        return;
+      }
+
+      setBookingId(rentalBookingId);
+
+      setOtpPageData({
+        notification,
+        actionType: action,
+        ...actionData,
+      });
 
       setPage("OTP");
 
       break;
-
+    }
 
     // --------------------------------------------------
     // REPORT OWNER
@@ -2788,7 +2854,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/renerate-otp",
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/regenerate-otp",
           {
             method: "POST",
 
@@ -3350,6 +3416,8 @@ const handleNotificationAction = async (
           onBookingId = {bookingId}
           onBackToNotifications={handleNotifications}
           onContinue = {handleOtpPageContinue}
+          actionType={otpPageData?.actionType}
+          notification={otpPageData?.notification}
         />
       )}
 
@@ -3458,7 +3526,7 @@ const handleNotificationAction = async (
       {page === "ReturnProcessing" && (
         <ReturnProcessing
           bookingId={selectedBookingId}
-          onBackHome={handleBackToHomePageRental}
+          onBackNotifications={() => handleOpenNotifications("ReturnProcessing")}
           onReview={handleReturnReview}
         />
       )}

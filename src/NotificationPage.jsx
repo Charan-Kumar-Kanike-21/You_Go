@@ -14,8 +14,6 @@ function NotificationPage({
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushEnabling, setPushEnabling] = useState(false);
 
-
-
   // ---------------------------------------------------------
   // PUSH NOTIFICATION STATE
   // ---------------------------------------------------------
@@ -330,7 +328,6 @@ function NotificationPage({
     if (!actionData || typeof actionData !== "object") {
       return null;
     }
-
     const decision =
       actionData.rental_decision ||
       actionData.rentalDecision ||
@@ -377,7 +374,6 @@ function NotificationPage({
       if (String(item.id) === String(notification.id)) {
         return false;
       }
-
       return (
         getRentalDecision(item) === "accepted" &&
         String(getRentalCycleId(item)) === String(cycleId)
@@ -575,7 +571,6 @@ const handleRentalDecision = async (notification, decision) => {
   if (!notification?.id || processingRentalId) return;
 
   const currentDecision = getRentalDecision(notification);
-
   if (currentDecision) return;
 
   /*
@@ -587,12 +582,14 @@ const handleRentalDecision = async (notification, decision) => {
    * The lock is stored in action_data so it survives page refreshes.
    */
   if (isRentalRequestTemporarilyLocked(notification)) {
+    
     return;
   }
 
   /*
    * Existing same-cycle protection.
    */
+
   if (
     decision === "accepted" &&
     hasAcceptedRentalForCycle(notification)
@@ -2144,7 +2141,6 @@ const handleRentalDecision = async (notification, decision) => {
                                       className="notification-action-button accept-button"
                                       disabled={
                                         isProcessing ||
-                                        cycleAlreadyOccupied ||
                                         temporarilyLocked
                                       }
                                       onClick={() =>
