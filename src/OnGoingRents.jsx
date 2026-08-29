@@ -3,8 +3,8 @@ import "./OnGoingRents.css";
 import { supabase } from "./supabase";
 import { useUgOCall } from "./CallProvider";
 
-const EXTRA_TIME_RATE_PER_MINUTE = 5;
-const GRACE_PERIOD_MINUTES = 15;
+const EXTRA_TIME_RATE_PER_MINUTE = 2;
+const GRACE_PERIOD_MINUTES = 10;
 const LOW_TIME_WARNING_MINUTES = 5;
 
 /* ============================================================
@@ -350,9 +350,6 @@ function RentalCard({
   };
 
   const getTimeInformation = () => {
-    // IMPORTANT: the timeline belongs only to this booking.
-    // Both renter and owner receive the exact same start/end timestamps
-    // from booking_table and therefore see the same countdown.
     const start = parseRentalTime(
       rental.start_time ??
         rental.rental_start_time ??
@@ -366,52 +363,115 @@ function RentalCard({
     );
 
     const now = currentTime.getTime();
-    const gracePeriod = GRACE_PERIOD_MINUTES * 60 * 1000;
+
+    const bookingStatus = String(
+      rental.booking_status ??
+        rental.status ??
+        ""
+    )
+      .trim()
+      .toLowerCase();
+
+    const gracePeriod =
+      GRACE_PERIOD_MINUTES * 60 * 1000;
 
     const validStart = Number.isFinite(start);
     const validEnd = Number.isFinite(end);
-    const validTimeline = validStart && validEnd && end > start;
+    const validTimeline =
+      validStart &&
+      validEnd &&
+      end > start;
 
-    if (validEnd) {
+    /*
+    * ============================================================
+    * CASE 1: ACTIVE
+    * ============================================================
+    *
+    * Active rental uses:
+    *
+    * end_time
+    *     ↓
+    * 10 minute grace period
+    *     ↓
+    * extra time
+    */
+    if (bookingStatus === "active") {
+      if (!validEnd) {
+        return {
+          start,
+          end,
+          totalDuration: 0,
+          elapsed: 0,
+          remaining: 0,
+          graceRemaining: 0,
+          extraMinutes: 0,
+          rentalCompleted: false,
+          inGracePeriod: false,
+          extraTimeStarted: false,
+          invalidTime: true,
+          incompleteTimeline: true,
+          lowTimeWarning: false,
+          remainingMinutes: 0,
+        };
+      }
+
+      // Rental time has not ended yet.
       if (now <= end) {
-        const remaining = Math.max(0, end - now);
-        const remainingMinutes = Math.ceil(remaining / (60 * 1000));
+        const remaining = Math.max(
+          0,
+          end - now
+        );
 
-        // If both timestamps are available, the progress timeline is
-        // calculated strictly from this booking's start_time/end_time.
-        const totalDuration = validTimeline ? end - start : 0;
-        const elapsed = validTimeline
-          ? Math.min(totalDuration, Math.max(0, now - start))
-          : 0;
+        const remainingMinutes = Math.ceil(
+          remaining / (60 * 1000)
+        );
 
         return {
           start,
           end,
-          totalDuration,
-          elapsed,
+          totalDuration: validTimeline
+            ? end - start
+            : 0,
+          elapsed: validTimeline
+            ? Math.min(
+                end - start,
+                Math.max(0, now - start)
+              )
+            : 0,
           remaining,
           graceRemaining: gracePeriod,
           extraMinutes: 0,
           rentalCompleted: false,
           inGracePeriod: false,
           extraTimeStarted: false,
-          invalidTime: !validEnd,
+          invalidTime: false,
           incompleteTimeline: !validTimeline,
-          lowTimeWarning: remainingMinutes <= LOW_TIME_WARNING_MINUTES,
+          lowTimeWarning:
+            remainingMinutes <=
+            LOW_TIME_WARNING_MINUTES,
           remainingMinutes,
         };
       }
 
+      // Time after rental end.
       const timeAfterRental = now - end;
 
+      // Still inside 10-minute grace period.
       if (timeAfterRental <= gracePeriod) {
         return {
           start,
           end,
-          totalDuration: validTimeline ? end - start : 0,
-          elapsed: validTimeline ? end - start : 0,
+          totalDuration: validTimeline
+            ? end - start
+            : 0,
+          elapsed: validTimeline
+            ? end - start
+            : 0,
           remaining: 0,
-          graceRemaining: Math.max(0, gracePeriod - timeAfterRental),
+          graceRemaining: Math.max(
+            0,
+            gracePeriod - timeAfterRental
+          ),
           extraMinutes: 0,
           rentalCompleted: true,
           inGracePeriod: true,
@@ -423,21 +483,30 @@ function RentalCard({
         };
       }
 
-      // Extra time is based ONLY on this booking's end_time.
-      const extraTimeFromThisRental = Math.max(0, now - end);
-      const extraMinutesForThisRental = Math.max(
+      // Grace period is over.
+      // Extra time starts ONLY after the 10-minute grace period.
+      const extraTime =
+        timeAfterRental - gracePeriod;
+
+      const extraMinutes = Math.max(
         0,
-        Math.ceil(extraTimeFromThisRental / (60 * 1000))
+        Math.ceil(
+          extraTime / (60 * 1000)
+        )
       );
 
       return {
         start,
         end,
-        totalDuration: validTimeline ? end - start : 0,
-        elapsed: validTimeline ? end - start : 0,
+        totalDuration: validTimeline
+          ? end - start
+          : 0,
+        elapsed: validTimeline
+          ? end - start
+          : 0,
         remaining: 0,
         graceRemaining: 0,
-        extraMinutes: extraMinutesForThisRental,
+        extraMinutes,
         rentalCompleted: true,
         inGracePeriod: false,
         extraTimeStarted: true,
@@ -448,23 +517,181 @@ function RentalCard({
       };
     }
 
-    // Only the absence of a usable end_time makes the countdown impossible.
-    // A missing start_time must NOT hide a valid end countdown.
+
+    /*
+    * ============================================================
+    * CASE 2: RETURN_PENDING
+    * ============================================================
+    *
+    * IMPORTANT:
+    *
+    * For return_pending we DO NOT use end_time.
+    * We DO NOT use the 10-minute rental grace period.
+    *
+    * The only deadline is:
+    *
+    * booking_table.return_accept_deadline
+    *
+    * Before deadline:
+    *     extraMinutes = 0
+    *     deduction = 0
+    *
+    * After deadline:
+    *     extraMinutes = minutes after deadline
+    *     deduction = extraMinutes × 2
+    */
+    if (bookingStatus === "return_pending") {
+      const returnDeadline =
+        parseRentalTime(
+          rental.return_accept_deadline
+        );
+
+      const validReturnDeadline =
+        Number.isFinite(returnDeadline);
+
+      if (!validReturnDeadline) {
+        return {
+          start,
+          end,
+          totalDuration: validTimeline
+            ? end - start
+            : 0,
+          elapsed: validTimeline
+            ? end - start
+            : 0,
+          remaining: 0,
+          graceRemaining: 0,
+          extraMinutes: 0,
+          rentalCompleted: true,
+          inGracePeriod: false,
+          extraTimeStarted: false,
+          invalidTime: false,
+          incompleteTimeline: !validTimeline,
+          lowTimeWarning: false,
+          remainingMinutes: 0,
+
+          returnPending: true,
+          returnAcceptDeadline: NaN,
+          returnAcceptDeadlineExceeded: false,
+        };
+      }
+
+      // Deadline has NOT been exceeded.
+      if (now <= returnDeadline) {
+        const remaining =
+          Math.max(
+            0,
+            returnDeadline - now
+          );
+
+        const remainingMinutes =
+          Math.ceil(
+            remaining / (60 * 1000)
+          );
+
+        return {
+          start,
+          end,
+          totalDuration: validTimeline
+            ? end - start
+            : 0,
+          elapsed: validTimeline
+            ? end - start
+            : 0,
+          remaining: 0,
+          graceRemaining: 0,
+          extraMinutes: 0,
+          rentalCompleted: true,
+          inGracePeriod: false,
+          extraTimeStarted: false,
+          invalidTime: false,
+          incompleteTimeline: !validTimeline,
+          lowTimeWarning: false,
+          remainingMinutes,
+
+          returnPending: true,
+          returnAcceptDeadline:
+            returnDeadline,
+          returnAcceptDeadlineExceeded:
+            false,
+        };
+      }
+
+      // Deadline exceeded.
+      const extraTimeAfterDeadline =
+        now - returnDeadline;
+
+      const extraMinutes =
+        Math.max(
+          0,
+          Math.ceil(
+            extraTimeAfterDeadline /
+              (60 * 1000)
+          )
+        );
+
+      return {
+        start,
+        end,
+        totalDuration: validTimeline
+          ? end - start
+          : 0,
+        elapsed: validTimeline
+          ? end - start
+          : 0,
+        remaining: 0,
+        graceRemaining: 0,
+        extraMinutes,
+        rentalCompleted: true,
+        inGracePeriod: false,
+        extraTimeStarted: true,
+        invalidTime: false,
+        incompleteTimeline: !validTimeline,
+        lowTimeWarning: false,
+        remainingMinutes: 0,
+
+        returnPending: true,
+        returnAcceptDeadline:
+          returnDeadline,
+        returnAcceptDeadlineExceeded:
+          true,
+      };
+    }
+
+
+    /*
+    * ============================================================
+    * FALLBACK
+    * ============================================================
+    *
+    * Unknown status → no extra-time deduction.
+    */
     return {
       start,
       end,
-      totalDuration: 0,
-      elapsed: 0,
+      totalDuration: validTimeline
+        ? end - start
+        : 0,
+      elapsed: validTimeline
+        ? Math.min(
+            end - start,
+            Math.max(0, now - start)
+          )
+        : 0,
       remaining: 0,
       graceRemaining: 0,
       extraMinutes: 0,
       rentalCompleted: false,
       inGracePeriod: false,
       extraTimeStarted: false,
-      invalidTime: true,
-      incompleteTimeline: true,
+      invalidTime: !validEnd,
+      incompleteTimeline: !validTimeline,
       lowTimeWarning: false,
       remainingMinutes: 0,
+
+      returnPending: false,
+      returnAcceptDeadline: NaN,
+      returnAcceptDeadlineExceeded: false,
     };
   };
 
@@ -779,8 +1006,8 @@ function RentalCard({
                 </div>
 
                 <p>
-                  Your 15-minute grace period has ended. Extra-time charges are now
-                  being deducted from your security deposit.
+                  Your {GRACE_PERIOD_MINUTES}-minute grace period has ended.
+                  Extra-time charges are now being deducted from your security deposit.
                 </p>
 
                 <div className="extra-rate">

@@ -5,11 +5,12 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { supabase } from "./supabase";
+import UgOCallProvider from "./CallProvider";
 
 import Landing from "./Landing";
 import Login from "./Login";
 import SignUp from "./SignUp";
-// import ChoicePage from "./ChoicePage";
+import ChoicePage from "./ChoicePage";
 import HomePageRental from "./HomePageRental";
 import Listing from "./Listing";
 import Profile from "./Profile";
@@ -27,20 +28,14 @@ import OwnerDetails from "./OwnerDetails";
 import CycleVerification from "./CycleVerification";
 import TermsAndConditions from "./TermsAndConditions";
 import ResetPassword from "./ResetPassword";
-import ReturnProcessing from "./ReturnProcessing";
-import ReviewPage from "./ReviewPage";
 import "./App.css";
-import UgOCallProvider from "./CallProvider";
 
 function AppContent() {
 
-  // Keep authentication state declared before any helper/effect that
-  // references it. This prevents the temporal-dead-zone error:
-  // "Cannot access 'userId' before initialization".
+  
   const [userId, setUserId] = useState(null);
-  const [otpPageData, setOtpPageData] = useState(null);
-
-// ============================================================
+  const [pageData, setPageData] = useState(null);
+  // ============================================================
 // PUSH NOTIFICATION HELPERS
 // ============================================================
 
@@ -79,13 +74,7 @@ const urlBase64ToUint8Array = (base64String) => {
 
 const enablePushNotifications = async () => {
   try {
-    console.log(
-      "🔔 Starting UgO push notification setup..."
-    );
-
-    // --------------------------------------------------------
-    // 1. USER AUTHENTICATION
-    // --------------------------------------------------------
+    console.log("🔔 Starting push notification setup...");
 
     if (!userId) {
       alert("Please log in first.");
@@ -118,48 +107,16 @@ const enablePushNotifications = async () => {
     }
 
     // --------------------------------------------------------
-    // 3. CHECK / REQUEST NOTIFICATION PERMISSION
+    // 1. Ask for notification permission
     // --------------------------------------------------------
 
-    let permission =
-      Notification.permission;
+    const permission =
+      await Notification.requestPermission();
 
     console.log(
-      "Current notification permission:",
+      "Notification permission:",
       permission
     );
-
-    /*
-     * Only request permission if the browser has
-     * not decided yet.
-     */
-
-    if (permission === "default") {
-      permission =
-        await Notification.requestPermission();
-
-      console.log(
-        "Notification permission after request:",
-        permission
-      );
-    }
-
-    // --------------------------------------------------------
-    // PERMISSION DENIED
-    // --------------------------------------------------------
-
-    if (permission === "denied") {
-      alert(
-        "Notifications are blocked for UgO. " +
-        "Please allow notifications in your browser's site settings and try again."
-      );
-
-      return;
-    }
-
-    // --------------------------------------------------------
-    // PERMISSION WAS NOT GRANTED
-    // --------------------------------------------------------
 
     if (permission !== "granted") {
       alert(
@@ -168,38 +125,34 @@ const enablePushNotifications = async () => {
 
       return;
     }
-
-    console.log(
-      "✅ Notification permission granted."
-    );
+    
 
     // --------------------------------------------------------
-    // 4. GET ACTIVE SERVICE WORKER
+    // 2. Get the active service worker
     // --------------------------------------------------------
 
     const registration =
       await navigator.serviceWorker.ready;
 
     console.log(
-      "✅ UgO Service Worker ready:",
+      "✅ Service Worker ready:",
       registration
     );
 
     // --------------------------------------------------------
-    // 5. CHECK EXISTING PUSH SUBSCRIPTION
+    // 3. Check whether subscription already exists
     // --------------------------------------------------------
 
     let subscription =
       await registration.pushManager.getSubscription();
 
     // --------------------------------------------------------
-    // 6. CREATE PUSH SUBSCRIPTION IF REQUIRED
+    // 4. Create subscription if necessary
     // --------------------------------------------------------
 
     if (!subscription) {
       const vapidPublicKey =
-        import.meta.env
-          .VITE_VAPID_PUBLIC_KEY;
+        import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
       if (!vapidPublicKey) {
         throw new Error(
@@ -208,7 +161,7 @@ const enablePushNotifications = async () => {
       }
 
       console.log(
-        "Creating new UgO push subscription..."
+        "Creating new push subscription..."
       );
 
       subscription =
@@ -220,25 +173,22 @@ const enablePushNotifications = async () => {
               vapidPublicKey
             ),
         });
-
-      console.log(
-        "✅ New push subscription created."
-      );
-    } else {
-      console.log(
-        "✅ Existing push subscription found."
-      );
     }
 
+    console.log(
+      "✅ Push subscription:",
+      subscription
+    );
+
     // --------------------------------------------------------
-    // 7. CONVERT SUBSCRIPTION TO JSON
+    // 5. Convert subscription to JSON
     // --------------------------------------------------------
 
     const subscriptionJSON =
       subscription.toJSON();
 
     console.log(
-      "UgO Push Subscription:",
+      "Subscription JSON:",
       subscriptionJSON
     );
 
@@ -252,92 +202,66 @@ const enablePushNotifications = async () => {
       subscriptionJSON.keys?.auth;
 
     // --------------------------------------------------------
-    // 8. VALIDATE SUBSCRIPTION DATA
+    // 6. Check whether this device is already saved
     // --------------------------------------------------------
 
-    if (
-      !endpoint ||
-      !p256dh ||
-      !auth
-    ) {
-      throw new Error(
-        "Push subscription is missing endpoint, p256dh or auth."
-      );
-    }
+    const { data: existingSubscription, error: checkError } =
+      await supabase
+        .from("push_subscriptions")
+        .select("id")
+        .eq("user_id", userId)
+        .eq(
+          "endpoint",
+          subscription.endpoint
+        )
+        .maybeSingle();
 
-    // --------------------------------------------------------
-    // 9. SAVE / UPDATE SUBSCRIPTION IN SUPABASE
-    // --------------------------------------------------------
-    //
-    // Your table has:
-    //
-    // UNIQUE(user_id, endpoint)
-    //
-    // Therefore upsert is safe.
-    //
-    // This handles:
-    //
-    // - first-time subscription
-    // - existing device
-    // - refreshed subscription keys
-    // --------------------------------------------------------
-
-    const {
-      data: savedSubscription,
-      error: subscriptionError,
-    } = await supabase
-      .from("push_subscriptions")
-      .upsert(
-        {
-          user_id: userId,
-
-          endpoint,
-
-          p256dh,
-
-          auth,
-
-          updated_at:
-            new Date().toISOString(),
-        },
-        {
-          onConflict:
-            "user_id,endpoint",
-        }
-      )
-      .select()
-      .maybeSingle();
-
-    if (subscriptionError) {
+    if (checkError) {
       console.error(
-        "❌ Failed to save push subscription:",
-        subscriptionError
+        "Subscription check error:",
+        checkError
       );
 
-      throw subscriptionError;
+      throw checkError;
     }
 
-    console.log(
-      "✅ Push subscription saved:",
-      savedSubscription
-    );
+    // --------------------------------------------------------
+    // 7. Save only if not already present
+    // --------------------------------------------------------
 
-    // --------------------------------------------------------
-    // 10. SUCCESS
-    // --------------------------------------------------------
-    //
-    // This subscription now receives BOTH:
-    //
-    // 🔔 Normal UgO notifications
-    // 📞 Incoming UgO call notifications
-    //
-    // The Edge Function decides what type of notification
-    // is being sent.
-    // --------------------------------------------------------
+    if (!existingSubscription) {
+      const { error: insertError } =
+        await supabase
+          .from("push_subscriptions")
+          .insert({
+            user_id: userId,
+            endpoint: subscription.endpoint,
+            p256dh:
+              subscriptionJSON.keys?.p256dh,
+            auth:
+              subscriptionJSON.keys?.auth,
+          });
+
+      if (insertError) {
+        console.error(
+          "Subscription insert error:",
+          insertError
+        );
+
+        throw insertError;
+      }
+
+      console.log(
+        "✅ Push subscription saved to Supabase."
+      );
+    } else {
+      console.log(
+        "✅ This device is already registered."
+      );
+    }
 
     alert(
-      "🔔 Notifications enabled successfully!\n\n" +
-      "You will also receive incoming UgO call alerts."
+      "🔔 Notifications enabled successfully!"
     );
 
   } catch (error) {
@@ -347,8 +271,7 @@ const enablePushNotifications = async () => {
     );
 
     alert(
-      "Failed to enable notifications. " +
-      "Please check the console for details."
+      "Failed to enable notifications. Check the console."
     );
   }
 };
@@ -1096,12 +1019,12 @@ useEffect(() => {
     }
 
     console.log("Opening Razorpay with:");
-    console.log("Key:", "rzp_live_TSl3eQnxqmNP83");
+    console.log("Key:", "rzp_test_TSslW485AyMVnu");
     console.log("Order:", payment.provider_order_id);
     console.log("Amount:", Number(payment.amount) * 100);
 
     const options = {
-      key: "rzp_live_TSl3eQnxqmNP83",
+      key: "rzp_test_TSslW485AyMVnu",
 
       amount: Math.round(Number(payment.amount) * 100),
 
@@ -1328,7 +1251,7 @@ useEffect(() => {
           ) {
             setPage("AdminDashboard");
           } else {
-            setPage("HomePageRental");
+            setPage("ChoicePage");
           }
         }
       }
@@ -2045,16 +1968,8 @@ useEffect(() => {
   // =========================================================
 
   const handleListingChoice = () => {
-    // Normal "List a Cycle" flow
-    // Clear any previously selected edit cycle.
-    setEditingCycleId(null);
-
     setPage("Listing");
   };
-
-  const handleNotifications = () => {
-    setPage("NotificationPage");
-  }
 
   // =========================================================
   // OPEN ONGOING RENTS
@@ -2095,6 +2010,460 @@ useEffect(() => {
   const handleProfileBack = () => {
     setPage(profileReturnPage);
   };
+
+  // =========================================================
+  // NOTIFICATION ACTIONS
+  // =========================================================
+
+  // const handleNotificationAction = (
+  //   notification,
+  //   actionType
+  // ) => {
+  //   switch (actionType) {
+  //     // -----------------------------------------------------
+  //     // RETURN CYCLE
+  //     // -----------------------------------------------------
+
+  //     case "RETURN_CYCLE":
+  //       setPage("ReturnPage");
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW RENTAL
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_RENTAL":
+  //       setPage("OnGoingRents");
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW REPORT
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_REPORT":
+  //       setPage("ReportPage");
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW CYCLE
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_CYCLE":
+  //       if (
+  //         notification.type ===
+  //         "CYCLE_VERIFICATION_ASSIGNED"
+  //       ) {
+  //         if (!notification.cycle_id) {
+  //           console.error(
+  //             "Cycle ID is missing from notification:",
+  //             notification
+  //           );
+
+  //           alert(
+  //             "Cycle ID not found in this notification."
+  //           );
+
+  //           return;
+  //         }
+
+  //         setSelectedCycle({
+  //           id: notification.cycle_id,
+  //         });
+
+  //         setPage("CycleVerification");
+  //       } else {
+  //         setPage("BookingPage");
+  //       }
+
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW EXTENSION
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_EXTENSION":
+  //       console.log(
+  //         "Open extension request"
+  //       );
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW ACCOUNT
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_ACCOUNT":
+  //       console.log(
+  //         "Open account"
+  //       );
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // RETRY PAYMENT
+  //     // -----------------------------------------------------
+
+  //     case "RETRY_PAYMENT":
+  //       console.log(
+  //         "Retry payment"
+  //       );
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW DISPUTE
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_DISPUTE":
+  //       console.log(
+  //         "Open payment dispute"
+  //       );
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // VIEW SECURITY
+  //     // -----------------------------------------------------
+
+  //     case "VIEW_SECURITY":
+  //       console.log(
+  //         "Open security settings"
+  //       );
+  //       break;
+
+  //     // -----------------------------------------------------
+  //     // DEFAULT
+  //     // -----------------------------------------------------
+
+  //     default:
+  //       console.log(
+  //         "Unknown notification action:",
+  //         actionType
+  //       );
+  //   }
+  // };
+
+  // const handleNotificationAction = (
+  //   notification,
+  //   actionType,
+  //   actionData
+  // ) => {
+
+  //   console.log(
+  //     "Handling notification action:",
+  //     {
+  //       notification,
+  //       actionType,
+  //       actionData,
+  //     }
+  //   );
+
+
+  //   /* =========================================================
+  //     ENTER RENTAL OTP
+  //     =========================================================
+      
+  //     Owner clicks:
+      
+  //     [ Enter OTP ]
+      
+  //     Opens OTP page.
+      
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       cycle_id,
+  //       renter_id,
+  //       owner_id
+  //     }
+  //   */
+
+  //   if (
+  //     actionType === "ENTER_RENTAL_OTP"
+  //   ) {
+
+  //     setPage("OTP");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     }); 
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     REPORT OWNER
+  //     =========================================================
+      
+  //     Used when:
+      
+  //     OTP expired because owner was absent.
+      
+  //     Opens report page.
+      
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       owner_id,
+  //       renter_id,
+  //       cycle_id
+  //     }
+  //   */
+
+  //   if (
+  //     actionType === "REPORT_OWNER"
+  //   ) {
+
+  //     setPage("ReportPage");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     VIEW EXTENSION
+  //     =========================================================
+      
+  //     Opens extension request page.
+      
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       extension_request_id,
+  //       cycle_id,
+  //       owner_id,
+  //       renter_id
+  //     }
+  //   */
+
+  //   if (
+  //     actionType === "VIEW_EXTENSION"
+  //   ) {
+
+  //     setCurrentPage("extension");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     RETURN CYCLE
+  //     =========================================================
+      
+  //     Opens return page.
+      
+  //     Required action_data:
+  //     {
+  //       booking_id,
+  //       cycle_id,
+  //       owner_id,
+  //       renter_id
+  //     }
+  //   */
+
+  //   if (
+  //     actionType === "RETURN_CYCLE"
+  //   ) {
+
+  //     setCurrentPage("return");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     VIEW REPORT
+  //     =========================================================
+      
+  //     Used by admins for:
+      
+  //     RETURN_PROBLEM_REPORTED
+  //     USER_REPORTED
+  //     OWNER_REPORTED
+  //     RENTER_REPORTED
+  //     CYCLE_REPORTED
+      
+  //     Required action_data:
+  //     {
+  //       report_id,
+  //       reporter_id,
+  //       reported_user_id,
+  //       booking_id,
+  //       cycle_id
+  //     }
+  //   */
+
+  //   if (
+  //     actionType === "VIEW_REPORT"
+  //   ) {
+
+  //     setCurrentPage("reportDetails");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     VIEW CYCLE
+  //     =========================================================
+      
+  //     Used mainly for:
+      
+  //     CYCLE_VERIFICATION_ASSIGNED
+      
+  //     Opens cycle verification/details page.
+      
+  //     Required action_data:
+  //     {
+  //       cycle_id,
+  //       owner_id,
+  //       admin_id
+  //     }
+  //   */
+
+  //   if (
+  //     actionType === "VIEW_CYCLE"
+  //   ) {
+
+  //     setCurrentPage("cycleDetails");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     RETRY PAYMENT
+  //     =========================================================
+      
+  //     Payment failed.
+      
+  //     Opens payment flow again using the same order details.
+      
+  //     action_data should contain the information required by
+  //     your payment flow, for example:
+      
+  //     {
+  //       booking_id,
+  //       payment_id,
+  //       order_id,
+  //       amount,
+  //       currency
+  //     }
+      
+  //     IMPORTANT:
+  //     The actual Razorpay initialization should happen in
+  //     your payment page/component, not directly inside this
+  //     notification router.
+  //   */
+
+  //   if (
+  //     actionType === "RETRY_PAYMENT"
+  //   ) {
+
+  //     setCurrentPage("payment");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     VIEW SECURITY
+  //     =========================================================
+      
+  //     Opens security/review page.
+      
+  //     Used for:
+      
+  //     NEW_LOGIN_DETECTED
+  //     SECURITY_ALERT
+  //     etc.
+  //   */
+
+  //   if (
+  //     actionType === "VIEW_SECURITY"
+  //   ) {
+
+  //     setCurrentPage("security");
+
+  //     setPageData({
+  //       notification,
+  //       actionType,
+  //       ...actionData,
+  //     });
+
+  //     return;
+  //   }
+
+
+  //   /* =========================================================
+  //     UNKNOWN ACTION
+  //     =========================================================
+  //   */
+
+  //   console.warn(
+  //     "Unknown notification action:",
+  //     actionType,
+  //     actionData
+  //   );
+  // };
+  // // }
+
+  // if (authLoading || !page) {
+  //   return (
+  //     <div
+  //       style={{
+  //         minHeight: "100vh",
+  //         display: "flex",
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         background:
+  //           "radial-gradient(circle at center, rgba(45, 130, 72, 0.75), rgba(6, 27, 20, 1))",
+  //         color: "white",
+  //         fontSize: "18px",
+  //       }}
+  //     >
+  //       Loading...
+  //     </div>
+  //   );
+  // }
+
+
+
 
   // =========================================================
   // MOBILE / RENTAL SECTION NAVIGATION
@@ -2382,41 +2751,25 @@ const handleNotificationAction = async (
     return;
   }
 
-  const normalizedNotificationAction = String(
-    action || ""
-  ).trim().toLowerCase();
 
-  if (
-    normalizedNotificationAction.includes("return") &&
-    normalizedNotificationAction.includes("otp")
-  ) {
-    const actionData =
-      notification?.action_data || {};
+  /*
+  |--------------------------------------------------------------------------
+  | PERFORM THE ACTUAL ACTION
+  |--------------------------------------------------------------------------
+  */
 
-    const returnBookingId =
-      actionData.booking_id ||
-      actionData.bookingId ||
-      actionData.booking?.id ||
-      notification?.booking_id ||
-      notification?.bookingId ||
-      null;
+  const normalizedNotificationAction = String(action || "").trim().toLowerCase();
 
+  if (normalizedNotificationAction.includes("return") && normalizedNotificationAction.includes("otp") && normalizedNotificationAction !== "regenerate_return_otp") {
+    const actionData = notification?.action_data || {};
+    const returnBookingId = actionData.booking_id || actionData.bookingId || notification?.booking_id || notification?.bookingId || null;
     if (!returnBookingId) {
-      console.error(
-        "Return OTP notification is missing booking_id:",
-        notification
-      );
+      console.error("Return OTP notification is missing booking_id:", notification);
       return;
     }
 
     setBookingId(returnBookingId);
-
-    setOtpPageData({
-      notification,
-      actionType: action,
-      ...actionData,
-    });
-
+    setPageData({ notification, actionType: action, ...actionData });
     setPage("OTP");
 
     return;
@@ -2435,38 +2788,16 @@ const handleNotificationAction = async (
     // ENTER RENTAL OTP
     // --------------------------------------------------
 
-    case "enter_rental_OTP": {
-      const actionData =
-        notification?.action_data || {};
-
-      const rentalBookingId =
-        actionData.booking_id ||
-        actionData.bookingId ||
-        actionData.booking?.id ||
-        notification?.booking_id ||
-        notification?.bookingId ||
-        null;
-
-      if (!rentalBookingId) {
-        console.error(
-          "Rental OTP notification is missing booking_id:",
-          notification
-        );
-        return;
-      }
-
-      setBookingId(rentalBookingId);
-
-      setOtpPageData({
-        notification,
-        actionType: action,
-        ...actionData,
-      });
-
+    case "enter_rental_OTP":
+    case "enter_return-OTP": {
+      const actionData = notification?.action_data || {};
+      setBookingId(actionData.booking_id || actionData.bookingId || notification?.booking_id || notification?.bookingId || "");
+      setPageData({ notification, actionType: action, ...actionData });
       setPage("OTP");
 
       break;
     }
+
 
     // --------------------------------------------------
     // REPORT OWNER
@@ -2534,38 +2865,32 @@ const handleNotificationAction = async (
     // CYCLE RETURNED
     // --------------------------------------------------
 
-    case "cycle_returned":
+    case "return_request_decision":
+      try {
 
-        try {
+        const response = await fetch(
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/return-accept",
+          {
+            method: "POST",
 
-          const response = await fetch(
-            "https://example.com/webhook/cycle-returned"
-          );
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-          if (!response.ok) {
+            body: JSON.stringify({
 
-            throw new Error(
-              "Failed to call cycle returned webhook"
-            );
-
+              booking_id:
+                notification?.action_data
+                  ?.booking_id,
+              status:
+                "accepted"
+            }),
           }
-
-          const data =
-            await response.json();
-
-          console.log(
-            "Cycle returned backend response:",
-            data
-          );
-
-        } catch (error) {
-
-          console.error(
-            "Cycle returned error:",
-            error
-          );
-
-        }
+        );
+      } catch(err){
+        console.log("failed to fetch error: ",err);
+      }
 
       break;
 
@@ -2579,6 +2904,176 @@ const handleNotificationAction = async (
       setPage("CycleVerification");
 
       break;
+
+    // --------------------------------------------------
+    // REGENERATE RETURN OTP
+    // --------------------------------------------------
+
+    case "regenerate_return_otp": {
+
+      const actionData =
+        notification?.action_data || {};
+
+      const returnBookingId =
+        actionData.booking_id ||
+        actionData.bookingId ||
+        actionData.booking?.id ||
+        notification?.booking_id ||
+        notification?.bookingId ||
+        null;
+
+      if (!returnBookingId) {
+        console.error(
+          "Return OTP regeneration is missing booking_id:",
+          notification
+        );
+
+        return false;
+      }
+
+      try {
+
+        const response = await fetch(
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/regenerate-return-otp",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+
+            body: JSON.stringify({
+              booking_id: returnBookingId
+            })
+          }
+        );
+
+        const responseText =
+          await response.text();
+
+        let result = null;
+
+        if (responseText) {
+          try {
+            result =
+              JSON.parse(responseText);
+          } catch {
+            result = responseText;
+          }
+        }
+
+        if (!response.ok) {
+
+          const backendMessage =
+            typeof result === "string"
+              ? result
+              : result?.message ||
+                result?.msg ||
+                result?.error ||
+                "";
+
+          throw new Error(
+            backendMessage ||
+            `Backend returned ${response.status}`
+          );
+        }
+
+        console.log(
+          "Return OTP regenerated successfully:",
+          result
+        );
+
+        return result ?? {};
+
+      } catch (error) {
+
+        console.error(
+          "Return OTP regeneration error:",
+          error
+        );
+
+        throw error;
+      }
+    }
+
+    case "regenerate_rental_otp": {
+      const actionData = notification?.action_data || {};
+
+      const rentalBookingId =
+        actionData.booking_id ||
+        actionData.bookingId ||
+        actionData.booking?.id ||
+        notification?.booking_id ||
+        notification?.bookingId ||
+        null;
+
+      if (!rentalBookingId) {
+        console.error(
+          "Rental OTP regeneration is missing booking_id:",
+          notification
+        );
+        return false;
+      }
+
+      try {
+        const response = await fetch(
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/regenerate-otp",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              booking_id: rentalBookingId,
+            }),
+          }
+        );
+
+        const responseText = await response.text();
+
+        let result = null;
+
+        if (responseText) {
+          try {
+            result = JSON.parse(responseText);
+          } catch {
+            result = responseText;
+          }
+        }
+
+        if (!response.ok) {
+          const backendMessage =
+            typeof result === "string"
+              ? result
+              : result?.message ||
+                result?.msg ||
+                result?.error ||
+                "";
+
+          throw new Error(
+            backendMessage ||
+            `Backend returned ${response.status}`
+          );
+        }
+
+        console.log(
+          "Rental OTP regenerated successfully:",
+          result
+        );
+
+        // NotificationPage.jsx uses this response to obtain the
+        // new expiry timestamp.
+        return result ?? {};
+      } catch (error) {
+        console.error(
+          "Rental OTP regeneration error:",
+          error
+        );
+        throw error;
+      }
+    }
 
 
     // --------------------------------------------------
@@ -2644,7 +3139,7 @@ const handleNotificationAction = async (
         const options = {
 
           key:
-            "rzp_live_TSl3eQnxqmNP83",
+            "rzp_test_TSslW485AyMVnu",
 
           amount:
             order.amount,
@@ -2788,7 +3283,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://stem61.app.n8n.cloud/webhook/booking-acceptance",
+          "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking-acceptance",
           {
             method: "POST",
 
@@ -2844,94 +3339,6 @@ const handleNotificationAction = async (
       setPage("Security");
 
       break;
-
-    // --------------------------------------------------
-    // REGENERATE RENTAL OTP
-    // --------------------------------------------------
-
-    case "regenerate_rental_otp":
-
-      try {
-
-        const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/regenerate-otp",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type": "application/json",
-            },
-
-            body: JSON.stringify({
-              booking_id:
-                notification?.action_data?.booking_id,
-
-              // Send the existing notification details too
-              notification_id:
-                notification?.id,
-
-              owner_id:
-                notification?.action_data?.owner_id,
-
-              renter_id:
-                notification?.action_data?.renter_id,
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Failed to regenerate rental OTP"
-          );
-        }
-
-        /*
-         * The backend may return JSON, but we should not fail just
-         * because the webhook returns an empty/non-JSON response.
-         */
-        const responseText = await response.text();
-
-        let data = {};
-
-        if (responseText) {
-          try {
-            data = JSON.parse(responseText);
-          } catch {
-            data = {
-              message: responseText,
-            };
-          }
-        }
-
-        console.log(
-          "Rental OTP regenerated successfully:",
-          data
-        );
-
-        /*
-         * IMPORTANT:
-         * Return the backend result to NotificationPage.
-         *
-         * NotificationPage uses the returned expiry_time immediately
-         * to restart the 15-minute countdown. Supabase realtime/fetch
-         * will subsequently pick up the actual user notification and
-         * session OTP generated by the backend.
-         */
-        return data;
-
-      } catch (error) {
-
-        console.error(
-          "Regenerate rental OTP error:",
-          error
-        );
-
-        /*
-         * Propagate the error so NotificationPage does NOT show
-         * "OTP regenerated" when the backend call actually failed.
-         */
-        throw error;
-      }
 
 
     // --------------------------------------------------
@@ -3084,7 +3491,7 @@ const handleNotificationAction = async (
             padding: "12px 18px",
             borderRadius: "10px",
             border: "none",
-            background: "white",
+            background: "#39e879",
             color: "#031f16",
             fontWeight: "700",
             cursor: "pointer",
@@ -3253,7 +3660,7 @@ const handleNotificationAction = async (
       {page === "Listing" && (
         <Listing
           onBack={handleCycleOwner}
-          editCycleId={editingCycleId}
+          // editCycleId={}
         />
       )}
 
@@ -3381,10 +3788,8 @@ const handleNotificationAction = async (
 
       {page === "NotificationPage" && (
         <NotificationPage
-          onAction={handleNotificationAction}
-          onBack={handleNotificationBack}
-          onEnableNotifications={enablePushNotifications}
-          checkPushEnabled={isPushCurrentlyEnabled}
+          onAction = {handleNotificationAction}
+          onBack = {handleNotificationBack}
         />
       )}
 
@@ -3402,7 +3807,7 @@ const handleNotificationAction = async (
             reporterRole
           }
           onBack={
-            handleOnGoingRents
+            handleOnGoingRentsBack
           }
         />
       )}
@@ -3413,11 +3818,11 @@ const handleNotificationAction = async (
 
       {page === "OTP" && (
         <OTP
-          onBookingId = {bookingId}
-          onBackToNotifications={handleNotifications}
-          onContinue = {handleOtpPageContinue}
-          actionType={otpPageData?.actionType}
-          notification={otpPageData?.notification}
+          onBookingId={bookingId}
+          actionType={pageData?.actionType}
+          notification={pageData?.notification}
+          onBackToNotifications={() => setPage("NotificationPage")}
+          onContinue={() => setPage("OnGoingRents")}
         />
       )}
 
@@ -3430,7 +3835,6 @@ const handleNotificationAction = async (
            bookingId = {selectedBookingId}
            onBack={handleOnGoingRents}
            onBackHome={handleBackToHomePageRental}
-           onReturnProcessing={handleReturnProcessing}
         />
       )}
 
@@ -3508,28 +3912,6 @@ const handleNotificationAction = async (
           and does not replace existing navigation.
       ===================================================== */}
       <RentalBottomNav />
-      {/* =====================================================
-          REVIEW PAGE
-      ===================================================== */}
-
-      {page === "ReviewPage" && (
-        <ReviewPage
-          bookingId={selectedBookingId}
-          onBackHome={handleBackToHomePageRental}
-        />
-      )}
-
-      {/* =====================================================
-          RETURN PROCESSING
-      ===================================================== */}
-
-      {page === "ReturnProcessing" && (
-        <ReturnProcessing
-          bookingId={selectedBookingId}
-          onBackNotifications={() => handleOpenNotifications("ReturnProcessing")}
-          onReview={handleReturnReview}
-        />
-      )}
     </>
   );
 }
@@ -3545,7 +3927,9 @@ const handleNotificationAction = async (
 function App() {
   return (
     <BrowserRouter>
-      <UgOCallProvider supabase={supabase}>
+      <UgOCallProvider
+        supabase={supabase}
+      >
         <AppContent />
       </UgOCallProvider>
     </BrowserRouter>
