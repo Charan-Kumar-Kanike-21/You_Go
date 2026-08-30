@@ -7,16 +7,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output
 dist
 dist-ssr
+
+# Local environment files
 *.local
+.env
+.env.*
+!.env.example
+.env.keys
+
+# Supabase local files
+.branches
+.temp
+.supabase/
+supabase/.temp/
+
+# Local Supabase backup
+supabase_backup/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# OS files
 .DS_Store
+
+# Visual Studio files
 *.suo
 *.ntvs*
 *.njsproj
