@@ -9,9 +9,9 @@ import { supabase } from "./supabase";
   Add your real backend URLs here later.
   ============================================================
 */
-const WITHDRAW_BACKEND_URL = "https://ugo-cyclesharing.app.n8n.cloud/webhook/withdraw";
+const WITHDRAW_BACKEND_URL = "https://ugonitk.app.n8n.cloud/webhook/withdraw"; //changed
 const PAY_BALANCE_BACKEND_URL = "";
-const CANCEL_BOOKING_BACKEND_URL = "https://ugo-cyclesharing.app.n8n.cloud/webhook/cancel-booking";
+const CANCEL_BOOKING_BACKEND_URL = "https://ugonitk.app.n8n.cloud/webhook/cancel-booking"; //changed
 
 /*
   Add the real support numbers here later.

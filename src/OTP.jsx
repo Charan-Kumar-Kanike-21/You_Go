@@ -16,8 +16,8 @@ function OTP({ onBookingId, onBackToNotifications, onContinue, actionType, notif
   const normalizedAction = String(actionType || notification?.action_type || "").trim().toLowerCase();
   const isReturnOtp = normalizedAction.includes("return") && normalizedAction.includes("otp");
   const webhook = isReturnOtp
-    ? "https://ugo-cyclesharing.app.n8n.cloud/webhook/return-otp-verification"
-    : "https://ugo-cyclesharing.app.n8n.cloud/webhook/otp-verification";
+    ? "https://ugonitk.app.n8n.cloud/webhook/return-otp-verification"  //changed
+    : "https://ugonitk.app.n8n.cloud/webhook/otp-verification";  //changed
 
   useEffect(() => {
     let cancelled = false;

@@ -1002,7 +1002,7 @@ useEffect(() => {
       };
 
       const response = await fetch(
-        "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking",
+        "https://ugonitk.app.n8n.cloud/webhook/booking", //changed
         {
           method: "POST",
           headers: {

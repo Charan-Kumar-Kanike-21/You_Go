@@ -2869,7 +2869,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/return-accept",
+          "https://ugonitk.app.n8n.cloud/webhook/return-accept",  //changed
           {
             method: "POST",
 
@@ -2934,7 +2934,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/regenerate-return-otp",
+          "https://ugonitk.app.n8n.cloud/webhook/regenerate-return-otp", //changed
           {
             method: "POST",
 
@@ -3018,7 +3018,7 @@ const handleNotificationAction = async (
 
       try {
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/regenerate-otp",
+          "https://ugonitk.app.n8n.cloud/webhook/regenerate-otp",  //changed
           {
             method: "POST",
             headers: {
@@ -3232,7 +3232,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking-acceptance",
+          "https://ugonitk.app.n8n.cloud/webhook/booking-acceptance",  //changed
           {
             method: "POST",
 
@@ -3283,7 +3283,7 @@ const handleNotificationAction = async (
       try {
 
         const response = await fetch(
-          "https://ugo-cyclesharing.app.n8n.cloud/webhook/booking-acceptance",
+          "https://ugonitk.app.n8n.cloud/webhook/booking-acceptance", //changed
           {
             method: "POST",
 
